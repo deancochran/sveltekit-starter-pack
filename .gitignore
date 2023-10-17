@@ -13,4 +13,7 @@ node_modules
 /dist
 .env
 .prisma
-/prisma/db/*.db
+/prisma/*.db
+/prisma/migrations/*
+/prisma/seed.ts
+/prisma/dev_data.ts
