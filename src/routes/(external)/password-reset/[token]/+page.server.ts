@@ -15,8 +15,8 @@ export const actions: Actions = {
 		const password = String(formData.get('password'));
 		const val_password = String(formData.get('val_password'));
 		if (password != val_password) {
-			console.log('Invalid Passwords or Token', password, val_password)
-			return fail(500, {message:"Invalid Passwords or Token"})
+			console.log('Invalid Passwords or Token', password, val_password);
+			return fail(500, { message: 'Invalid Passwords or Token' });
 		}
 		try {
 			const { token } = params;
@@ -27,7 +27,7 @@ export const actions: Actions = {
 
 			if (!user.email_verified) {
 				user = await auth.updateUserAttributes(user.userId, {
-					email_verified:true
+					email_verified: true
 				});
 			}
 			const session = await auth.createSession({
@@ -35,12 +35,10 @@ export const actions: Actions = {
 				attributes: {}
 			});
 			locals.auth.setSession(session); // set session cookie
-			
 		} catch (e) {
-			console.log(e)
-			return fail(500, {message:"Invalid Passwords or Token"})
-			
+			console.log(e);
+			return fail(500, { message: 'Invalid Passwords or Token' });
 		}
-		throw redirect(302,'/')
+		throw redirect(302, '/');
 	}
 };

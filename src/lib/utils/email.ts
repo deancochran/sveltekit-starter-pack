@@ -1,10 +1,9 @@
-
 import nodemailer from 'nodemailer';
-import {NODEMAILER_GMAIL_PASSWORD, NODEMAILER_GMAIL} from "$env/static/private"
+import { NODEMAILER_GMAIL_PASSWORD, NODEMAILER_GMAIL } from '$env/static/private';
 import { render } from 'svelte-email';
 
-import VerifyEmail from "$lib/emails/VerifyEmail.svelte"
-import ResetPassword from "$lib/emails/ResetPassword.svelte"
+import VerifyEmail from '$lib/emails/VerifyEmail.svelte';
+import ResetPassword from '$lib/emails/ResetPassword.svelte';
 import { generateEmailVerificationToken, generatePasswordResetToken } from './token';
 
 const transporter = nodemailer.createTransport({
@@ -19,7 +18,6 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function sendEmail(to_email: string, to_subject: string, html: string) {
-
 	const options = {
 		from: NODEMAILER_GMAIL,
 		to: to_email,
@@ -35,10 +33,8 @@ export async function sendEmail(to_email: string, to_subject: string, html: stri
 	});
 }
 
-
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function sendPasswordResetLink(user:any, url_origin:string){
+export async function sendPasswordResetLink(user: any, url_origin: string) {
 	const token = await generatePasswordResetToken(user.id);
 	const emailHtml = render({
 		template: ResetPassword,
@@ -47,12 +43,24 @@ export async function sendPasswordResetLink(user:any, url_origin:string){
 			token: token
 		}
 	});
-	await sendEmail(user.email, "Reset your Password", emailHtml);
+	await sendEmail(user.email, 'Reset your Password', emailHtml);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function sendEmailVerificationLink(user: any, url_origin: string) {
+	const token = await generateEmailVerificationToken(user.userId);
+	const emailHtml = render({
+		template: VerifyEmail,
+		props: {
+			origin: url_origin,
+			token: token
+		}
+	});
+	await sendEmail(user.email, 'Verify your email', emailHtml);
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function sendEmailVerificationLink(user:any, url_origin:string){
+export async function resendEmailVerificationLink(user: any, url_origin: string) {
 	const token = await generateEmailVerificationToken(user.id);
 	const emailHtml = render({
 		template: VerifyEmail,
@@ -61,5 +69,5 @@ export async function sendEmailVerificationLink(user:any, url_origin:string){
 			token: token
 		}
 	});
-	await sendEmail(user.email, "Verify your email", emailHtml);
+	await sendEmail(user.email, 'Verify your email', emailHtml);
 }

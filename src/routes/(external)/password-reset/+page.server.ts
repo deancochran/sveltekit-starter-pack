@@ -7,7 +7,7 @@ import { sendPasswordResetLink } from '$lib/utils/email';
 export const load: PageServerLoad = async ({ locals }) => {
 	const session = await locals.auth.validate();
 	if (!session) throw redirect(302, '/sign-in');
-	return {user:session.user};
+	return { user: session.user };
 };
 
 export const actions: Actions = {

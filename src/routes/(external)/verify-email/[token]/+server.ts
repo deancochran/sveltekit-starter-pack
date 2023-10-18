@@ -1,7 +1,7 @@
 import { validateEmailVerificationToken } from '$lib/utils/token';
 import { auth } from '$lib/server/lucia';
 
-import type { RequestHandler } from "./$types";
+import type { RequestHandler } from './$types';
 import { redirect } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
@@ -19,10 +19,9 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		});
 		locals.auth.setSession(session);
 	} catch {
-		return new Response("Invalid email verification link", {
+		return new Response('Invalid email verification link', {
 			status: 400
 		});
-
 	}
-	throw redirect(302,'/')
+	throw redirect(302, '/');
 };
