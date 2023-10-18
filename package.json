@@ -18,27 +18,28 @@
     "prisma-studio": "npx prisma studio"
   },
   "devDependencies": {
-    "@playwright/test": "^1.28.1",
-    "@sveltejs/adapter-auto": "^2.0.0",
-    "@sveltejs/kit": "^1.20.4",
+    "@playwright/test": "^1.39.0",
+    "@sveltejs/adapter-auto": "^2.1.0",
+    "@sveltejs/kit": "^1.25.2",
     "@types/node": "^20.8.6",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
+    "@types/nodemailer": "^6.4.11",
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/parser": "^6.8.0",
     "esbuild": "^0.19.5",
-    "eslint": "^8.28.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-svelte": "^2.30.0",
-    "prettier": "^2.8.0",
+    "eslint": "^8.51.0",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-plugin-svelte": "^2.34.0",
+    "prettier": "^2.8.8",
     "prettier-plugin-svelte": "^2.10.1",
     "prisma": "^5.4.2",
-    "svelte": "^4.0.5",
-    "svelte-check": "^3.4.3",
+    "svelte": "^4.2.1",
+    "svelte-check": "^3.5.2",
     "ts-node": "^10.9.1",
-    "tslib": "^2.4.1",
-    "tsx": "^3.13.0",
+    "tslib": "^2.6.2",
+    "tsx": "^3.14.0",
     "typescript": "^5.2.2",
-    "vite": "^4.4.2",
-    "vitest": "^0.32.2"
+    "vite": "^4.4.11",
+    "vitest": "^0.32.4"
   },
   "type": "module",
   "prisma": {
@@ -49,7 +50,19 @@
     "@lucia-auth/sveltekit": "^0.6.11",
     "@prisma/client": "5.4.2",
     "lucia": "^2.7.1",
+    "nodemailer": "^6.9.6",
+    "svelte-email": "^0.0.4",
     "update": "^0.7.4",
     "upgrade": "^1.1.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "braces@<2.3.1": ">=2.3.1",
+      "yargs-parser@<=5.0.0": ">=5.0.1",
+      "glob-parent@<5.1.2": ">=5.1.2",
+      "set-value@>=3.0.0 <4.0.1": ">=4.0.1",
+      "set-value@<2.0.1": ">=2.0.1",
+      "undici@<5.26.2": ">=5.26.2"
+    }
   }
 }

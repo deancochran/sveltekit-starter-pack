@@ -1,23 +1,31 @@
 // routes/signup/+page.server.ts
 import { auth } from "$lib/server/lucia";
-import { fail, redirect } from "@sveltejs/kit";
+import { redirect } from "@sveltejs/kit";
+
+
+
+import type { Actions } from "./$types";
+// import { generateEmailVerificationToken } from "$lib/utils/token";
+import { LuciaError } from "lucia";
+import { sendEmailVerificationLink } from "$lib/utils/email";
 
 import type { PageServerLoad} from "./$types";
 export const load: PageServerLoad = async ({ locals }) => {
 	const session = await locals.auth.validate();
-	if (session) throw redirect(302, "/");
+	if (session) {
+		if (!session.user.email_verified) throw redirect(302, "/verify-email");
+		throw redirect(302, "/");
+	}
 };
 
-import type { Actions } from "./$types";
-import { generateEmailVerificationToken } from "$lib/utils/token";
-import { LuciaError } from "lucia";
 
 export const actions: Actions = {
-	signup: async ({ request, locals }) => {
+	signup: async ({ request, locals, url }) => {
 		const formData = await request.formData();
 		const email = String(formData.get("email"));
 		const username = String(formData.get("username"));
 		const password = String(formData.get("password"));
+		let session
 		try {
 			const user = await auth.createUser({
 				key: {
@@ -32,14 +40,11 @@ export const actions: Actions = {
 				}
 			});
 
-			const session = await auth.createSession({
+			session = await auth.createSession({
 				userId: user.userId,
 				attributes: {}
 			});
-
-			const token = await generateEmailVerificationToken(user.userId);
-			await sendEmailVerificationLink(token);
-			
+			await sendEmailVerificationLink(user, url.origin);
 			locals.auth.setSession(session); // set session cookie
 			
 		}catch(e){
@@ -55,6 +60,12 @@ export const actions: Actions = {
 				status: 500
 			});
 		}
-		throw redirect(302, "/");
+		if(session){
+			if(session.user.email_verified){
+				throw redirect(302, "/");
+			}else{
+				throw redirect(302, "/verify-email");
+			}
+		}
 	}
 };
