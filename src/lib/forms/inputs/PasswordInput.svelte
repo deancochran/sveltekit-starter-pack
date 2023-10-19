@@ -19,4 +19,3 @@
 	/>
 </label>
 {#if errors}<span class="text-error-500">{errors}</span>{/if}
-

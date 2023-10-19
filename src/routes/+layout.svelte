@@ -5,13 +5,15 @@
 	import { getFlash } from 'sveltekit-flash-message';
 	import { page } from '$app/stores';
 	initializeStores();
-	const toastStore = getToastStore();
 
-	const toast = getFlash(page);
-	toast.subscribe((obj: ToastSettings | undefined) => {
-		if (obj) {
-			toastStore.trigger(obj);
-		}
+	const toastStore = getToastStore();
+	const toast = getFlash(page, {
+		clearOnNavigate: false,
+	});
+
+	toast.subscribe(($toast) => {
+		if (!$toast) return;
+		toastStore.trigger($toast);
 	});
 </script>
 

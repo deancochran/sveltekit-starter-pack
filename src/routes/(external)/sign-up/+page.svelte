@@ -1,4 +1,3 @@
-<!-- routes/signup/+page.svelte -->
 <script lang="ts">
 	import SignUpForm from '$lib/forms/SignUpForm.svelte';
 	import type { PageData } from './$types';
