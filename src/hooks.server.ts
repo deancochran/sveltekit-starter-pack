@@ -1,6 +1,6 @@
 // src/hooks.server.ts
 import { auth } from '$lib/server/lucia';
-import type { Handle, HandleServerError } from '@sveltejs/kit';
+import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.auth = auth.handleRequest(event);
@@ -14,8 +14,21 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
+	let theme = '';
+
+	const cookieTheme = event.cookies.get('theme');
+
+	if (cookieTheme) {
+		theme = cookieTheme;
+	} else {
+		event.cookies.set('theme', 'skeleton');
+		theme = 'skeleton';
+	}
+
 	const start = performance.now();
-	const response = await resolve(event);
+	const response = await resolve(event, {
+		transformPageChunk: ({ html }) => html.replace('data-theme=""', `data-theme="${theme}"`)
+	});
 	const end = performance.now();
 
 	const responseTime = end - start;
@@ -33,14 +46,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 };
 
 // Make sure that handleError never throws an error
-export const handleError: HandleServerError = ({ error }) => {
-	// example integration with https://sentry.io/
-	// Sentry.captureException(error, { extra: { event } });
+// export const handleError: HandleServerError = ({ error }) => {
+// 	// example integration with https://sentry.io/
+// 	// Sentry.captureException(error, { extra: { event } });
 
-	return {
-		message: 'Whoops!',
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		//@ts-ignore
-		code: error?.code ?? 'UNKNOWN'
-	};
-};
+// 	return {
+// 		message: 'Whoops!',
+// 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// 		//@ts-ignore
+// 		code: error?.code ?? 'UNKNOWN'
+// 	};
+// };

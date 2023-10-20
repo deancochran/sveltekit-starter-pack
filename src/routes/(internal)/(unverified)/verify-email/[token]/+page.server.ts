@@ -1,15 +1,15 @@
 import { validateEmailVerificationToken } from '$lib/utils/token';
 import { auth } from '$lib/server/lucia';
-import type { PageServerLoad } from './$types';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { redirect } from 'sveltekit-flash-message/server';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
 	const { params, locals, parent } = event;
 	await parent();
 	const { token } = params;
-	let valid
-	let t: ToastSettings
+	let valid;
+	let t: ToastSettings;
 	try {
 		const userId = await validateEmailVerificationToken(token);
 		const user = await auth.getUser(userId);
@@ -26,7 +26,7 @@ export const load: PageServerLoad = async (event) => {
 			message: 'Your Email has Successfully been Verified',
 			background: 'variant-filled-success'
 		};
-		valid=true
+		valid = true;
 	} catch (error) {
 		let message;
 		if (error instanceof Error) {
@@ -38,9 +38,8 @@ export const load: PageServerLoad = async (event) => {
 			message: message,
 			background: 'variant-filled-warning'
 		};
-		valid=false
+		valid = false;
 	}
-	if(valid) throw redirect('/', t, event)
-	else throw redirect('/verify-email', t, event)
-	
+	if (valid) throw redirect('/', t, event);
+	else throw redirect('/verify-email', t, event);
 };

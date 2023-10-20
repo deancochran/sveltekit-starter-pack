@@ -9,11 +9,12 @@ import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { fail } from '@sveltejs/kit';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async (event) => {
+	const { parent } = event;
+	const data = await parent();
 	const signupForm = await superValidate(signup_schema);
-	const session = await locals.auth.validate();
-	if (session) {
-		if (!session.user.email_verified) throw redirect(302, '/verify-email');
+	if (data.session) {
+		if (!data.session.user.email_verified) throw redirect(302, '/verify-email');
 		throw redirect(302, '/');
 	}
 	return { signupForm };
@@ -46,34 +47,32 @@ export const actions: Actions = {
 				await sendEmailVerificationLink(user, url.origin);
 				locals.auth.setSession(session);
 			} catch (error) {
-				let t: ToastSettings
+				let t: ToastSettings;
 				if (error instanceof PrismaClientKnownRequestError) {
 					t = {
 						message: 'Request Error',
 						background: 'variant-filled-warning'
 					} as const;
-					if(error.meta){
-						if(error.meta.target == 'email')
-						// invalid key or pass
-						t = {
-							message: 'Email Already Exists',
-							background: 'variant-filled-warning'
-						} as const;
-						if(error.meta.target == 'username')
-						// invalid key or pass
-						t = {
-							message: 'Username Already Exists',
-							background: 'variant-filled-warning'
-						} as const;
-
+					if (error.meta) {
+						if (error.meta.target == 'email')
+							// invalid key or pass
+							t = {
+								message: 'Email Already Exists',
+								background: 'variant-filled-warning'
+							} as const;
+						if (error.meta.target == 'username')
+							// invalid key or pass
+							t = {
+								message: 'Username Already Exists',
+								background: 'variant-filled-warning'
+							} as const;
 					}
-				}else{
+				} else {
 					t = {
-						message: "Unknown Error",
+						message: 'Unknown Error',
 						background: 'variant-filled-warning'
 					} as const;
-
-				}				
+				}
 				setFlash(t, event);
 				return fail(500, { form });
 			}
@@ -81,7 +80,7 @@ export const actions: Actions = {
 				message: `Successfully Registered`,
 				background: 'variant-filled-success'
 			} as const;
-			throw redirect('/verify-email',t, event)
+			throw redirect('/verify-email', t, event);
 		} else {
 			const t: ToastSettings = {
 				message: 'Invalid Form',

@@ -28,13 +28,12 @@ export const checkPasswordResetToken = async (token: string) => {
 	const storedToken = await prisma.passwordResetToken.findUnique({
 		where: { id: token }
 	});
-	if (!storedToken) return false
+	if (!storedToken) return false;
 	const tokenExpires = Number(storedToken.expires); // bigint => number conversion
 	if (!isWithinExpiration(tokenExpires)) {
-		return false
+		return false;
 	}
 	return true;
-	
 };
 export const validatePasswordResetToken = async (token: string) => {
 	const storedToken = await prisma.$transaction(async (db) => {

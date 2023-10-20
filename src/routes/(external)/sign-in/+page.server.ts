@@ -9,11 +9,12 @@ import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { LuciaError } from 'lucia';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async (event) => {
+	const { parent } = event;
+	const data = await parent();
 	const signinForm = await superValidate(signin_schema);
-	const session = await locals.auth.validate();
-	if (session) {
-		if (!session.user.email_verified) throw redirect(302, '/verify-email');
+	if (data.session) {
+		if (!data.session.user.email_verified) throw redirect(302, '/verify-email');
 		throw redirect(302, '/');
 	}
 	return { signinForm };
@@ -36,30 +37,32 @@ export const actions: Actions = {
 					attributes: {}
 				});
 				locals.auth.setSession(session); // set session cookie
-
 			} catch (error) {
-				if (error instanceof LuciaError && (error.message === "AUTH_INVALID_KEY_ID" || error.message === "AUTH_INVALID_PASSWORD")) {
+				if (
+					error instanceof LuciaError &&
+					(error.message === 'AUTH_INVALID_KEY_ID' || error.message === 'AUTH_INVALID_PASSWORD')
+				) {
 					// invalid key or pass
 					const t: ToastSettings = {
 						message: 'Invalid Credentials Provided',
 						background: 'variant-filled-warning'
 					} as const;
 					await setFlash(t, event);
-				}else{
+				} else {
 					const t: ToastSettings = {
 						message: 'Unknown Error',
 						background: 'variant-filled-warning'
 					} as const;
 					await setFlash(t, event);
 				}
-				
+
 				return fail(500, { form });
 			}
 			const t: ToastSettings = {
 				message: `Welcome ${session.user.username}`,
 				background: 'variant-filled-success'
 			} as const;
-			throw redirect('/',t, event)
+			throw redirect('/', t, event);
 		} else {
 			const t: ToastSettings = {
 				message: 'Invalid Form',

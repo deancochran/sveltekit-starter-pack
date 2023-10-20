@@ -1,5 +1,4 @@
-import { fail } from '@sveltejs/kit';
-import type { Actions } from './$types';
+import { fail, type Actions } from '@sveltejs/kit';
 import { resendEmailVerificationLink } from '$lib/utils/email';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { setFlash, redirect } from 'sveltekit-flash-message/server';
@@ -12,7 +11,7 @@ export const actions: Actions = {
 		if (session.user.email_verified) {
 			throw redirect(302, '/');
 		}
-		let t: ToastSettings
+		let t: ToastSettings;
 		try {
 			const user = await prisma.user.findUniqueOrThrow({ where: { email: session.user.email } });
 			await resendEmailVerificationLink(user, url.origin);
@@ -33,6 +32,6 @@ export const actions: Actions = {
 			} as const;
 			return fail(500);
 		}
-		setFlash(t, event)
+		setFlash(t, event);
 	}
 };

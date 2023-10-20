@@ -5,7 +5,7 @@
 	export let form_data: SuperValidated<ResendResetPassSchema>;
 	import { focusTrap } from '@skeletonlabs/skeleton';
 
-	const { form, errors, constraints, enhance } = superForm(form_data, {
+	const { enhance } = superForm(form_data, {
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: false,

@@ -13,7 +13,6 @@ export const load: PageServerLoad = async ({ parent }) => {
 	return { resendPassResetForm };
 };
 
-
 export const actions: Actions = {
 	resend: async (event) => {
 		const { url, request, locals } = event;

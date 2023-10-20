@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { PageData } from './$types';
 	import ResendPassResetForm from '$lib/forms/ResendPassResetForm.svelte';
+	import type { PageData } from './$types';
 	export let data: PageData;
 </script>
 
