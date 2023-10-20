@@ -1,9 +1,11 @@
 import type { LayoutServerLoad } from './$types';
-
-import { loadFlash } from 'sveltekit-flash-message/server';
+import { flashCookieOptions, loadFlash } from 'sveltekit-flash-message/server';
+flashCookieOptions.sameSite = 'lax';
 
 export const load: LayoutServerLoad = loadFlash(async (event) => {
-	const { parent, locals } = event;
-	await parent();
-	return { session: await locals.auth.validate() };
+	const { locals, url } = event;
+	return { 
+		session: await locals.auth.validate(),
+		pathname: url.pathname
+	};
 });

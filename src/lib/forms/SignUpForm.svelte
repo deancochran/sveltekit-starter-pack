@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { signup_schema, type SignUpSchema } from '$lib/forms/schemas';
+	import { signup_schema, type SignUpSchema } from '$lib/schemas';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import { superForm } from 'sveltekit-superforms/client';
 	export let form_data: SuperValidated<SignUpSchema>;
@@ -7,6 +7,7 @@
 	import EmailInput from '$lib/forms/inputs/EmailInput.svelte';
 	import PasswordInput from '$lib/forms/inputs/PasswordInput.svelte';
 	import { focusTrap } from '@skeletonlabs/skeleton';
+	import Link from '$lib/components/Link.svelte';
 
 	const { form, errors, constraints, enhance } = superForm(form_data, {
 		applyAction: true,
@@ -55,5 +56,6 @@
 	</section>
 	<footer class="card-footer">
 		<button form="signup" type="submit" class="btn variant-filled-primary">Sign Up</button>
+		<Link class="btn variant-soft-secondary" href="/sign-in">Sign-In to your Account</Link>
 	</footer>
 </div>

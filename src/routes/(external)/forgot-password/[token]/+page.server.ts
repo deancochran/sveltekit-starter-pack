@@ -1,23 +1,22 @@
 import { auth } from '$lib/server/lucia';
 import { validatePasswordResetToken } from '$lib/utils/token';
 import { superValidate } from 'sveltekit-superforms/server';
-import { reset_pass_schema } from '$lib/schemas';
+import { reset_forgot_pass_schema } from '$lib/schemas';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { setFlash, redirect } from 'sveltekit-flash-message/server';
 import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from '../$types';
 
 export const load: PageServerLoad = async () => {
-	const resetPassForm = await superValidate(reset_pass_schema);
-	return { resetPassForm };
+	const resetForgotPassForm = await superValidate(reset_forgot_pass_schema);
+	return { resetForgotPassForm };
 };
 
 export const actions: Actions = {
-	reset: async (event) => {
+	reset_forgot: async (event) => {
 		const { request, locals, params } = event;
-		const form = await superValidate(request, reset_pass_schema);
+		const form = await superValidate(request, reset_forgot_pass_schema);
 		let t: ToastSettings;
-		let valid;
 		if (form.valid) {
 			try {
 				const token: string = String(params.token);
@@ -44,7 +43,6 @@ export const actions: Actions = {
 					message: `Your Password has been Updated`,
 					background: 'variant-filled-success'
 				} as const;
-				valid = true;
 			} catch (error) {
 				let message;
 				if (error instanceof Error) {
@@ -56,10 +54,8 @@ export const actions: Actions = {
 					message: message,
 					background: 'variant-filled-warning'
 				} as const;
-				valid = false;
 			}
-			if (valid) throw redirect('/', t, event);
-			else throw redirect('/password-reset', t, event);
+			throw redirect('/', t, event);
 		} else {
 			const t: ToastSettings = {
 				message: 'Invalid Form',
@@ -68,5 +64,6 @@ export const actions: Actions = {
 			setFlash(t, event);
 			return { form };
 		}
+			
 	}
 };

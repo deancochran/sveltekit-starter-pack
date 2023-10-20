@@ -1,17 +1,16 @@
 <script lang="ts">
-	import { reset_pass_schema, type ResetPassSchema } from '$lib/schemas';
+	import { reset_forgot_pass_schema, type ResetForgotPassSchema } from '$lib/schemas';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import { superForm } from 'sveltekit-superforms/client';
-	export let form_data: SuperValidated<ResetPassSchema>;
+	export let form_data: SuperValidated<ResetForgotPassSchema>;
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import PasswordInput from './inputs/PasswordInput.svelte';
-	import Link from '$lib/components/Link.svelte';
 
 	const { form, errors, constraints, enhance } = superForm(form_data, {
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: false,
-		validators: reset_pass_schema
+		validators: reset_forgot_pass_schema
 	});
 	let isFocused: boolean = true;
 </script>
@@ -21,7 +20,8 @@
 		<h1>Reset Password</h1>
 	</header>
 	<section class="p-4">
-		<form id="reset" use:focusTrap={isFocused} method="POST" action="?/reset" use:enhance>
+		<form id="reset_forgot" use:focusTrap={isFocused} method="POST" action="?/reset_forgot" use:enhance>
+			
 			<PasswordInput
 				name="password"
 				label="Password"
@@ -39,7 +39,6 @@
 		</form>
 	</section>
 	<footer class="card-footer">
-		<button form="reset" type="submit" class="btn variant-filled-primary">Submit</button>
-		<Link href="/password-reset" class="btn variant-filled-primary">Need a New Password Reset Link?</Link>
+		<button form="reset_forgot" type="submit" class="btn variant-filled-primary">Submit</button>
 	</footer>
 </div>

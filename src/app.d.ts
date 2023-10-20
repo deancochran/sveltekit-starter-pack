@@ -1,6 +1,7 @@
 import type { PrismaClient } from '@prisma/client';
 import type { ToastSettings } from '@skeletonlabs/skeleton/index.js';
-// import
+import { Session } from 'lucia';
+
 
 declare global {
 	namespace NodeJS {
@@ -12,13 +13,14 @@ declare global {
 	namespace App {
 		interface Locals {
 			auth: import('lucia').AuthRequest;
-			user;
 		}
 		interface Error {
 			code: string;
 		}
 		interface PageData {
 			flash?: ToastSettings;
+			session?: Session;
+			pathname?: string;
 		}
 	}
 

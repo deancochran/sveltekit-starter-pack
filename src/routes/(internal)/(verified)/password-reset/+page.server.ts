@@ -4,7 +4,7 @@ import type { PageServerLoad } from './$types';
 import { sendPasswordResetLink } from '$lib/utils/email';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { setFlash } from 'sveltekit-flash-message/server';
-import { resend_reset_pass_schema } from '$lib/forms/schemas';
+import { resend_reset_pass_schema } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms/server';
 
 export const load: PageServerLoad = async ({ parent }) => {

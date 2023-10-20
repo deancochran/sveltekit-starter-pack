@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { resend_reset_pass_schema, type ResendResetPassSchema } from '$lib/forms/schemas';
+	import { resend_reset_pass_schema, type ResendResetPassSchema } from '$lib/schemas';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import { superForm } from 'sveltekit-superforms/client';
 	export let form_data: SuperValidated<ResendResetPassSchema>;

@@ -1,6 +1,6 @@
 // src/hooks.server.ts
 import { auth } from '$lib/server/lucia';
-import type { Handle } from '@sveltejs/kit';
+import type { Handle, HandleServerError } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.auth = auth.handleRequest(event);
@@ -46,14 +46,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 };
 
 // Make sure that handleError never throws an error
-// export const handleError: HandleServerError = ({ error }) => {
-// 	// example integration with https://sentry.io/
-// 	// Sentry.captureException(error, { extra: { event } });
-
-// 	return {
-// 		message: 'Whoops!',
-// 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// 		//@ts-ignore
-// 		code: error?.code ?? 'UNKNOWN'
-// 	};
-// };
+export const handleError: HandleServerError = ({ error }) => {
+	// example integration with https://sentry.io/
+	return {
+		message: 'Whoops!',
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		//@ts-ignore
+		code: error?.code ?? 'UNKNOWN'
+	};
+};

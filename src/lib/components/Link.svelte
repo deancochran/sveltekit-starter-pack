@@ -2,4 +2,4 @@
 	export let href: string;
 </script>
 
-<a data-sveltekit-preload-data="tap" {href}><slot /></a>
+<a data-sveltekit-preload-data="tap" {href} {...$$props}><slot /></a>

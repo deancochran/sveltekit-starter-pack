@@ -1,28 +1,26 @@
 <script lang="ts">
-	import { signin_schema, type SignInSchema } from '$lib/schemas';
+	import { forgot_pass_schema, type ForgotPassSchema } from '$lib/schemas';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import { superForm } from 'sveltekit-superforms/client';
-	export let form_data: SuperValidated<SignInSchema>;
+	export let form_data: SuperValidated<ForgotPassSchema>;
 	import EmailInput from '$lib/forms/inputs/EmailInput.svelte';
-	import PasswordInput from '$lib/forms/inputs/PasswordInput.svelte';
 	import { focusTrap } from '@skeletonlabs/skeleton';
-	import Link from '$lib/components/Link.svelte';
 
 	const { form, errors, constraints, enhance, message } = superForm(form_data, {
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: false,
-		validators: signin_schema
+		validators: forgot_pass_schema
 	});
 	let isFocused: boolean = true;
 </script>
 
 <div class="card">
 	<header class="card-header flex justify-center">
-		<h1>Sign In</h1>
+		<h1>Forgotten Password?</h1>
 	</header>
 	<section class="p-4">
-		<form id="signin" use:focusTrap={isFocused} method="POST" action="?/signin" use:enhance>
+		<form id="forgot" use:focusTrap={isFocused} method="POST" action="?/forgot" use:enhance>
 			<EmailInput
 				name="email"
 				label="Email"
@@ -30,17 +28,9 @@
 				errors={$errors.email}
 				constraints={$constraints.email}
 			/>
-			<PasswordInput
-				name="password"
-				label="Password"
-				bind:value={$form.password}
-				errors={$errors.password}
-				constraints={$constraints.password}
-			/>
 		</form>
 	</section>
 	<footer class="card-footer">
-		<button form="signin" type="submit" class="btn variant-filled-primary">Sign In</button>
-		<Link class="btn variant-soft-secondary" href="/sign-up">Create an Account</Link>
+		<button form="forgot" type="submit" class="btn variant-filled-primary">Send Reset Link</button>
 	</footer>
 </div>

@@ -3,7 +3,7 @@ import type { Actions } from './$types';
 import { sendEmailVerificationLink } from '$lib/utils/email';
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms/server';
-import { signup_schema } from '$lib/forms/schemas';
+import { signup_schema } from '$lib/schemas';
 import { setFlash, redirect } from 'sveltekit-flash-message/server';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { fail } from '@sveltejs/kit';
@@ -55,13 +55,11 @@ export const actions: Actions = {
 					} as const;
 					if (error.meta) {
 						if (error.meta.target == 'email')
-							// invalid key or pass
 							t = {
 								message: 'Email Already Exists',
 								background: 'variant-filled-warning'
 							} as const;
 						if (error.meta.target == 'username')
-							// invalid key or pass
 							t = {
 								message: 'Username Already Exists',
 								background: 'variant-filled-warning'

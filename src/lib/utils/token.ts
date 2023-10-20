@@ -8,8 +8,6 @@ export const generatePasswordResetToken = async (userId: string) => {
 	});
 	if (storedUserTokens.length > 0) {
 		const reusableStoredToken = storedUserTokens.find((token) => {
-			// check if expiration is within 1 hour
-			// and reuse the token if true
 			return isWithinExpiration(Number(token.expires) - EXPIRES_IN / 2);
 		});
 		if (reusableStoredToken) return reusableStoredToken.id;
@@ -59,8 +57,6 @@ export const generateEmailVerificationToken = async (userId: string) => {
 	});
 	if (storedUserTokens.length > 0) {
 		const reusableStoredToken = storedUserTokens.find((token) => {
-			// check if expiration is within 1 hour
-			// and reuse the token if true
 			return isWithinExpiration(Number(token.expires) - EXPIRES_IN / 2);
 		});
 		if (reusableStoredToken) return reusableStoredToken.id;

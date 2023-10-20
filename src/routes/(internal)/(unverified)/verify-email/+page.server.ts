@@ -2,15 +2,22 @@ import { fail, type Actions } from '@sveltejs/kit';
 import { resendEmailVerificationLink } from '$lib/utils/email';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { setFlash, redirect } from 'sveltekit-flash-message/server';
+import type { PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async (event) => {
+	const { parent } = event
+	const data = await parent();
+	if (data.session.user.email_verified) {
+		throw redirect(302, '/');
+	}
+};
+
 
 export const actions: Actions = {
 	resend: async (event) => {
 		const { url, locals } = event;
 		const session = await locals.auth.validate();
 		if (!session) throw redirect(302, '/sign-in');
-		if (session.user.email_verified) {
-			throw redirect(302, '/');
-		}
 		let t: ToastSettings;
 		try {
 			const user = await prisma.user.findUniqueOrThrow({ where: { email: session.user.email } });

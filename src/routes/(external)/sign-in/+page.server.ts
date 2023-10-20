@@ -3,7 +3,7 @@ import { redirect } from 'sveltekit-flash-message/server';
 import type { Actions } from './$types';
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms/server';
-import { signin_schema } from '$lib/forms/schemas';
+import { signin_schema } from '$lib/schemas';
 import { fail } from '@sveltejs/kit';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -17,7 +17,7 @@ export const load: PageServerLoad = async (event) => {
 		if (!data.session.user.email_verified) throw redirect(302, '/verify-email');
 		throw redirect(302, '/');
 	}
-	return { signinForm };
+	return { signinForm, ...data };
 };
 
 export const actions: Actions = {
@@ -42,7 +42,6 @@ export const actions: Actions = {
 					error instanceof LuciaError &&
 					(error.message === 'AUTH_INVALID_KEY_ID' || error.message === 'AUTH_INVALID_PASSWORD')
 				) {
-					// invalid key or pass
 					const t: ToastSettings = {
 						message: 'Invalid Credentials Provided',
 						background: 'variant-filled-warning'

@@ -56,7 +56,7 @@
 						type="submit"
 						name="theme"
 						value={name}
-						class:bg-primary-active-token={$storeTheme === name}
+						class:variant-soft-secondary={$storeTheme === name}
 					>
 						<span class="w-full h-full flex-auto text-center">{name}</span>
 					</button>
