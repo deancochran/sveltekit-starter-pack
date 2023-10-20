@@ -1,4 +1,4 @@
-# Full Stack SvelteKitAuthentication
+# Full Stack `S`velte`K`it`Auth`entication
 ### *Built with Superforms, Skeleton UI, Zod, Lucia, Prisma, and Nodemailer*
 
 Welcome to the SvelteKit Authentication Starter Kit, a robust and flexible boilerplate to kickstart your web application projects! This repository integrates a powerful set of tools and technologies to simplify the process of building authentication-driven apps.
