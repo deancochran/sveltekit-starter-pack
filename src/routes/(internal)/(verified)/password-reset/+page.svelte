@@ -4,4 +4,6 @@
 	export let data: PageData;
 </script>
 
-<ResendPassResetForm form_data={data.resendPassResetForm} />
+<div class="page-container">
+	<ResendPassResetForm form_data={data.resendPassResetForm} />
+</div>

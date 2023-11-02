@@ -6,6 +6,7 @@ import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { resend_reset_pass_schema } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms/server';
+import { handleSignInRedirect } from '$lib/utils/redirects/loginRedirect';
 
 export const load: PageServerLoad = async ({ parent }) => {
 	await parent();
@@ -19,7 +20,7 @@ export const actions: Actions = {
 		const form = await superValidate(request, resend_reset_pass_schema);
 
 		const session = await locals.auth.validate();
-		if (!session) throw redirect(302, '/sign-in');
+		if (!session) throw redirect(302, handleSignInRedirect(event));
 		if (form.valid) {
 			try {
 				const user = await prisma.user.findUniqueOrThrow({ where: { email: session.user.email } });
