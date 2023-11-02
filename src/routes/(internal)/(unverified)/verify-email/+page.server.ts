@@ -5,13 +5,12 @@ import { setFlash, redirect } from 'sveltekit-flash-message/server';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
-	const { parent } = event
+	const { parent } = event;
 	const data = await parent();
 	if (data.session.user.email_verified) {
 		throw redirect(302, '/');
 	}
 };
-
 
 export const actions: Actions = {
 	resend: async (event) => {
