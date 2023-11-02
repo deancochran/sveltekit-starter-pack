@@ -11,7 +11,7 @@
 	};
 </script>
 
-<button class="btn hover:variant-soft-primary" use:popup={profilePopup}>
+<button class="btn" use:popup={profilePopup}>
 	<Avatar src="invalid-image.jpg" initials="{String(session.user.username).slice(0,2)}" />
 </button>
 
@@ -19,7 +19,7 @@
 	<h3 class="h4 w-full font-serif">@{session.user.username}</h3>
 	<hr class="py-2" />
 	<div class="flex flex-col items-center justify-center align-middle gap-1">
-		<Link class="btn hover:variant-soft-primary" href="/settings">Your Profile</Link>
-		<Link class="btn hover:variant-soft-primary" href="/sign-out">Sign-Out</Link>
+		<Link class="btn " href="/settings">Your Profile</Link>
+		<Link class="btn" href="/sign-out">Sign-Out</Link>
 	</div>
 </div>

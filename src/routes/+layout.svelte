@@ -79,8 +79,8 @@
 					{#if data.session}
 						<ProfilePopup session={data.session} />
 					{:else}
-						<Link class="btn m-0 px-4 hover:variant-soft-primary" href="/sign-in">Sign-In</Link>
-						<Link class="btn m-0 px-4 hover:variant-soft-primary" href="/sign-up">Sign-Up</Link>
+						<Link primary_color_text={true} class="btn m-0 px-4" href="/sign-in">Sign-In</Link>
+						<Link primary_color_text={true} class="btn m-0 px-4" href="/sign-up">Sign-Up</Link>
 					{/if}
 				</nav>
 			</svelte:fragment>
@@ -105,7 +105,7 @@
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
 				<Link
-					class="btn btn-icon hover:variant-soft-primary"
+					class="btn btn-icon"
 					href="https://github.com/deancochran/skauth"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
@@ -116,7 +116,7 @@
 					>
 				</Link>
 				<Link
-					class="btn-icon hover:variant-soft-primary"
+					class="btn-icon"
 					href="https://www.buymeacoffee.com/deancochran"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"

@@ -8,10 +8,6 @@
 	const dispatch = createEventDispatcher()
 </script>
 
-<!-- <ProfilePopup {session} /> -->
-<!-- <Link class="btn m-0 px-4 hover:variant-soft-primary" href="/sign-up">Sign-Up</Link>
-	<ThemeSelector /> 
--->
 <div
 	class="relative h-full w-full flex flex-col flex-wrap gap-4 items-center align-middle justify-between"
 >
@@ -23,13 +19,13 @@
 				</div>
 
 				<div class="relative flex gap-2" >
-					<Link class="flex btn" href="/sign-out" on:click={()=>dispatch('close')}>Sign-Out</Link>
+					<Link primary_color_text={true} class="flex btn" href="/sign-out" on:click={()=>dispatch('close')}>Sign-Out</Link>
 				</div>
 
 			</a>
 		{:else}
-			<Link class="btn w-full" href="/sign-in">Sign-In</Link>
-			<Link class="btn w-full" href="/sign-up">Sign-Up</Link>
+			<Link primary_color_text={true} class="btn w-full" href="/sign-in">Sign-In</Link>
+			<Link primary_color_text={true} class="btn w-full" href="/sign-up">Sign-Up</Link>
 		{/if}
 	</div>
 	<button class="flex flex-row logo-cloud rounded-none w-full" on:click={()=>dispatch('close')}>
