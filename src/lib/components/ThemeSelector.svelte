@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 
 	import { storeTheme } from '$lib/stores/theme';
-	import { LightSwitch, modeCurrent, popup, type PopupSettings } from '@skeletonlabs/skeleton';
+	import { LightSwitch, popup, type PopupSettings } from '@skeletonlabs/skeleton';
 	import type { SubmitFunction } from '@sveltejs/kit';
 
 	const themes = [
@@ -34,25 +34,23 @@
 </script>
 
 <button class="btn variant-filled" use:popup={popupClick}>Theme</button>
-<div class="card p-4 soft-filled-primary" data-popup="popupClick">
-	<div class="flex p-2 items-center justify-center align-middle gap-1">
-		{#if $modeCurrent}
+<div class="card p-2 soft-filled-primary" data-popup="popupClick">
+	<div class="flex py-2 items-center justify-center align-middle gap-1">
+		<!-- {#if $modeCurrent}
 			<p>Light Mode:</p>
 		{:else}
 			<p>Dark Mode:</p>
-		{/if}
+		{/if} -->
 		<LightSwitch />
 	</div>
 	<hr class="variant-filled-active py-2" />
 
-	<div class="arrow soft-filled-primary" />
 	<form action="/?/setTheme" method="POST" use:enhance={setTheme}>
 		<ul class="w-full h-full gap-2">
 			{#each themes as name}
 				<li class="w-full h-full hover:variant-soft-secondary">
 					<button
 						class="w-full h-full btn"
-						type="submit"
 						name="theme"
 						value={name}
 						class:variant-soft-secondary={$storeTheme === name}

@@ -14,7 +14,7 @@ model User {
   id                     String                   @id @unique
   email                  String                   @unique
   username               String                   @unique
-  created_at              DateTime                 @default(now())
+  created_at             DateTime                 @default(now())
   email_verified         Boolean
   auth_session           Session[]
   key                    Key[]
