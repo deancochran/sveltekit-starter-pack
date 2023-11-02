@@ -4,7 +4,7 @@ flashCookieOptions.sameSite = 'lax';
 
 export const load: LayoutServerLoad = loadFlash(async (event) => {
 	const { locals, url } = event;
-	return { 
+	return {
 		session: await locals.auth.validate(),
 		pathname: url.pathname
 	};

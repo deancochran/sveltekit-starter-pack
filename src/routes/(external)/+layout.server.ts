@@ -8,7 +8,7 @@ export const load: LayoutServerLoad = async (event) => {
 	if (data.session) {
 		if (!data.session.user.email_verified) throw redirect(302, '/verify-email');
 		throw redirect(302, '/');
-	};
+	}
 
 	return data;
 };

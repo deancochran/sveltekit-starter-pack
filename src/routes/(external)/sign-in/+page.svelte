@@ -4,4 +4,6 @@
 	export let data: PageData;
 </script>
 
-<SignInForm form_data={data.signinForm} />
+<div class="page-container">
+	<SignInForm form_data={data.signinForm} />
+</div>

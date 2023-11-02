@@ -4,4 +4,6 @@
 	export let data: PageData;
 </script>
 
-<ForgotPassForm form_data={data.forgotPassForm}/>
+<div class="page-container">
+	<ForgotPassForm form_data={data.forgotPassForm} />
+</div>

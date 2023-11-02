@@ -64,6 +64,5 @@ export const actions: Actions = {
 			setFlash(t, event);
 			return { form };
 		}
-			
 	}
 };
