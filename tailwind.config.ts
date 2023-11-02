@@ -3,9 +3,6 @@ import type { Config } from 'tailwindcss';
 
 import { skeleton } from '@skeletonlabs/tw-plugin';
 
-import forms from '@tailwindcss/forms';
-import typography from '@tailwindcss/typography';
-
 const config = {
 	darkMode: 'class',
 	content: [
@@ -19,10 +16,9 @@ const config = {
 	// 	aspectRatio: false,
 	// },
 	plugins: [
-		forms,
-		typography,
+		require('@tailwindcss/forms'),
+		require('@tailwindcss/typography'),
 		require('@tailwindcss/container-queries'),
-		// require('@tailwindcss/aspect-ratio'),
 		skeleton({
 			themes: {
 				preset: [

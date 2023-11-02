@@ -4,14 +4,17 @@ import type { Handle, HandleServerError } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.auth = auth.handleRequest(event);
+	event.locals.pathname = event.url.pathname;
 	let user_email;
 	if (event.locals?.auth) {
-		const session = await event.locals.auth.validate();
-		if (session) {
-			user_email = session.user.email;
+		event.locals.session = await event.locals.auth.validate();
+		if (event.locals.session) {
+			user_email = event.locals.session.user.email;
 		} else {
 			user_email = 'unknown_user';
 		}
+	} else {
+		event.locals.session = undefined;
 	}
 
 	let theme = '';
