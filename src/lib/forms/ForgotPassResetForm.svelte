@@ -20,8 +20,13 @@
 		<h1>Reset Password</h1>
 	</header>
 	<section class="p-4">
-		<form id="reset_forgot" use:focusTrap={isFocused} method="POST" action="?/reset_forgot" use:enhance>
-			
+		<form
+			id="reset_forgot"
+			use:focusTrap={isFocused}
+			method="POST"
+			action="?/reset_forgot"
+			use:enhance
+		>
 			<PasswordInput
 				name="password"
 				label="Password"

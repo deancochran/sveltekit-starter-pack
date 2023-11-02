@@ -8,6 +8,5 @@
 <Html lang="en">
 	<Text>Hello, New User!</Text>
 	<Hr />
-	<!-- <Button >Visit Svelte</Button> -->
 	<Button href="{origin}/verify-email/{token}">Verify Email</Button>
 </Html>

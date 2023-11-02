@@ -8,6 +8,5 @@
 <Html lang="en">
 	<Text>Hello, User!</Text>
 	<Hr />
-	<!-- <Button >Visit Svelte</Button> -->
 	<Button href="{origin}/forgot-password/{token}">Reset Password</Button>
 </Html>

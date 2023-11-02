@@ -40,6 +40,8 @@
 	</section>
 	<footer class="card-footer">
 		<button form="reset" type="submit" class="btn variant-filled-primary">Submit</button>
-		<Link href="/password-reset" class="btn variant-filled-primary">Need a New Password Reset Link?</Link>
+		<Link href="/password-reset" class="btn variant-filled-primary"
+			>Need a New Password Reset Link?</Link
+		>
 	</footer>
 </div>

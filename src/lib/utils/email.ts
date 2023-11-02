@@ -4,7 +4,7 @@ import { render } from 'svelte-email';
 
 import VerifyEmail from '$lib/emails/VerifyEmail.svelte';
 import ResetPassword from '$lib/emails/ResetPassword.svelte';
-import ForgottenPassword from '$lib/emails/FogottenPassword.svelte'
+import ForgottenPassword from '$lib/emails/FogottenPassword.svelte';
 import { generateEmailVerificationToken, generatePasswordResetToken } from './token';
 import type { User } from 'lucia';
 
@@ -34,7 +34,6 @@ export async function sendEmail(to_email: string, to_subject: string, html: stri
 		}
 	});
 }
-
 
 export async function sendForgottenPasswordResetLink(user: User, url_origin: string) {
 	const token = await generatePasswordResetToken(user.id);

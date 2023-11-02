@@ -18,6 +18,8 @@
 		{...$$restProps}
 	/>
 </label>
-{#if errors}<span class="flex flex-inline space-x-2 text-error-500">{#each errors as err}
-	<p class="">{err}</p>
-{/each}</span>{/if}
+{#if errors}<span class="flex flex-inline space-x-2 text-error-500"
+		>{#each errors as err}
+			<p class="">{err}</p>
+		{/each}</span
+	>{/if}

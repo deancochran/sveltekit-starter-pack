@@ -27,7 +27,7 @@
 	};
 
 	const popupClick: PopupSettings = {
-		event: 'click',
+		event: 'focus-click',
 		target: 'popupClick',
 		placement: 'bottom'
 	};
@@ -35,7 +35,6 @@
 
 <button class="btn variant-filled" use:popup={popupClick}>Theme</button>
 <div class="card p-4 soft-filled-primary" data-popup="popupClick">
-	<!-- <p>Click Content</p> -->
 	<div class="flex p-2 items-center justify-center align-middle gap-1">
 		{#if $modeCurrent}
 			<p>Light Mode:</p>
