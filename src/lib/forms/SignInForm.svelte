@@ -43,5 +43,6 @@
 		<button form="signin" type="submit" class="btn variant-filled-primary">Sign In</button>
 		<Link class="btn variant-soft-secondary" href="/sign-up">Create an Account</Link>
 		<Link class="btn variant-soft-secondary" href="/forgot-password">Forgot your password?</Link>
+		
 	</footer>
 </div>
