@@ -5,8 +5,7 @@ import { Session } from 'lucia';
 declare global {
 	namespace NodeJS {
 		interface Global {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			prisma: any;
+			prisma: unknown;
 		}
 	}
 	namespace App {
