@@ -1,25 +1,32 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  // provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  ADMIN
+  PRO
+  BASE
+}
+
 model User {
-  id                     String                   @id @unique
-  email                  String                   @unique
-  username               String                   @unique
-  created_at             DateTime                 @default(now())
-  email_verified         Boolean
-  auth_session           Session[]
-  key                    Key[]
-  PasswordResetToken     PasswordResetToken[]
-  EmailVerificationToken EmailVerificationToken[]
+  id                      String                   @id @unique
+  // User Attributes
+  username                String                   @unique
+  email                   String                   @unique
+  email_verified          Boolean                  @default(false)
+  created_at              DateTime                 @default(now())
+  // role                    UserRole                 @default(BASE)
+  // Relationships
+  auth_session            Session[]
+  key                     Key[]
+  passwordResetTokens     PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
 }
 
 model Session {
@@ -27,7 +34,7 @@ model Session {
   user_id        String
   active_expires BigInt
   idle_expires   BigInt
-  user           User   @relation(references: [id], fields: [user_id], onDelete: Cascade)
+  user           User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id])
 }
@@ -36,7 +43,7 @@ model Key {
   id              String  @id @unique
   hashed_password String?
   user_id         String
-  user            User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
+  user            User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id])
 }
@@ -45,7 +52,7 @@ model PasswordResetToken {
   id      String  @id @unique
   expires BigInt?
   user_id String
-  user    User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
+  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id])
 }
@@ -54,7 +61,7 @@ model EmailVerificationToken {
   id      String  @id @unique
   expires BigInt?
   user_id String
-  user    User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
+  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id])
 }

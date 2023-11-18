@@ -15,7 +15,7 @@
 		{#if session}
 			<a href="/settings" class="relative card card-hover w-full p-4 inline-flex flex-row justify-between" on:click={()=>dispatch('close')}>
 				<div class="relative flex" >
-					<Avatar src="invalid-image.jpg" initials="{String(session.user.username).slice(0,2)}"/>
+					<Avatar src="" initials="{String(session.user.username).slice(0,2)}"/>
 				</div>
 
 				<div class="relative flex gap-2" >
@@ -49,7 +49,7 @@
 		</Link>
 		<Link
 			class="flex w-full logo-item"
-			href="https://github.com/deancochran/skauth"
+			href="https://github.com/deancochran/skauth-stripe"
 			target="_blank"
 			rel="noreferrer"
 		>

@@ -91,3 +91,88 @@ export type ResetPassSchema = typeof reset_pass_schema;
 
 export const resend_reset_pass_schema = z.object({});
 export type ResendResetPassSchema = typeof resend_reset_pass_schema;
+
+export const stripeProductSchema = z.object({
+	id: z.string(),
+	name: z.string(),
+	active: z.boolean(),
+	description: z.string(),
+	metadata: z.record(z.string())
+});
+
+export const stripeCustomerSchema = z.object({
+	id: z.string(),
+	email: z.string().email(),
+	metadata: z.record(z.string())
+});
+
+
+type ProductConfig = Record<string, { features: string[]; call_to_action: string }>;
+
+export const productConfig: ProductConfig = {
+	Free: {
+		features: [
+			"✅ Up to 5 Contacts",
+			"❌ Community Support",
+			"❌ Automatic Backups",
+			"❌ 24/7 Customer Support",
+			"❌ SSO"
+		],
+		call_to_action: "Get Started"
+	},
+	Plus: {
+		features: [
+			"✅ Up to 25 Contacts",
+			"✅ Community Support",
+			"✅ Automatic Backups",
+			"❌ 24/7 Customer Support",
+			"❌ SSO"
+		],
+		call_to_action: "Start Free Trial"
+	},
+	Pro: {
+		features: [
+			"✅ Unlimited Contacts",
+			"✅ Community Support",
+			"✅ Automatic Backups",
+			"✅ 24/7 Customer Support",
+			"✅ SSO"
+		],
+		call_to_action: "Start Free Trial"
+	}
+};
+
+export const freePrice = {
+	id: "",
+	unit_amount: 0,
+	interval: "forever",
+	product: {
+		name: "Free",
+		description: "For limited personal use",
+		features: productConfig.Free.features,
+		call_to_action: productConfig.Free.call_to_action
+	}
+};
+
+const priceProductSchema = z
+	.object({
+		id: z.string(),
+		name: z.string(),
+		description: z.string()
+	})
+	.transform((product) => {
+		return {
+			...product,
+			features: productConfig[product.name].features,
+			call_to_action: productConfig[product.name].call_to_action
+		};
+	});
+
+const priceSchema = z.object({
+	id: z.string(),
+	lookup_key: z.string(),
+	unit_amount: z.number().transform((amount) => amount / 100),
+	product: priceProductSchema
+});
+
+export const priceListSchema = z.array(priceSchema);

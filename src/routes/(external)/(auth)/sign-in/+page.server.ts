@@ -13,10 +13,6 @@ export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
 	const data = await parent();
 	const signinForm = await superValidate(signin_schema);
-	if (data.session) {
-		if (!data.session.user.email_verified) throw redirect(302, '/verify-email');
-		throw redirect(302, '/');
-	}
 	return { signinForm, ...data };
 };
 

@@ -1,6 +1,6 @@
 import type { PrismaClient } from '@prisma/client';
 import type { ToastSettings } from '@skeletonlabs/skeleton/index.js';
-import { Session } from 'lucia';
+// import { Session } from 'lucia';
 
 declare global {
 	namespace NodeJS {
@@ -11,8 +11,6 @@ declare global {
 	namespace App {
 		interface Locals {
 			auth: import('lucia').AuthRequest;
-			session: Session;
-			pathname?: string;
 		}
 		interface Error {
 			code: string;

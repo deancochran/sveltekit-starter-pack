@@ -12,7 +12,7 @@
 </script>
 
 <button class="btn" use:popup={profilePopup}>
-	<Avatar src="invalid-image.jpg" initials="{String(session.user.username).slice(0,2)}" />
+	<Avatar src="" initials="{String(session.user.username).slice(0,2)}" />
 </button>
 
 <div class="card p-4 soft-filled-primary" data-popup="profilePopup">

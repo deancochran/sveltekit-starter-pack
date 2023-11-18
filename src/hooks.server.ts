@@ -3,18 +3,20 @@ import { auth } from '$lib/server/lucia';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
-	event.locals.auth = auth.handleRequest(event);
-	event.locals.pathname = event.url.pathname;
+	event.locals.auth = auth.handleRequest(event)
+	
+	// event.locals.pathname = event.url.pathname;
 	let user_email;
+	let session;
 	if (event.locals?.auth) {
-		event.locals.session = await event.locals.auth.validate();
-		if (event.locals.session) {
-			user_email = event.locals.session.user.email;
-		} else {
+		session = await event.locals.auth.validate();
+		if (session) {
+			user_email = session.user.email;
+			} else {
 			user_email = 'unknown_user';
 		}
 	} else {
-		event.locals.session = undefined;
+		session = undefined;
 	}
 
 	let theme = '';

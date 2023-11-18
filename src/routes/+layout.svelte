@@ -66,7 +66,7 @@
 					<h1 class="h1 font-serif bg-op font-bold text-4xl">
 						<span
 							class="bg-gradient-to-br from-primary-500 to-tertiary-500 bg-clip-text text-transparent box-decoration-clone"
-							>skauth</span
+							>skauth-stripe</span
 						>
 					</h1>
 				</Link>
@@ -98,15 +98,15 @@
 			<svelte:fragment slot="lead">
 				<div class="flex flex-col">
 					<h1 class="h1 font-serif bg-op font-bold text-4xl">
-						<span class="text-primary-500">skauth</span>
+						<span class="text-primary-500">skauth-stripe</span>
 					</h1>
-					<p>Modern Sveltekit Auth</p>
+					<p>Modern Sveltekit Auth and Billing</p>
 				</div>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
 				<Link
 					class="btn btn-icon"
-					href="https://github.com/deancochran/skauth"
+					href="https://github.com/deancochran/skauth-stripe"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
 						><path

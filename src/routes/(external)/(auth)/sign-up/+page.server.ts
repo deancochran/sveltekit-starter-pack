@@ -11,12 +11,8 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
-	const data = await parent();
+	await parent();
 	const signupForm = await superValidate(signup_schema);
-	if (data.session) {
-		if (!data.session.user.email_verified) throw redirect(302, '/verify-email');
-		throw redirect(302, '/');
-	}
 	return { signupForm };
 };
 
@@ -67,7 +63,7 @@ export const actions: Actions = {
 					}
 				} else {
 					t = {
-						message: 'Unknown Error',
+						message: `Unknown Error:`,
 						background: 'variant-filled-warning'
 					} as const;
 				}

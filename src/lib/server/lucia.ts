@@ -3,12 +3,13 @@ import { sveltekit } from 'lucia/middleware';
 import { dev } from '$app/environment';
 import { prisma as Adapter } from '@lucia-auth/adapter-prisma';
 import { prisma } from '$lib/server/prisma';
+import type { UserSchema } from 'lucia-auth';
 
 export const auth = lucia({
 	env: dev ? 'DEV' : 'PROD',
 	middleware: sveltekit(),
 	adapter: Adapter(prisma),
-	getUserAttributes: (data) => {
+	getUserAttributes: (data: UserSchema) => {
 		return {
 			email: data.email,
 			username: data.username,

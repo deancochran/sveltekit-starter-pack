@@ -10,7 +10,7 @@
 			Welcome {#if data.session} {data.session.user.username} {:else} Alien {/if}
 			
 		</h1>
-		<span>To an opinionated Authentication Implementation for Sveltekit</span>
+		<span>To an opinionated Authentication and Billing Implementation for Sveltekit using Stripe</span>
 		{#if !data.session} 
 			<p>Need an Account? <Link primary_color_text={true} class="btn m-0 px-4" href="/sign-up">Sign-Up</Link></p>
 		{/if}
