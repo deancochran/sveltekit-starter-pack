@@ -33,7 +33,8 @@ export const checkPasswordResetToken = async (token: string) => {
 	}
 	return true;
 };
-export const validatePasswordResetToken = async (token: string) => {
+
+export const validatePasswordResetToken = async (token: string): Promise<string> => {
 	const storedToken = await prisma.$transaction(async (db) => {
 		const obj = await db.passwordResetToken.findUnique({
 			where: { id: token }
@@ -63,7 +64,7 @@ export const generateEmailVerificationToken = async (userId: string) => {
 	}
 	const newToken = await prisma.emailVerificationToken.create({
 		data: {
-			id: generateRandomString(63),
+			id: generateRandomString(8),
 			expires: new Date().getTime() + EXPIRES_IN,
 			user_id: userId
 		}

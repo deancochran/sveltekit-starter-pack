@@ -7,7 +7,7 @@
 	export let constraints: InputConstraint | undefined = undefined;
 </script>
 
-<label class="label">
+<label class="label w-full">
 	{#if label}<span>{label}</span><br />{/if}
 	<input
 		class="input"
@@ -17,9 +17,10 @@
 		{...constraints}
 		{...$$restProps}
 	/>
+	{#if errors}
+		<span class="flex flex-inline space-x-2 text-error-500"
+			>{#each errors as err}
+				<p class="">{err}</p>
+			{/each}</span
+		>{/if}
 </label>
-{#if errors}<span class="flex flex-inline space-x-2 text-error-500"
-		>{#each errors as err}
-			<p class="">{err}</p>
-		{/each}</span
-	>{/if}

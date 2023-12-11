@@ -7,6 +7,7 @@ import ResetPassword from '$lib/emails/ResetPassword.svelte';
 import ForgottenPassword from '$lib/emails/FogottenPassword.svelte';
 import { generateEmailVerificationToken, generatePasswordResetToken } from './token';
 import type { User } from 'lucia';
+import NewEmailCode from '$lib/emails/NewEmailCode.svelte';
 
 const transporter = nodemailer.createTransport({
 	service: 'gmail',
@@ -28,9 +29,11 @@ export async function sendEmail(to_email: string, to_subject: string, html: stri
 	};
 	transporter.sendMail(options, function (error, info) {
 		if (error) {
+			console.log('FAILED TO Send email: ' + info.response);
 			console.log(error);
 		} else {
 			console.log('Email sent: ' + info.response);
+			// break
 		}
 	});
 }
@@ -81,4 +84,26 @@ export async function resendEmailVerificationLink(user: User, url_origin: string
 		}
 	});
 	await sendEmail(user.email, 'Verify your email', emailHtml);
+}
+
+export async function sendEmailChangeCode(user: User, email: string) {
+	const token = await generateEmailVerificationToken(user.userId);
+	const emailHtml = render({
+		template: NewEmailCode,
+		props: {
+			token: token
+		}
+	});
+	await sendEmail(email, 'Validate your change of email', emailHtml);
+}
+
+export async function reSendEmailChangeCode(user: User) {
+	const token = await generateEmailVerificationToken(user.userId);
+	const emailHtml = render({
+		template: NewEmailCode,
+		props: {
+			token: token
+		}
+	});
+	await sendEmail(user.email, 'Validate your change of email', emailHtml);
 }

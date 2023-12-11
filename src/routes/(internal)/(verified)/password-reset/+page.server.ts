@@ -1,7 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import type { PageServerLoad } from './$types';
-import { sendPasswordResetLink } from '$lib/utils/email';
+import { sendPasswordResetLink } from '$lib/utils/emails';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { resend_reset_pass_schema } from '$lib/schemas';

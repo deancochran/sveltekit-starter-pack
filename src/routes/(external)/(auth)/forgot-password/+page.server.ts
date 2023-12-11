@@ -3,7 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { forgot_pass_schema, signin_schema } from '$lib/schemas';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { redirect } from 'sveltekit-flash-message/server';
-import { sendForgottenPasswordResetLink } from '$lib/utils/email';
+import { sendForgottenPasswordResetLink } from '$lib/utils/emails';
 
 export const load: PageServerLoad = async () => {
 	const forgotPassForm = await superValidate(signin_schema);

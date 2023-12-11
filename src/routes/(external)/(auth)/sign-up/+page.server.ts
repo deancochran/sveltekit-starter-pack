@@ -1,13 +1,17 @@
 import { auth } from '$lib/server/lucia';
 import type { Actions } from './$types';
-import { sendEmailVerificationLink } from '$lib/utils/email';
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms/server';
 import { signup_schema } from '$lib/schemas';
 import { setFlash, redirect } from 'sveltekit-flash-message/server';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { fail } from '@sveltejs/kit';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import {
+	PrismaClientKnownRequestError,
+	PrismaClientUnknownRequestError
+} from '@prisma/client/runtime/library';
+import { stripe } from '$lib/server/stripe';
+import { sendEmailVerificationLink } from '$lib/utils/emails';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
@@ -23,6 +27,15 @@ export const actions: Actions = {
 		let session;
 		if (form.valid) {
 			try {
+				const existingCustomers = await stripe.customers.list({ email: form.data.email });
+				if (existingCustomers.data.length) {
+					throw new PrismaClientUnknownRequestError(`Email ${form.data.email} already exists.`, {
+						clientVersion: '2.19.0'
+					});
+				}
+				const customer = await stripe.customers.create({
+					email: form.data.email
+				});
 				const user = await auth.createUser({
 					key: {
 						providerId: 'email', // auth method
@@ -32,7 +45,10 @@ export const actions: Actions = {
 					attributes: {
 						email: form.data.email,
 						username: form.data.username,
-						email_verified: false
+						email_verified: false,
+						stripe_id: customer.id,
+						created_at: undefined,
+						role: undefined
 					}
 				});
 
@@ -61,6 +77,11 @@ export const actions: Actions = {
 								background: 'variant-filled-warning'
 							} as const;
 					}
+				} else if (error instanceof PrismaClientUnknownRequestError) {
+					t = {
+						message: error.message,
+						background: 'variant-filled-warning'
+					} as const;
 				} else {
 					t = {
 						message: `Unknown Error:`,

@@ -9,7 +9,6 @@ datasource db {
 }
 
 enum UserRole {
-  ADMIN
   PRO
   BASE
 }
@@ -21,12 +20,34 @@ model User {
   email                   String                   @unique
   email_verified          Boolean                  @default(false)
   created_at              DateTime                 @default(now())
-  // role                    UserRole                 @default(BASE)
+  stripe_id               String?                  @unique
+  role                    UserRole?                @default(BASE)
   // Relationships
-  auth_session            Session[]
-  key                     Key[]
+  auth_sessions           Session[]
+  keys                    Key[]
   passwordResetTokens     PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
+  Subscriptions           Subscription[]
+}
+
+model Subscription {
+  stripe_id            String    @id @unique
+  user_id              String
+  cancel_at            DateTime?
+  cancel_at_period_end Boolean?
+  canceled_at          DateTime?
+  current_period_start DateTime
+  current_period_end   DateTime
+  created              DateTime
+  ended_at             DateTime?
+  start_date           DateTime
+  trial_start          DateTime?
+  trial_end            DateTime?
+  metadata             Json
+  status               String
+  user                 User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
 }
 
 model Session {

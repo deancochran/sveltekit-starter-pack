@@ -42,13 +42,13 @@ export const actions: Actions = {
 						message: 'Invalid Credentials Provided',
 						background: 'variant-filled-warning'
 					} as const;
-					await setFlash(t, event);
+					setFlash(t, event);
 				} else {
 					const t: ToastSettings = {
 						message: 'Unknown Error',
 						background: 'variant-filled-warning'
 					} as const;
-					await setFlash(t, event);
+					setFlash(t, event);
 				}
 
 				return fail(500, { form });

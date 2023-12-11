@@ -7,7 +7,7 @@
 	export let constraints: InputConstraint | undefined = undefined;
 </script>
 
-<label class="label">
+<label class="label w-full">
 	{#if label}<span>{label}</span><br />{/if}
 	<input
 		class="input"

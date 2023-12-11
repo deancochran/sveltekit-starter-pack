@@ -11,9 +11,12 @@ export const auth = lucia({
 	adapter: Adapter(prisma),
 	getUserAttributes: (data: UserSchema) => {
 		return {
-			email: data.email,
 			username: data.username,
-			email_verified: data.email_verified
+			email: data.email,
+			email_verified: data.email_verified,
+			created_at: data.created_at,
+			stripe_id: data.stripe_id,
+			role: data.role
 		};
 	},
 	sessionCookie: {

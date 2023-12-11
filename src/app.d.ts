@@ -1,6 +1,5 @@
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient, UserRole } from '@prisma/client';
 import type { ToastSettings } from '@skeletonlabs/skeleton/index.js';
-// import { Session } from 'lucia';
 
 declare global {
 	namespace NodeJS {
@@ -29,6 +28,9 @@ declare global {
 			email: string;
 			username: string;
 			email_verified: boolean;
+			created_at: Date | undefined;
+			stripe_id: string | undefined;
+			role: UserRole | undefined;
 		};
 		type DatabaseSessionAttributes = object;
 	}

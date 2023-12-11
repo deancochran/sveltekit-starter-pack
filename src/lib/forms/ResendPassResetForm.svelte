@@ -4,6 +4,7 @@
 	import { superForm } from 'sveltekit-superforms/client';
 	export let form_data: SuperValidated<ResendResetPassSchema>;
 	import { focusTrap } from '@skeletonlabs/skeleton';
+	import Button from '$lib/components/Button.svelte';
 
 	const { enhance } = superForm(form_data, {
 		applyAction: true,
@@ -21,7 +22,13 @@
 	<section class="p-4">
 		<form id="resend" use:focusTrap={isFocused} method="POST" action="?/resend" use:enhance />
 	</section>
-	<footer class="card-footer">
-		<button form="resend" type="submit" class="btn variant-filled-primary">Submit</button>
+	<footer class="w-full card-footer flex items-end align-middle justify-end gap-2">
+		<Button
+			shadow="shadow-md"
+			color="variant-filled-primary"
+			form="resend"
+			type="submit"
+			class="btn ">Submit</Button
+		>
 	</footer>
 </div>

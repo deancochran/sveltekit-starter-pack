@@ -1,10 +1,14 @@
 <script lang="ts">
-	import { createEventDispatcher } from "svelte";
-    const dispatch =createEventDispatcher()
+	import { createEventDispatcher } from 'svelte';
+	import Button from './Button.svelte';
+	const dispatch = createEventDispatcher();
 </script>
-<button
+
+<Button
+	on:click={() => {
+		dispatch('click');
+	}}
 	class="flex md:hidden btn hover:variant-soft-primary text-primary-500"
-	on:click={()=>dispatch('click')}
 >
 	<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
 		><g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -14,4 +18,4 @@
 			/></g
 		></svg
 	>
-</button>
+</Button>

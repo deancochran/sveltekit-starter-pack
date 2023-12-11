@@ -1,18 +1,16 @@
 // src/hooks.server.ts
 import { auth } from '$lib/server/lucia';
-import type { Handle, HandleServerError } from '@sveltejs/kit';
+import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
-	event.locals.auth = auth.handleRequest(event)
-	
-	// event.locals.pathname = event.url.pathname;
+	event.locals.auth = auth.handleRequest(event);
 	let user_email;
 	let session;
 	if (event.locals?.auth) {
 		session = await event.locals.auth.validate();
 		if (session) {
 			user_email = session.user.email;
-			} else {
+		} else {
 			user_email = 'unknown_user';
 		}
 	} else {
@@ -48,15 +46,4 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	return response;
-};
-
-// Make sure that handleError never throws an error
-export const handleError: HandleServerError = ({ error }) => {
-	// example integration with https://sentry.io/
-	return {
-		message: 'Whoops!',
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		//@ts-ignore
-		code: error?.code ?? 'UNKNOWN'
-	};
 };

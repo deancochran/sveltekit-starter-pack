@@ -8,12 +8,14 @@
 	import PasswordInput from '$lib/forms/inputs/PasswordInput.svelte';
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import Link from '$lib/components/Link.svelte';
+	import Button from '$lib/components/Button.svelte';
 
-	const { form, errors, constraints, enhance } = superForm(form_data, {
+	const { form, errors, constraints, enhance, timeout } = superForm(form_data, {
 		applyAction: true,
 		invalidateAll: true,
-		resetForm: false,
-		validators: signup_schema
+		resetForm: true,
+		validators: signup_schema,
+		timeoutMs: 8000
 	});
 	let isFocused: boolean = true;
 </script>
@@ -54,8 +56,16 @@
 			/>
 		</form>
 	</section>
-	<footer class="card-footer">
-		<button form="signup" type="submit" class="btn variant-filled-primary">Sign Up</button>
-		<Link class="btn variant-soft-secondary" href="/sign-in">Sign-In to your Account</Link>
+	<footer class="w-full card-footer flex items-end align-middle justify-end gap-2">
+		<Button
+			shadow="shadow-md"
+			color="variant-filled-primary"
+			form="signup"
+			type="submit"
+			class="btn variant-filled-primary">Sign Up</Button
+		>
+		<Link shadow="shadow-md" color="variant-soft-secondary" href="/sign-in"
+			>Sign-In to your Account</Link
+		>
 	</footer>
 </div>

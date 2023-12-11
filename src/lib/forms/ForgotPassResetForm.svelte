@@ -5,6 +5,7 @@
 	export let form_data: SuperValidated<ResetForgotPassSchema>;
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import PasswordInput from './inputs/PasswordInput.svelte';
+	import Button from '$lib/components/Button.svelte';
 
 	const { form, errors, constraints, enhance } = superForm(form_data, {
 		applyAction: true,
@@ -43,7 +44,13 @@
 			/>
 		</form>
 	</section>
-	<footer class="card-footer">
-		<button form="reset_forgot" type="submit" class="btn variant-filled-primary">Submit</button>
+	<footer class="w-full card-footer flex items-end align-middle justify-end gap-2">
+		<Button
+			shadow="shadow-md"
+			color="variant-filled-primary"
+			form="reset_forgot"
+			type="submit"
+			class="btn">Submit</Button
+		>
 	</footer>
 </div>

@@ -1,5 +1,5 @@
 import { fail, type Actions } from '@sveltejs/kit';
-import { resendEmailVerificationLink } from '$lib/utils/email';
+import { resendEmailVerificationLink } from '$lib/utils/emails';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { setFlash, redirect } from 'sveltekit-flash-message/server';
 import type { PageServerLoad } from './$types';

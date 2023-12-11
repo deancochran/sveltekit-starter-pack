@@ -1,15 +1,23 @@
 <script lang="ts">
 	export let href: string;
-	export let primary_color_text:boolean = false
+	export let type: 'btn' | 'btn-icon' | 'logo-item' = 'btn';
+	export let target: '_blank' | undefined = undefined;
+	export let rel: 'noreferrer' | undefined = undefined;
+	export let color:
+		| 'variant-soft-primary'
+		| 'variant-soft-secondary'
+		| 'variant-soft-tertiary'
+		| undefined = undefined;
+	export let shadow: 'shadow-md' | undefined = undefined;
+	let classes = `${type} ${color} ${shadow}`;
 </script>
 
-<a	
-	class:text-primary-500={primary_color_text}
-	class:hover:text-primary-500={true}
-	class:hover:variant-soft-primary={true}
+<a
 	class:transition-colors={true}
 	class:duration-300={true}
+	class={classes}
+	{target}
+	{rel}
 	data-sveltekit-preload-data="tap"
-	{href}
-	{...$$props}><slot /></a
+	{href}><slot /></a
 >

@@ -9,7 +9,7 @@
 
 {#if $page.status == 404}
 	<h1>You must be lost</h1>
-	<Link href="/">Go Home</Link>
+	<Link shadow="shadow-md" color="variant-soft-secondary" href="/">Go Home</Link>
 {:else if $page.status == 500}
 	<h1>Whoops</h1>
 	<p>We are investigating this issue</p>
