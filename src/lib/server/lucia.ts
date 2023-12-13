@@ -1,9 +1,9 @@
-import { lucia } from 'lucia';
+import { lucia, type UserSchema  } from 'lucia';
 import { sveltekit } from 'lucia/middleware';
 import { dev } from '$app/environment';
+
 import { prisma as Adapter } from '@lucia-auth/adapter-prisma';
 import { prisma } from '$lib/server/prisma';
-import type { UserSchema } from 'lucia-auth';
 
 export const auth = lucia({
 	env: dev ? 'DEV' : 'PROD',
