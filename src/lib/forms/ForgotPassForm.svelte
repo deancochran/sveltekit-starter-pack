@@ -33,6 +33,7 @@
 	</section>
 	<footer class="w-full card-footer flex items-end align-middle justify-end gap-2">
 		<Button
+		label={"Send Reset Link"}
 			shadow="shadow-md"
 			color="variant-filled-primary"
 			form="forgot"

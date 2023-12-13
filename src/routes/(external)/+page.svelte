@@ -18,7 +18,7 @@
 		>
 		{#if !data.session}
 			<p>
-				Need an Account? <Link shadow="shadow-md" color="variant-soft-secondary" href="/sign-up"
+				Need an Account? <Link label={"Sign Up"} shadow="shadow-md" color="variant-soft-secondary" href="/sign-up"
 					>Sign-Up</Link
 				>
 			</p>

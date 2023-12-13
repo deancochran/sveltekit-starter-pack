@@ -43,7 +43,7 @@
 		<Button shadow="shadow-md" color="variant-filled-primary" form="reset" type="submit" class="btn"
 			>Submit</Button
 		>
-		<Link shadow="shadow-md" color="variant-soft-secondary" href="/password-reset"
+		<Link label={"Need a New Password Reset Link"} shadow="shadow-md" color="variant-soft-secondary" href="/password-reset"
 			>Need a New Password Reset Link?</Link
 		>
 	</footer>

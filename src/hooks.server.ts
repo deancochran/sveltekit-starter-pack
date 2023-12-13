@@ -1,6 +1,6 @@
 // src/hooks.server.ts
 import { auth } from '$lib/server/lucia';
-import type { Handle } from '@sveltejs/kit';
+import type { Handle, HandleServerError } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.auth = auth.handleRequest(event);
@@ -46,4 +46,16 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	return response;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const handleError: HandleServerError = ({ error, event }) => {
+	
+	// example integration with https://sentry.io/
+	// Sentry.captureException(error, { extra: { event } });
+
+	return {
+		message: 'Whoops!',
+		code: 'Errors Occurred',
+	};
 };

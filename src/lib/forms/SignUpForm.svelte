@@ -64,7 +64,7 @@
 			type="submit"
 			class="btn variant-filled-primary">Sign Up</Button
 		>
-		<Link shadow="shadow-md" color="variant-soft-secondary" href="/sign-in"
+		<Link label={"Sign-In to your Account"} shadow="shadow-md" color="variant-soft-secondary" href="/sign-in"
 			>Sign-In to your Account</Link
 		>
 	</footer>

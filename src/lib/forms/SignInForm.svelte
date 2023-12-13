@@ -55,8 +55,8 @@
 				class="btn">Sign In</Button
 			>
 		{/if}
-		<Link shadow="shadow-md" color="variant-soft-secondary" href="/sign-up">Create an Account</Link>
-		<Link shadow="shadow-md" color="variant-soft-secondary" href="/forgot-password"
+		<Link label={"Create An Account"} shadow="shadow-md" color="variant-soft-secondary" href="/sign-up">Create an Account</Link>
+		<Link label={"Forgot your password?"} shadow="shadow-md" color="variant-soft-secondary" href="/forgot-password"
 			>Forgot your password?</Link
 		>
 	</footer>

@@ -23,9 +23,9 @@
 	import type { LayoutData } from './$types';
 	import SideBarButton from '$lib/components/SideBarButton.svelte';
 	import NavBarMobile from '$lib/components/NavBarMobile.svelte';
-
 	//Modal Registry Components
 	import DeleteUserForm from '$lib/forms/DeleteUserForm.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 
 	export let data: LayoutData;
 
@@ -65,6 +65,7 @@
 	};
 </script>
 
+<Seo/>
 <Toast />
 <Modal components={modalRegistry} />
 <Drawer>
@@ -79,11 +80,11 @@
 			slotTrail="place-content-end"
 		>
 			<svelte:fragment slot="lead">
-				<Link href="/">
+				<Link label={'Skauth'} href="/">
 					<h1 class="h1 font-serif bg-op font-bold text-4xl">
 						<span
 							class="bg-gradient-to-br from-primary-500 to-tertiary-500 bg-clip-text text-transparent box-decoration-clone"
-							>skauth-stripe</span
+							>skauth</span
 						>
 					</h1>
 				</Link>
@@ -95,8 +96,8 @@
 					{#if data.session}
 						<ProfilePopup session={data.session} />
 					{:else}
-						<Link shadow="shadow-md" color="variant-soft-secondary" href="/sign-in">Sign-In</Link>
-						<Link shadow="shadow-md" color="variant-soft-tertiary" href="/sign-up">Sign-Up</Link>
+						<Link label={"Sign In"} shadow="shadow-md" color="variant-soft-secondary" href="/sign-in">Sign-In</Link>
+						<Link label={"Sign Up"} shadow="shadow-md" color="variant-soft-tertiary" href="/sign-up">Sign-Up</Link>
 					{/if}
 				</nav>
 			</svelte:fragment>
@@ -114,13 +115,13 @@
 			<svelte:fragment slot="lead">
 				<div class="flex flex-col">
 					<h1 class="h1 font-serif bg-op font-bold text-4xl">
-						<span class="text-surface">skauth-stripe</span>
+						<span class="text-surface">skauth</span>
 					</h1>
 					<p>Modern Sveltekit Auth and Billing</p>
 				</div>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
-				<Link type="btn-icon" href="https://github.com/deancochran/skauth-stripe">
+				<Link label={"skauth"} type="btn-icon" href="https://github.com/deancochran/skauth">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="32"
@@ -132,7 +133,7 @@
 						/></svg
 					>
 				</Link>
-				<Link type="btn-icon" href="https://www.buymeacoffee.com/deancochran">
+				<Link label={"Buy Me a Coffee"} type="btn-icon" href="https://www.buymeacoffee.com/deancochran">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="32"

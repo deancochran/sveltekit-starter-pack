@@ -9,10 +9,12 @@
 		| 'variant-soft-tertiary'
 		| undefined = undefined;
 	export let shadow: 'shadow-md' | undefined = undefined;
+	export let label:string
 	let classes = `${type} ${color} ${shadow}`;
 </script>
 
 <a
+	aria-label={label}
 	class:transition-colors={true}
 	class:duration-300={true}
 	class={classes}

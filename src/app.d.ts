@@ -18,6 +18,8 @@ declare global {
 			flash?: ToastSettings;
 			session?: Session;
 			pathname?: string;
+			title?:string
+			description?:string
 		}
 	}
 
