@@ -1,5 +1,3 @@
-
-
 # SvelteKit SaaS Starter Kit
 
 <p align="center">
@@ -9,20 +7,22 @@
   <img src="./static/sign-up.png" alt="drawing" width="800"/>
 </p>
 
-
-
-
-A full-stack example of a Software as a Service (SaaS) web application built with SvelteKit, incorporating various technologies such as Stripe for subscriptions, Lucia for authentication, Prisma ORM for database interactions, Svelte Superforms and Zod for form handling, and enhanced with Skeleton UI and Lucide icons.
+A full-stack example of a Software as a Service (SaaS) web application built with SvelteKit, incorporating various technologies such as Stripe for subscriptions, Lucia for authentication, Prisma ORM for database interactions, Svelte Superforms form handling, Zod for validation, and enhanced with Skeleton UI and Lucide icons.
 
 ## Table of Contents
+
 - [SvelteKit SaaS Starter Kit](#sveltekit-saas-starter-kit)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Features](#features)
   - [Technologies Used](#technologies-used)
   - [Getting Started](#getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
+  - [Configuration](#configuration)
+    - [Stripe Setup](#stripe-setup)
+    - [Creating a Stripe Subscription Product in Test Mode](#creating-a-stripe-subscription-product-in-test-mode)
+    - [Lucia Authentication](#lucia-authentication)
+    - [Database (Prisma)](#database-prisma)
+    - [Database (Prisma)](#database-prisma-1)
 
 ## Introduction
 
@@ -32,6 +32,7 @@ This SvelteKit SaaS Starter Kit provides a foundation for building modern web ap
 
 - User authentication using Lucia
 - Subscription management with Stripe
+- Stripe Webhook integration and handling
 - Database interactions with Prisma ORM
 - Form handling with Svelte Superforms and Zod
 - UI styling with Skeleton UI
@@ -51,15 +52,6 @@ This SvelteKit SaaS Starter Kit provides a foundation for building modern web ap
 
 ## Getting Started
 
-### Prerequisites
-
-- A Node.js (version x.x.x)
-- A package Manager
-- A Stripe account for subscription handling
-- A Database (PostgreSQL, MySQL, Supabase, PocketBase) for Prisma
-
-### Installation
-
 1. Clone the repository:
 
    ```bash
@@ -69,19 +61,56 @@ This SvelteKit SaaS Starter Kit provides a foundation for building modern web ap
 2. Install dependencies:
 
    ```bash
-   pnpm install 
+   pnpm install
    ```
 
-<!-- ## Configuration -->
-<!-- 
-### Stripe
+## Configuration
 
-To enable subscription handling, sign up for a [Stripe](https://stripe.com/) account and obtain your API keys. Update the corresponding values in the `.env` file:
+### Stripe Setup
 
-```env
-STRIPE_SECRET_KEY=your_stripe_secret_key
-STRIPE_PUBLIC_KEY=your_stripe_public_key
+To enable subscription handling, sign up for a [Stripe](https://stripe.com/) account and obtain your test API keys.
+To develop and test locally, you'll need to download and login to stripe through the CLI tool. https://stripe.com/docs/stripe-cli
+
+### Creating a Stripe Subscription Product in Test Mode
+
+To set up a subscription product for testing purposes, you can follow these steps on your Stripe dashboard:
+
+1. Navigate to the "Products" section in the Dashboard.
+2. Click the "Create product" button. Fill in the product details, including a name, description, and pricing information.
+
+<div style="padding: 0px 25px 0px 25px">
+
+NOTICE: It is imperative for the application that your add a `TIER` tag to the product you configure.
+
+  <p align="center">
+    <img src="./static/TierExample.png" alt="drawing" width="800"/>
+  </p>
+  
+The different tags that you can specify are found in the `prisma/schema.prisma` file. So changing these will alter the business logic of the application.
+
+```prisma
+enum UserRole {
+  PRO
+  BASE
+}
 ```
+
+</div>
+
+3. Inside the product, click the "Add pricing plan" button. Configure the plan details, such as the billing interval, currency, and amount.
+4. Go to the "Developers" section and find your API keys. Use the test publishable and secret keys for your integration.
+5. Implement Stripe into your application using the Stripe API library. Use the test API keys to update the corresponding values in the `.env` file:
+
+<div style="padding: 0px 25px 0px 25px">
+
+```yaml
+~/.env
+
+STRIPE_SECRET_KEY=XXXXXX
+STRIPE_PUBLIC_KEY=XXXXXX
+```
+
+</div>
 
 ### Lucia Authentication
 
@@ -89,47 +118,30 @@ Configure Lucia authentication by updating the authentication configuration in `
 
 ### Database (Prisma)
 
-1. Install Prisma CLI globally:
+Create a `.env` file with your database connection URL:
 
-   ```bash
-   npm install -g prisma
-   ```
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
+```
 
-2. Create a `.env` file with your database connection URL:
+Apply database migrations:
 
-   ```env
-   DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
-   ```
+```bash
+prisma migrate dev
+```
 
-3. Apply database migrations:
-
-   ```bash
-   prisma migrate dev
-   ```
-
-## Usage
+### Database (Prisma)
 
 Run the SvelteKit application:
 
 ```bash
-npm run dev # or yarn dev
+pnpm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) in your browser.
+In a separate terminal start the webhook listener:
 
-## Folder Structure
-
-- `/src`: SvelteKit source code
-  - `/lib`: Utility functions and configurations
-  - `/routes`: Application routes
-  - `/components`: Reusable Svelte components
-  - `/styles`: Global styles
-- `/prisma`: Prisma ORM configuration and migrations
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE). -->
+```bash
+pnpm run stripe-webhook
+# or
+stripe listen --forward-to localhost:5173/stripe/webhook
+```
