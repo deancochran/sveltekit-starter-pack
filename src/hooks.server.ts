@@ -1,11 +1,12 @@
 // src/hooks.server.ts
 import { auth } from '$lib/server/lucia';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
+import type { Session } from 'lucia';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.auth = auth.handleRequest(event);
 	let user_email;
-	let session;
+	let session:Session
 	if (event.locals?.auth) {
 		session = await event.locals.auth.validate();
 		if (session) {
@@ -24,7 +25,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (cookieTheme) {
 		theme = cookieTheme;
 	} else {
-		event.cookies.set('theme', 'skeleton');
+		event.cookies.set('theme', 'skeleton', { path: '/' });
 		theme = 'skeleton';
 	}
 

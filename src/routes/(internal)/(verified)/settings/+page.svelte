@@ -5,7 +5,9 @@
 	import UpdateUserEmailForm from '$lib/forms/UpdateUserEmailForm.svelte';
 	import UpdateUserPasswordForm from '$lib/forms/UpdateUserPasswordForm.svelte';
 	import UpdateUserProfileForm from '$lib/forms/UpdateUserProfileForm.svelte';
-	export let data;
+
+	import UpdateUserProfilePictureForm from '$lib/forms/UpdateUserProfilePictureForm.svelte';
+export let data;
 </script>
 
 <div class="page-container">
@@ -13,6 +15,7 @@
 		<div class="card p-4 flex-col gap-2 flex items-center justify-center align-middle">
 			<h1 class="h1 font-serif">Settings Page</h1>
 		</div>
+		<UpdateUserProfilePictureForm />
 		<UpdateUserProfileForm form_data={data.updateUserForm} />
 		<UpdateUserEmailForm
 			form_data={data.updateUserEmailForm}
@@ -21,5 +24,10 @@
 		<UpdateUserPasswordForm form_data={data.updateUserEmailPasswordForm} />
 		<CancelUserSubscription form_data={data.cancelUserSubscriptionForm} />
 		<DeleteUserForm form_data={data.deleteUserForm} />
+
+		<div class="flex">
+			<div class="flex">Strava Integration</div>
+			<div class="flex">Trainging Peaks Integration</div>
+		</div>
 	</div>
 </div>

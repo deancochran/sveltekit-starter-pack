@@ -1,13 +1,26 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-
+	import Map from '$lib/components/Map/Map.svelte';
+	import LineString from '$lib/components/LineString/LineString.svelte';
 	export let data: PageData;
+
+	$: loaded=false
+	function handledMapLoaded() {
+		loaded=true
+	}
 </script>
 
-<div class="page-container flex items-center justify-center align-middle">
-	<div class="card p-4 flex-col gap-2 flex items-center justify-center align-middle">
-		<h1 class="h2 font-serif font-thin">
-			Subscription Tier: <span class="h1 font-serif font-thin">{data.session.user.role}</span>
-		</h1>
+<div class="relative page-container">
+	<div class="col-span-1 h-[70vh]">
+		<Map let:map on:load={()=>{handledMapLoaded()}}>
+			{#if map && loaded}
+				<!-- {#each markers as { lngLat, label, name }, i}
+					<Marker {map} {lngLat} on:click={(e)=>{console.log(e)}}/>
+				{/each} -->
+				<LineString {map}/>
+			{/if}
+				
+		</Map>
 	</div>
 </div>
+

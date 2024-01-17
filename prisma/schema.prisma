@@ -3,34 +3,29 @@ generator client {
 }
 
 datasource db {
-  // provider = "sqlite"
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  PRO
-  BASE
+model user {
+  id                          String                       @id @unique
+  username                    String                       @unique
+  email                       String                       @unique
+  email_verified              Boolean                      @default(false)
+  created_at                  DateTime                     @default(now())
+  stripe_id                   String?                      @unique
+  role                        UserRole?                    @default(BASE)
+  emailVerificationTokens     emailVerificationToken[]
+  keys                        key[]
+  passwordResetTokens         passwordResetToken[]
+  auth_sessions               session[]
+  Subscriptions               subscription[]
+  ThirdPartyIntegrationTokens thirdPartyIntegrationToken[]
+
+  @@index([id])
 }
 
-model User {
-  id                      String                   @id @unique
-  // User Attributes
-  username                String                   @unique
-  email                   String                   @unique
-  email_verified          Boolean                  @default(false)
-  created_at              DateTime                 @default(now())
-  stripe_id               String?                  @unique
-  role                    UserRole?                @default(BASE)
-  // Relationships
-  auth_sessions           Session[]
-  keys                    Key[]
-  passwordResetTokens     PasswordResetToken[]
-  emailVerificationTokens EmailVerificationToken[]
-  Subscriptions           Subscription[]
-}
-
-model Subscription {
+model subscription {
   stripe_id            String    @id @unique
   user_id              String
   cancel_at            DateTime?
@@ -45,44 +40,64 @@ model Subscription {
   trial_end            DateTime?
   metadata             Json
   status               String
-  user                 User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([user_id])
+  user                 user      @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
-model Session {
+model session {
   id             String @id @unique
   user_id        String
   active_expires BigInt
   idle_expires   BigInt
-  user           User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([user_id])
+  user           user   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
-model Key {
+model key {
   id              String  @id @unique
   hashed_password String?
   user_id         String
-  user            User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([user_id])
+  user            user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
-model PasswordResetToken {
+model passwordResetToken {
   id      String  @id @unique
   expires BigInt?
   user_id String
-  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([user_id])
+  user    user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
-model EmailVerificationToken {
+model emailVerificationToken {
   id      String  @id @unique
   expires BigInt?
   user_id String
-  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user    user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
 
-  @@index([user_id])
+model thirdPartyIntegrationToken {
+  id            Int                            @id @default(autoincrement())
+  user_id       String
+  provider      ThirdPartyIntegrationProvider?
+  expires_at    BigInt
+  expires_in    BigInt
+  createdAt     DateTime                       @default(now())
+  updatedAt     DateTime                       @updatedAt
+  access_token  String
+  refresh_token String
+  user          user                           @relation(fields: [user_id], references: [id])
+}
+
+model thirdPartyIntegrationLogs {
+  id        Int                            @id @default(autoincrement())
+  provider  ThirdPartyIntegrationProvider?
+  createdAt DateTime                       @default(now())
+  updatedAt DateTime                       @updatedAt
+  metadata  Json
+}
+
+enum UserRole {
+  PRO
+  BASE
+}
+
+enum ThirdPartyIntegrationProvider {
+  STRAVA
 }

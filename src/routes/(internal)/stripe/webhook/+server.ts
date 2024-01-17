@@ -16,7 +16,7 @@ export async function POST(event) {
 		stripe_event = stripe.webhooks.constructEvent(payload, signature, STRIPE_WEBHOOK_SECRET);
 		stripe_event_type = stripe_event.type;
 	} catch (e) {
-		throw error(500);
+		error(500);
 	}
 	if (!stripe_event.data.object) throw Error('Something went wrong');
 

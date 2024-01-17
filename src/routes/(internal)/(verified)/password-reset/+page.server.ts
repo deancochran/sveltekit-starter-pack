@@ -20,7 +20,7 @@ export const actions: Actions = {
 		const form = await superValidate(request, resend_reset_pass_schema);
 
 		const session = await locals.auth.validate();
-		if (!session) throw redirect(302, handleSignInRedirect(event));
+		if (!session) redirect(302, handleSignInRedirect(event));
 		if (form.valid) {
 			try {
 				const user = await prisma.user.findUniqueOrThrow({ where: { email: session.user.email } });

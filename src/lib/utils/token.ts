@@ -18,6 +18,7 @@ export const generatePasswordResetToken = async (userId: string) => {
 			expires: new Date().getTime() + EXPIRES_IN,
 			user_id: userId
 		}
+		
 	});
 	return newToken.id;
 };

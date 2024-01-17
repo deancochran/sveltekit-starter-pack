@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '../app.postcss';
+	// import 'maplibre-gl/dist/maplibre-gl.css';
 	import {
 		Toast,
 		initializeStores,
@@ -26,11 +27,14 @@
 	//Modal Registry Components
 	import DeleteUserForm from '$lib/forms/DeleteUserForm.svelte';
 	import Seo from '$lib/components/Seo.svelte';
-
+	import { setMapContext } from '$lib/components/Map/stores';
 	export let data: LayoutData;
 
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 	initializeStores();
+
+	// init Maplibre Stores
+	setMapContext();
 
 	const toastStore = getToastStore();
 	const toast = getFlash(page, {
@@ -65,7 +69,7 @@
 	};
 </script>
 
-<Seo/>
+<Seo />
 <Toast />
 <Modal components={modalRegistry} />
 <Drawer>
@@ -96,8 +100,15 @@
 					{#if data.session}
 						<ProfilePopup session={data.session} />
 					{:else}
-						<Link label={"Sign In"} shadow="shadow-md" color="variant-soft-secondary" href="/sign-in">Sign-In</Link>
-						<Link label={"Sign Up"} shadow="shadow-md" color="variant-soft-tertiary" href="/sign-up">Sign-Up</Link>
+						<Link
+							label={'Sign In'}
+							shadow="shadow-md"
+							color="variant-soft-secondary"
+							href="/sign-in">Sign-In</Link
+						>
+						<Link label={'Sign Up'} shadow="shadow-md" color="variant-soft-tertiary" href="/sign-up"
+							>Sign-Up</Link
+						>
 					{/if}
 				</nav>
 			</svelte:fragment>
@@ -121,7 +132,7 @@
 				</div>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
-				<Link label={"skauth"} type="btn-icon" href="https://github.com/deancochran/skauth">
+				<Link label={'skauth'} type="btn-icon" href="https://github.com/deancochran/skauth">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="32"
@@ -133,7 +144,11 @@
 						/></svg
 					>
 				</Link>
-				<Link label={"Buy Me a Coffee"} type="btn-icon" href="https://www.buymeacoffee.com/deancochran">
+				<Link
+					label={'Buy Me a Coffee'}
+					type="btn-icon"
+					href="https://www.buymeacoffee.com/deancochran"
+				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="32"

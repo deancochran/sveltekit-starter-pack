@@ -15,7 +15,7 @@ export const actions = {
 				background: 'variant-filled-warning'
 			} as const;
 			setFlash(t, event);
-			throw redirect(301, '/sign-in');
+			redirect(301, '/sign-in');
 		}
 		const active_sub = await getActiveSubscription(auth_session.user.userId);
 		if (active_sub) {
@@ -32,7 +32,7 @@ export const actions = {
 				background: 'variant-filled-warning'
 			} as const;
 			setFlash(t, event);
-			throw redirect(301, '/verify-email');
+			redirect(301, '/verify-email');
 		}
 
 		const data = await request.formData();
@@ -70,6 +70,6 @@ export const actions = {
 			custom_text: { submit: { message: 'Thanks for trying out the free trial. - Dean' } }
 		});
 
-		throw redirect(303, stripeSession.url ?? '/');
+		redirect(303, stripeSession.url ?? '/');
 	}
 };

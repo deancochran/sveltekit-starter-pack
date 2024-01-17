@@ -1,12 +1,10 @@
-import type { PrismaClient, UserRole } from '@prisma/client';
+import type {  UserRole } from '@prisma/client';
 import type { ToastSettings } from '@skeletonlabs/skeleton/index.js';
 
 declare global {
-	namespace NodeJS {
-		interface Global {
-			prisma: unknown;
-		}
-	}
+	
+	let prisma: PrismaClient;
+
 	namespace App {
 		interface Locals {
 			auth: import('lucia').AuthRequest;
@@ -18,8 +16,8 @@ declare global {
 			flash?: ToastSettings;
 			session?: Session;
 			pathname?: string;
-			title?:string
-			description?:string
+			title?: string;
+			description?: string;
 		}
 	}
 
@@ -36,7 +34,8 @@ declare global {
 		};
 		type DatabaseSessionAttributes = object;
 	}
-	let prisma: PrismaClient;
+
+	
 }
 
 export {};

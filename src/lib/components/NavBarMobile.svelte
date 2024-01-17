@@ -3,7 +3,7 @@
 	import Link from './Link.svelte';
 	import type { Session } from 'lucia';
 	import { createEventDispatcher } from 'svelte';
-	import Button from './Button.svelte';
+	import handleGetAvatarPresignedURL from '$lib/utils/minio/client/profile-picture';
 	export let session: Session;
 
 	const dispatch = createEventDispatcher();
@@ -20,12 +20,16 @@
 				on:click={() => dispatch('close')}
 			>
 				<div class="relative flex">
-					<Avatar src="" initials={String(session.user.username).slice(0, 2)} />
+					{#await handleGetAvatarPresignedURL(session.user.userId)}
+						<Avatar src="" initials={String(session.user.username).slice(0, 2)} />
+					{:then obj}
+						<Avatar src={obj.presignedUrl} initials={String(session.user.username).slice(0, 2)} />
+					{/await}
 				</div>
 
 				<div class="relative flex gap-2">
 					<Link
-						label={"Sign Out"}
+						label={'Sign Out'}
 						shadow="shadow-md"
 						color="variant-soft-secondary"
 						href="/sign-out"
@@ -34,13 +38,17 @@
 				</div>
 			</a>
 		{:else}
-			<Link label={"Sign In"} shadow="shadow-md" color="variant-soft-secondary" href="/sign-in">Sign-In</Link>
-			<Link label={"Sign Up"} shadow="shadow-md" color="variant-soft-secondary" href="/sign-up">Sign-Up</Link>
+			<Link label={'Sign In'} shadow="shadow-md" color="variant-soft-secondary" href="/sign-in"
+				>Sign-In</Link
+			>
+			<Link label={'Sign Up'} shadow="shadow-md" color="variant-soft-secondary" href="/sign-up"
+				>Sign-Up</Link
+			>
 		{/if}
 	</div>
 	<div class="flex flex-row logo-cloud rounded-none w-full">
 		<Link
-		label={"Buy Me A Coffee"}
+			label={'Buy Me A Coffee'}
 			type="logo-item"
 			href="https://www.buymeacoffee.com/deancochran"
 			target="_blank"
@@ -58,7 +66,7 @@
 			>
 		</Link>
 		<Link
-			label={"Skauth"}
+			label={'Skauth'}
 			type="logo-item"
 			href="https://github.com/deancochran/skauth/"
 			target="_blank"

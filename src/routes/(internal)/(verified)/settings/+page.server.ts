@@ -18,6 +18,8 @@ import { auth } from '$lib/server/lucia';
 import { sendEmailChangeCode } from '$lib/utils/emails';
 import { fail } from '@sveltejs/kit';
 import { getActiveSubscription } from '$lib/utils/stripe/subscriptions';
+import { uploadProfilePicture } from '$lib/utils/minio/upload';
+import { invalidateAll } from '$app/navigation';
 
 export const load: PageServerLoad = async ({ parent }) => {
 	await parent();
@@ -131,7 +133,6 @@ export const actions: Actions = {
 				userId: session.user.userId,
 				attributes: {}
 			});
-			// console.log(session);
 			locals.auth.setSession(session);
 			t = {
 				message: 'Updated Email',
@@ -156,7 +157,6 @@ export const actions: Actions = {
 		try {
 			if (!form.valid) throw new Error('Must provide a valid email');
 			if (form.data.email === session.user.email) throw new Error('Must choose a new email');
-			// console.log('\n sending email to ', form.data.email);
 			await sendEmailChangeCode(session.user, form.data.email);
 			t = {
 				message: `A Code to verify your new email was sent`,
@@ -241,6 +241,35 @@ export const actions: Actions = {
 			}
 			setFlash(t, event);
 			return fail(400, { form });
+		}
+	},
+	updateUserProfilePicture: async (event) => {
+		const { request, locals } = event;
+		const session = await locals.auth.validate();
+		const formData = await request.formData();
+		let t: ToastSettings;
+		try {
+			// if (!form.valid) throw new Error('Must provide a valid file');
+			const file = Object.fromEntries(formData).files;
+			if (file instanceof File) {
+				await uploadProfilePicture(session.user.userId, file);
+				invalidateAll();
+				t = {
+					message: 'Updated Profile Picture',
+					background: 'variant-filled-success'
+				} as const;
+				setFlash(t, event);
+				// return { form };
+			} else {
+				throw new Error('Must provide a file');
+			}
+		} catch (e) {
+			t = {
+				message: 'Failed to update Profile Picture',
+				background: 'variant-filled-error'
+			} as const;
+			setFlash(t, event);
+			// return fail(400, { form });
 		}
 	}
 };
