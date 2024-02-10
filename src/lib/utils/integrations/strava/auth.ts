@@ -2,6 +2,7 @@ import { SECRET_STRAVA_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_STRAVA_CLIENT_ID } from '$env/static/public';
 import { ThirdPartyIntegrationProvider } from '@prisma/client';
 import { error } from '@sveltejs/kit';
+import { SummaryAthlete } from './typescript-fetch-client/models';
 
 export type StravaOAuth = {
 	token_type: string;
@@ -9,7 +10,7 @@ export type StravaOAuth = {
 	expires_in: number;
 	refresh_token: string;
 	access_token: string;
-	athlete: object;
+	athlete: SummaryAthlete;
 };
 
 export async function getTokenFromAuthCode(code: string): Promise<StravaOAuth> {

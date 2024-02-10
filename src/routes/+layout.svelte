@@ -96,7 +96,7 @@
 			<svelte:fragment slot="trail">
 				<SideBarButton on:click={openDrawer} />
 
-				<nav class="hidden md:flex space-x-2">
+				<nav class="hidden md:flex space-x-2 h-[5vh]">
 					{#if data.session}
 						<ProfilePopup session={data.session} />
 					{:else}

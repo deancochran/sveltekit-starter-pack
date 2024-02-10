@@ -28,43 +28,33 @@ export async function GET(event) {
 		}
 		try {
 			const token_obj: StravaOAuth = await getTokenFromAuthCode(code);
-			const integration = await prisma.thirdPartyIntegrationToken.findFirst({
+			await prisma.thirdPartyIntegrationToken.upsert({
+				create: {
+					user_id: session.user.userId,
+					integration_id: String(token_obj.athlete.id),
+					provider: ThirdPartyIntegrationProvider.STRAVA,
+					expires_at: token_obj.expires_at,
+					expires_in: token_obj.expires_in,
+					access_token: token_obj.access_token,
+					refresh_token: token_obj.refresh_token
+				},
+				update: {
+					integration_id: String(token_obj.athlete.id),
+					expires_at: token_obj.expires_at,
+					expires_in: token_obj.expires_in,
+					access_token: token_obj.access_token,
+					refresh_token: token_obj.refresh_token
+				},
 				where: {
-					AND: [
-						{ user_id: session.user.userId },
-						{ provider: ThirdPartyIntegrationProvider.STRAVA }
-					]
-				}
+						integration_id: String(token_obj.athlete.id),
+					}
 			});
-			if (integration) {
-				await prisma.thirdPartyIntegrationToken.update({
-					data: {
-						expires_at: token_obj.expires_at,
-						expires_in: token_obj.expires_in,
-						access_token: token_obj.access_token,
-						refresh_token: token_obj.refresh_token
-					},
-					where: {
-						id: integration?.id
-					}
-				});
-			} else {
-				await prisma.thirdPartyIntegrationToken.create({
-					data: {
-						user_id: session.user.userId,
-						provider: ThirdPartyIntegrationProvider.STRAVA,
-						expires_at: token_obj.expires_at,
-						expires_in: token_obj.expires_in,
-						access_token: token_obj.access_token,
-						refresh_token: token_obj.refresh_token
-					}
-				});
-			}
 			t = {
 				message: 'Successfully created strava integration',
 				background: 'variant-filled-success'
 			} as const;
 		} catch (e) {
+			console.log(e);
 			t = {
 				message: 'Case 3 Failed to create strava integration',
 				background: 'variant-filled-error'

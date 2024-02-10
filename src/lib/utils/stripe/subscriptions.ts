@@ -80,7 +80,7 @@ export async function upsertSubscription(subscriptionId: string, stripe_user_id:
 
 	await prisma.subscription.upsert({
 		create: {
-			stripe_id: subscription.id,
+			stripe_sub_id: subscription.id,
 			user_id: user.id,
 			cancel_at: subscription.cancel_at ? toDateTime(subscription.cancel_at).toISOString() : null,
 			cancel_at_period_end: subscription.cancel_at_period_end,
@@ -100,7 +100,7 @@ export async function upsertSubscription(subscriptionId: string, stripe_user_id:
 			status: subscription.status
 		},
 		update: {
-			stripe_id: subscription.id,
+			stripe_sub_id: subscription.id,
 			user_id: user.id,
 			cancel_at: subscription.cancel_at ? toDateTime(subscription.cancel_at).toISOString() : null,
 			cancel_at_period_end: subscription.cancel_at_period_end,
@@ -119,7 +119,7 @@ export async function upsertSubscription(subscriptionId: string, stripe_user_id:
 			status: subscription.status
 		},
 		where: {
-			stripe_id: subscription.id
+			user_id: user.id
 		}
 	});
 
@@ -133,4 +133,24 @@ export async function upsertSubscription(subscriptionId: string, stripe_user_id:
 	});
 
 	console.log(`Upserted subscription [${subscription.id}] for user [${user.id}]`);
+}
+
+export async function deleteSubscription(subscriptionId: string, stripe_user_id: string) {
+	const user = await prisma.user.findUnique({
+		where: { stripe_id: stripe_user_id }
+	});
+
+	if (!user) throw new Error('no user found with the provided stripe id');
+
+	const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+		expand: ['default_payment_method', 'plan']
+	});
+
+	await prisma.subscription.delete({
+		where: {
+			user_id: user.id
+		}
+	});
+
+	console.log(`Delete subscription [${subscription.id}] for user [${user.id}]`);
 }

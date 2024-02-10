@@ -1,3 +1,4 @@
+import type { PrismaClient } from '@prisma/client';
 import type {  UserRole } from '@prisma/client';
 import type { ToastSettings } from '@skeletonlabs/skeleton/index.js';
 

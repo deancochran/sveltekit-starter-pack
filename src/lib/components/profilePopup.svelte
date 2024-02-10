@@ -1,8 +1,9 @@
 <script lang="ts">
 	import Link from './Link.svelte';
-	import { Avatar, popup, type PopupSettings } from '@skeletonlabs/skeleton';
+	import {  popup, type PopupSettings } from '@skeletonlabs/skeleton';
 	import type { Session } from 'lucia';
-	import handleGetAvatarPresignedURL from '$lib/utils/minio/client/profile-picture'
+
+	import UserAvatar from './UserAvatar/UserAvatar.svelte';
 
 	export let session: Session;
 
@@ -14,13 +15,8 @@
 	
 </script>
 
-<button class="btn" use:popup={profilePopup}>
-	{#await handleGetAvatarPresignedURL(session.user.userId)}
-		<Avatar src="" initials={String(session.user.username).slice(0, 2)} />
-	{:then obj}
-		<Avatar src={obj.presignedUrl} initials={String(session.user.username).slice(0, 2)} />
-	{/await}
-	
+<button class="btn relative" use:popup={profilePopup}>
+	<UserAvatar/>
 </button>
 
 <div class="card p-4 soft-filled-primary" data-popup="profilePopup">

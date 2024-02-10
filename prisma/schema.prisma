@@ -8,26 +8,30 @@ datasource db {
 }
 
 model user {
-  id                          String                       @id @unique
-  username                    String                       @unique
-  email                       String                       @unique
-  email_verified              Boolean                      @default(false)
-  created_at                  DateTime                     @default(now())
-  stripe_id                   String?                      @unique
-  role                        UserRole?                    @default(BASE)
-  emailVerificationTokens     emailVerificationToken[]
-  keys                        key[]
-  passwordResetTokens         passwordResetToken[]
-  auth_sessions               session[]
-  Subscriptions               subscription[]
-  ThirdPartyIntegrationTokens thirdPartyIntegrationToken[]
+  id                      String                       @id @unique
+  username                String                       @unique
+  email                   String                       @unique
+  email_verified          Boolean                      @default(false)
+  created_at              DateTime                     @default(now())
+  stripe_id               String?                      @unique
+  role                    UserRole?                    @default(BASE)
+  bike_ftp                Int                          @default(0)
+  run_ftp                 Int                          @default(0)
+  swim_ftp                Int                          @default(0)
+  activities              activities[]
+  emailVerificationTokens emailVerificationToken[]
+  keys                    key[]
+  passwordResetTokens     passwordResetToken[]
+  auth_sessions           session[]
+  subscriptions           subscription?
+  integration_logs        thirdPartyIntegrationLogs[]
+  integrations            thirdPartyIntegrationToken[]
 
   @@index([id])
 }
 
 model subscription {
-  stripe_id            String    @id @unique
-  user_id              String
+  user_id              String    @id @unique
   cancel_at            DateTime?
   cancel_at_period_end Boolean?
   canceled_at          DateTime?
@@ -40,7 +44,10 @@ model subscription {
   trial_end            DateTime?
   metadata             Json
   status               String
+  stripe_sub_id        String    @unique
   user                 user      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
 }
 
 model session {
@@ -73,16 +80,18 @@ model emailVerificationToken {
 }
 
 model thirdPartyIntegrationToken {
-  id            Int                            @id @default(autoincrement())
-  user_id       String
-  provider      ThirdPartyIntegrationProvider?
-  expires_at    BigInt
-  expires_in    BigInt
-  createdAt     DateTime                       @default(now())
-  updatedAt     DateTime                       @updatedAt
-  access_token  String
-  refresh_token String
-  user          user                           @relation(fields: [user_id], references: [id])
+  id             Int                            @id @default(autoincrement())
+  user_id        String
+  provider       ThirdPartyIntegrationProvider?
+  expires_at     BigInt
+  expires_in     BigInt
+  createdAt      DateTime                       @default(now())
+  updatedAt      DateTime                       @updatedAt
+  access_token   String
+  refresh_token  String
+  integration_id String                         @unique
+  logs           thirdPartyIntegrationLogs[]
+  user           user                           @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model thirdPartyIntegrationLogs {
@@ -91,6 +100,28 @@ model thirdPartyIntegrationLogs {
   createdAt DateTime                       @default(now())
   updatedAt DateTime                       @updatedAt
   metadata  Json
+  user_id   String
+  token_id  Int
+  token     thirdPartyIntegrationToken     @relation(fields: [token_id], references: [id], onDelete: Cascade)
+  user      user                           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model activities {
+  id                Int          @id @unique @default(autoincrement())
+  type              ActivityType
+  metric_distance   Float
+  imperial_distance Float
+  duration_seconds  Int
+  date              DateTime
+  user_id           String
+  stress_score      Int
+  user              user         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+enum ActivityType {
+  CYCLING
+  SWIMMING
+  RUNNING
 }
 
 enum UserRole {

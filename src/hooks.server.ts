@@ -54,6 +54,7 @@ export const handleError: HandleServerError = ({ error, event }) => {
 	
 	// example integration with https://sentry.io/
 	// Sentry.captureException(error, { extra: { event } });
+	console.log(error)
 
 	return {
 		message: 'Whoops!',

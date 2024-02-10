@@ -1,3 +1,5 @@
+import type { DetailedActivity } from "./typescript-fetch-client/models"
+
 type userHasStravaIntegrationResponse = {
 	exists:boolean
 }
@@ -13,9 +15,6 @@ export async function userStravaActivities():Promise<userStravaActivitiesRespons
 	return await res.json()
 }
 
-
-
-
 export async function getCurrentUserStravaActivities(user_id:string, strava_access_token:string):Promise<Array<unknown>> {
 	
 	const res = await fetch('https://www.strava.com/api/v3/athlete/activities', {
@@ -27,7 +26,7 @@ export async function getCurrentUserStravaActivities(user_id:string, strava_acce
 	return await res.json()
 }
 
-export async function getUserActivityByID(user_id:string, activity_id:number, strava_access_token:string):Promise<Array<unknown>> {
+export async function getUserActivityByID(activity_id:number, strava_access_token:string):Promise<DetailedActivity> {
 	const res = await fetch(`https://www.strava.com/api/v3/activities/${activity_id}`, {
 		method: 'GET',
 		headers: {

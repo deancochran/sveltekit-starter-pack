@@ -1,23 +1,20 @@
-import { ThirdPartyIntegrationProvider } from "@prisma/client";
-import type { PageServerLoad } from "./$types";
-import { getStravaActivities } from "$lib/utils/integrations/strava/server";
 
-export const load: PageServerLoad = async ({ parent }) => {
+import type { PageServerLoad } from "./$types";
+
+export const load: PageServerLoad = async ({ parent, fetch }) => {
 	await parent();
 	const data = await parent();
-    const integration = await prisma.thirdPartyIntegrationToken.findFirstOrThrow({
+    const user = await prisma.user.findUnique({
         where: {
-            AND: [
-                {
-                    user_id: data.session.user.userId,
-                    provider: ThirdPartyIntegrationProvider.STRAVA
-                }
-            ]
+            id: data.session.user.userId,
+        },
+        include:{
+            integration_logs:false
         }
     });
-    const activities = await getStravaActivities(integration.user_id, integration.access_token)
-	return {
-        activities,
-		...data
+
+    return {
+        user,
+        ...data
     }
 }

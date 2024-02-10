@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { Avatar } from '@skeletonlabs/skeleton';
 	import Link from './Link.svelte';
 	import type { Session } from 'lucia';
 	import { createEventDispatcher } from 'svelte';
 	import handleGetAvatarPresignedURL from '$lib/utils/minio/client/profile-picture';
+	import UserAvatar from './UserAvatar/UserAvatar.svelte';
 	export let session: Session;
 
 	const dispatch = createEventDispatcher();
@@ -20,11 +20,7 @@
 				on:click={() => dispatch('close')}
 			>
 				<div class="relative flex">
-					{#await handleGetAvatarPresignedURL(session.user.userId)}
-						<Avatar src="" initials={String(session.user.username).slice(0, 2)} />
-					{:then obj}
-						<Avatar src={obj.presignedUrl} initials={String(session.user.username).slice(0, 2)} />
-					{/await}
+					<UserAvatar/>
 				</div>
 
 				<div class="relative flex gap-2">

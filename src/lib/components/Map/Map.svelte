@@ -5,12 +5,13 @@
 	import { getMapContext } from './stores';
 
 	export let map_id = 'map';
-	export let map_style = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+	export let map_style = 'https://api.maptiler.com/maps/outdoor-v2/style.json?key=vcLMPIc3W2UdFOStWLDw'; 
 	export let center: LngLatLike = [0, 0];
 	export let zoom = 1;
 
 	const MapDisptacher: MapEventDispatcher = createEventDispatcher<MapEvent>();
 	const mapStore = getMapContext();
+
 	function createMap(element: HTMLDivElement) {
 		$mapStore = new maplibre.Map({ container: element, style: map_style, center, zoom });
 		// Add geolocate control to the map.
