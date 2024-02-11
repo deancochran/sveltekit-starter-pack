@@ -6,7 +6,6 @@
 	import UpdateUserPasswordForm from '$lib/forms/UpdateUserPasswordForm.svelte';
 	import UpdateUserProfileForm from '$lib/forms/UpdateUserProfileForm.svelte';
 
-	import UpdateUserProfilePictureForm from '$lib/forms/UpdateUserProfilePictureForm.svelte';
 export let data;
 </script>
 
@@ -15,7 +14,6 @@ export let data;
 		<div class="card p-4 flex-col gap-2 flex items-center justify-center align-middle">
 			<h1 class="h1 font-serif">Settings Page</h1>
 		</div>
-		<UpdateUserProfilePictureForm />
 		<UpdateUserProfileForm form_data={data.updateUserForm} />
 		<UpdateUserEmailForm
 			form_data={data.updateUserEmailForm}

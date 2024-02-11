@@ -2,7 +2,6 @@
 	import Link from './Link.svelte';
 	import type { Session } from 'lucia';
 	import { createEventDispatcher } from 'svelte';
-	import handleGetAvatarPresignedURL from '$lib/utils/minio/client/profile-picture';
 	import UserAvatar from './UserAvatar/UserAvatar.svelte';
 	export let session: Session;
 

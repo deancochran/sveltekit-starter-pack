@@ -15,9 +15,10 @@ model user {
   created_at              DateTime                     @default(now())
   stripe_id               String?                      @unique
   role                    UserRole?                    @default(BASE)
-  bike_ftp                Int                          @default(0)
-  run_ftp                 Int                          @default(0)
-  swim_ftp                Int                          @default(0)
+  bike_ftp                Int                          @default(150)
+  run_ftp                 Int                          @default(10)
+  swim_ftp                Int                          @default(5)
+  unitType                UnitType                     @default(METRIC)
   activities              activities[]
   emailVerificationTokens emailVerificationToken[]
   keys                    key[]
@@ -95,27 +96,29 @@ model thirdPartyIntegrationToken {
 }
 
 model thirdPartyIntegrationLogs {
-  id        Int                            @id @default(autoincrement())
-  provider  ThirdPartyIntegrationProvider?
-  createdAt DateTime                       @default(now())
-  updatedAt DateTime                       @updatedAt
-  metadata  Json
-  user_id   String
-  token_id  Int
-  token     thirdPartyIntegrationToken     @relation(fields: [token_id], references: [id], onDelete: Cascade)
-  user      user                           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  id          Int                            @id @default(autoincrement())
+  provider    ThirdPartyIntegrationProvider?
+  createdAt   DateTime                       @default(now())
+  updatedAt   DateTime                       @updatedAt
+  metadata    Json
+  user_id     String
+  token_id    Int
+  token       thirdPartyIntegrationToken     @relation(fields: [token_id], references: [id], onDelete: Cascade)
+  user        user                           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  activity_id Int?                           @unique
+  activity    activities?                    @relation(fields: [activity_id], references: [id], onDelete: Cascade)
 }
 
 model activities {
-  id                Int          @id @unique @default(autoincrement())
-  type              ActivityType
-  metric_distance   Float
-  imperial_distance Float
-  duration_seconds  Int
-  date              DateTime
-  user_id           String
-  stress_score      Int
-  user              user         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  id                       Int                        @id @unique @default(autoincrement())
+  type                     ActivityType
+  distance                 Float
+  duration                 Int
+  date                     DateTime                   @default(now())
+  user_id                  String
+  stress_score             Int
+  user                     user                       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  thirdPartyIntegrationLog thirdPartyIntegrationLogs?
 }
 
 enum ActivityType {
@@ -131,4 +134,9 @@ enum UserRole {
 
 enum ThirdPartyIntegrationProvider {
   STRAVA
+}
+
+enum UnitType {
+  IMPERIAL
+  METRIC
 }

@@ -95,7 +95,7 @@ export interface ActivityTotal {
      * @type {number}
      * @memberof ActivityTotal
      */
-    movingTime?: number;
+    moving_time?: number;
     /**
      * The total elapsed time of the considered activities.
      * @type {number}
@@ -239,7 +239,7 @@ export interface AltitudeStream extends BaseStream {
      * @type {Array<number>}
      * @memberof AltitudeStream
      */
-    data?: Array<number>;
+    data: Array<number>;
 }
 
 /**
@@ -313,7 +313,7 @@ export interface CadenceStream extends BaseStream {
      * @type {Array<number>}
      * @memberof CadenceStream
      */
-    data?: Array<number>;
+    data: Array<number>;
 }
 
 /**
@@ -353,7 +353,7 @@ export interface ClubActivity {
      * @type {number}
      * @memberof ClubActivity
      */
-    movingTime?: number;
+    moving_time?: number;
     /**
      * The activity's elapsed time, in seconds
      * @type {number}
@@ -377,7 +377,7 @@ export interface ClubActivity {
      * @type {SportType}
      * @memberof ClubActivity
      */
-    sportType?: SportType;
+    sport_type?: SportType;
     /**
      * The activity's workout type
      * @type {number}
@@ -787,7 +787,7 @@ export interface DetailedSegmentEffort extends SummarySegmentEffort {
      * @type {number}
      * @memberof DetailedSegmentEffort
      */
-    movingTime?: number;
+    moving_time?: number;
     /**
      * The start index of this effort in its activity's stream
      * @type {number}
@@ -867,7 +867,7 @@ export interface DistanceStream extends BaseStream {
      * @type {Array<number>}
      * @memberof DistanceStream
      */
-    data?: Array<number>;
+    data: Array<number>;
 }
 
 /**
@@ -1031,7 +1031,7 @@ export interface HeartrateStream extends BaseStream {
      * @type {Array<number>}
      * @memberof HeartrateStream
      */
-    data?: Array<number>;
+    data: Array<number>;
 }
 
 /**
@@ -1119,7 +1119,7 @@ export interface Lap {
      * @type {number}
      * @memberof Lap
      */
-    movingTime?: number;
+    moving_time?: number;
     /**
      * The name of the lap
      * @type {string}
@@ -1379,7 +1379,7 @@ export interface PowerStream extends BaseStream {
      * @type {Array<number>}
      * @memberof PowerStream
      */
-    data?: Array<number>;
+    data: Array<number>;
 }
 
 /**
@@ -1505,7 +1505,7 @@ export interface Route {
      * @type {number}
      * @memberof Route
      */
-    estimatedMovingTime?: number;
+    estimatedmoving_time?: number;
     /**
      * The segments traversed by this route
      * @type {Array<SummarySegment>}
@@ -1525,7 +1525,7 @@ export interface SmoothGradeStream extends BaseStream {
      * @type {Array<number>}
      * @memberof SmoothGradeStream
      */
-    data?: Array<number>;
+    data: Array<number>;
 }
 
 /**
@@ -1539,6 +1539,28 @@ export namespace SmoothGradeStream {
 /**
  * 
  * @export
+ * @interface GradeAdjustedDistanceStream
+ */
+export interface GradeAdjustedDistanceStream extends BaseStream {
+    /**
+     * The sequence of grade values for this stream, as percents of a grade
+     * @type {Array<number>}
+     * @memberof GradeAdjustedDistanceStream
+     */
+    data: Array<number>;
+}
+
+/**
+ * @export
+ * @namespace GradeAdjustedDistanceStream
+ */
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace GradeAdjustedDistanceStream {
+}
+
+/**
+ * 
+ * @export
  * @interface SmoothVelocityStream
  */
 export interface SmoothVelocityStream extends BaseStream {
@@ -1547,7 +1569,7 @@ export interface SmoothVelocityStream extends BaseStream {
      * @type {Array<number>}
      * @memberof SmoothVelocityStream
      */
-    data?: Array<number>;
+    data: Array<number>;
 }
 
 /**
@@ -1599,7 +1621,7 @@ export interface Split {
      * @type {number}
      * @memberof Split
      */
-    movingTime?: number;
+    moving_time?: number;
     /**
      * N/A
      * @type {number}
@@ -1672,72 +1694,7 @@ export enum SportType {
  * @interface StreamSet
  */
 export interface StreamSet {
-    /**
-     * 
-     * @type {TimeStream}
-     * @memberof StreamSet
-     */
-    time?: TimeStream;
-    /**
-     * 
-     * @type {DistanceStream}
-     * @memberof StreamSet
-     */
-    distance?: DistanceStream;
-    /**
-     * 
-     * @type {LatLngStream}
-     * @memberof StreamSet
-     */
-    latlng?: LatLngStream;
-    /**
-     * 
-     * @type {AltitudeStream}
-     * @memberof StreamSet
-     */
-    altitude?: AltitudeStream;
-    /**
-     * 
-     * @type {SmoothVelocityStream}
-     * @memberof StreamSet
-     */
-    velocitySmooth?: SmoothVelocityStream;
-    /**
-     * 
-     * @type {HeartrateStream}
-     * @memberof StreamSet
-     */
-    heartrate?: HeartrateStream;
-    /**
-     * 
-     * @type {CadenceStream}
-     * @memberof StreamSet
-     */
-    cadence?: CadenceStream;
-    /**
-     * 
-     * @type {PowerStream}
-     * @memberof StreamSet
-     */
-    watts?: PowerStream;
-    /**
-     * 
-     * @type {TemperatureStream}
-     * @memberof StreamSet
-     */
-    temp?: TemperatureStream;
-    /**
-     * 
-     * @type {MovingStream}
-     * @memberof StreamSet
-     */
-    moving?: MovingStream;
-    /**
-     * 
-     * @type {SmoothGradeStream}
-     * @memberof StreamSet
-     */
-    gradeSmooth?: SmoothGradeStream;
+    [index: number]: TimeStream|DistanceStream|LatLngStream|AltitudeStream|SmoothVelocityStream|HeartrateStream|CadenceStream|PowerStream|TemperatureStream|SmoothGradeStream|MovingStream|GradeAdjustedDistanceStream
 }
 
 /**
@@ -1781,7 +1738,7 @@ export interface SummaryActivity extends MetaActivity {
      * @type {number}
      * @memberof SummaryActivity
      */
-    movingTime?: number;
+    moving_time?: number;
     /**
      * The activity's elapsed time, in seconds
      * @type {number}
@@ -1817,7 +1774,7 @@ export interface SummaryActivity extends MetaActivity {
      * @type {SportType}
      * @memberof SummaryActivity
      */
-    sportType?: SportType;
+    sport_type?: SportType;
     /**
      * The time at which the activity was started.
      * @type {Date}
@@ -1991,7 +1948,7 @@ export interface SummaryActivity extends MetaActivity {
      * @type {number}
      * @memberof SummaryActivity
      */
-    weightedAverageWatts?: number;
+    weighted_average_watts?: number;
 }
 
 /**
@@ -2132,7 +2089,7 @@ export interface SummaryClub extends MetaClub {
      * @type {string}
      * @memberof SummaryClub
      */
-    sportType?: SummaryClub.SportTypeEnum;
+    sport_type?: SummaryClub.SportTypeEnum;
     /**
      * The activity types that count for a club. This takes precedence over sport_type.
      * @type {Array<ActivityType>}
@@ -2464,7 +2421,7 @@ export interface TemperatureStream extends BaseStream {
      * @type {Array<number>}
      * @memberof TemperatureStream
      */
-    data?: Array<number>;
+    data: Array<number>;
 }
 
 /**
@@ -2486,7 +2443,7 @@ export interface TimeStream extends BaseStream {
      * @type {Array<number>}
      * @memberof TimeStream
      */
-    data?: Array<number>;
+    data: Array<number>;
 }
 
 /**
@@ -2566,7 +2523,7 @@ export interface UpdatableActivity {
      * @type {SportType}
      * @memberof UpdatableActivity
      */
-    sportType?: SportType;
+    sport_type?: SportType;
     /**
      * Identifier for the gear associated with the activity. ‘none’ clears gear from activity
      * @type {string}

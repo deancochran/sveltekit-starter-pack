@@ -18,7 +18,6 @@ import { auth } from '$lib/server/lucia';
 import { sendEmailChangeCode } from '$lib/utils/emails';
 import { fail } from '@sveltejs/kit';
 import { getActiveSubscription } from '$lib/utils/stripe/subscriptions';
-import { uploadProfilePicture } from '$lib/utils/minio/upload';
 
 export const load: PageServerLoad = async ({ parent }) => {
 	await parent();
@@ -55,7 +54,7 @@ export const actions: Actions = {
 			const key = await auth.useKey('email', session.user.email, form.data.password);
 			if (key.userId != session.user.userId) throw new Error('Invalid Request');
 			const subscription = await getActiveSubscription(session.user.userId);
-			if (subscription) await stripe.subscriptions.cancel(subscription?.stripe_id);
+			if (subscription) await stripe.subscriptions.cancel(subscription?.stripe_sub_id);
 			await stripe.customers.del(session.user.stripe_id);
 			await auth.deleteUser(session.user.userId);
 			success = true;
@@ -242,31 +241,31 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 	},
-	updateUserProfilePicture: async (event) => {
+	// updateUserProfilePicture: async (event) => {
 
-		const { request, locals } = event;
-		const session = await locals.auth.validate();
-		const formData = await request.formData();
-		let t: ToastSettings;
-		try {
-			const file = Object.fromEntries(formData).file;
-			if (file instanceof File) {
-				await uploadProfilePicture(session.user.userId, file);
-				t = {
-					message: 'Updated Profile Picture',
-					background: 'variant-filled-success'
-				} as const;
-				setFlash(t, event);
-			} else {
-				throw new Error('Must provide a file');
-			}
-		} catch (e) {
+	// 	const { request, locals } = event;
+	// 	const session = await locals.auth.validate();
+	// 	const formData = await request.formData();
+	// 	let t: ToastSettings;
+	// 	try {
+	// 		const file = Object.fromEntries(formData).file;
+	// 		if (file instanceof File) {
+	// 			await uploadProfilePicture(session.user.userId, file);
+	// 			t = {
+	// 				message: 'Updated Profile Picture',
+	// 				background: 'variant-filled-success'
+	// 			} as const;
+	// 			setFlash(t, event);
+	// 		} else {
+	// 			throw new Error('Must provide a file');
+	// 		}
+	// 	} catch (e) {
 
-			t = {
-				message: 'Failed to update Profile Picture',
-				background: 'variant-filled-error'
-			} as const;
-			setFlash(t, event);
-		}
-	}
+	// 		t = {
+	// 			message: 'Failed to update Profile Picture',
+	// 			background: 'variant-filled-error'
+	// 		} as const;
+	// 		setFlash(t, event);
+	// 	}
+	// }
 };
