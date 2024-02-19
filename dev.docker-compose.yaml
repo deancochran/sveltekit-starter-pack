@@ -17,17 +17,7 @@ services:
     volumes:
       - postgres:/var/lib/postgresql/data
     ports:
-      - 5432:5432
-
-  minio:
-    image: bitnami/minio:latest
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    env_file:
-      - .env
-    volumes:
-      - minio:/data
+      - 5678:5432
 volumes:
   postgres:
   minio:
