@@ -1,13 +1,7 @@
-# SvelteKit SaaS Starter Kit
+# Cadence 
 
-<p align="center">
-  <img src="./static/performance.png" alt="drawing" width="800"/>
-</p>
-<p align="center">
-  <img src="./static/sign-up.png" alt="drawing" width="800"/>
-</p>
 
-A full-stack example of a Software as a Service (SaaS) web application built with SvelteKit, incorporating various technologies such as Stripe for subscriptions, Lucia for authentication, Prisma ORM for database interactions, Svelte Superforms form handling, Zod for validation, and enhanced with Skeleton UI and Lucide icons.
+A full-stack endurance athletics focused Software as a Service (SaaS) web application built with SvelteKit, incorporating various technologies such as Stripe for subscriptions, Lucia for authentication, Prisma ORM for database interactions, Svelte Superforms form handling, Zod for validation, and enhanced with Skeleton UI and Lucide icons.
 
 ## Table of Contents
 
@@ -26,7 +20,7 @@ A full-stack example of a Software as a Service (SaaS) web application built wit
 
 ## Introduction
 
-This SvelteKit SaaS Starter Kit provides a foundation for building modern web applications with a focus on SaaS features. It integrates powerful tools and libraries to handle essential aspects like user authentication, subscription management, form handling, and more.
+This SaaS implements modern standards for building web applications with a focus on endurance athleteics. It integrates powerful tools and libraries to handle essential aspects like user authentication, subscription management, form handling, and more.
 
 ## Features
 
