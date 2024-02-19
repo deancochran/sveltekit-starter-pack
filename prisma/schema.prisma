@@ -103,10 +103,10 @@ model thirdPartyIntegrationLogs {
   metadata    Json
   user_id     String
   token_id    Int
-  token       thirdPartyIntegrationToken     @relation(fields: [token_id], references: [id], onDelete: Cascade)
-  user        user                           @relation(fields: [user_id], references: [id], onDelete: Cascade)
   activity_id Int?                           @unique
   activity    activities?                    @relation(fields: [activity_id], references: [id], onDelete: Cascade)
+  token       thirdPartyIntegrationToken     @relation(fields: [token_id], references: [id], onDelete: Cascade)
+  user        user                           @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model activities {
