@@ -15,7 +15,7 @@ export async function userStravaActivities():Promise<userStravaActivitiesRespons
 	return await res.json()
 }
 
-export async function getCurrentUserStravaActivities(user_id:string, strava_access_token:string):Promise<Array<unknown>> {
+export async function getCurrentUserStravaActivities(strava_access_token:string):Promise<Array<DetailedActivity>> {
 	
 	const res = await fetch('https://www.strava.com/api/v3/athlete/activities', {
 		method: 'GET',

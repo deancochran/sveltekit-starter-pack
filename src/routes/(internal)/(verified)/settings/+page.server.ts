@@ -9,6 +9,7 @@ import {
 	cancel_user_subscription_schema,
 	delete_user_schema,
 	send_new_user_email_code_schema,
+	update_ftp_schema,
 	update_user_email_schema,
 	update_user_password_schema,
 	update_user_schema
@@ -32,8 +33,13 @@ export const load: PageServerLoad = async ({ parent }) => {
 	const deleteUserForm = await superValidate(delete_user_schema);
 	const updateUserEmailPasswordForm = await superValidate(update_user_password_schema);
 	const cancelUserSubscriptionForm = await superValidate(cancel_user_subscription_schema);
+	const updateFTPForm = await superValidate(
+		initialData,
+		update_ftp_schema);
+	console.log(initialData)
 	return {
 		updateUserForm,
+		updateFTPForm,
 		updateUserEmailForm,
 		sendNewUserEmailCodeForm,
 		deleteUserForm,
@@ -174,6 +180,36 @@ export const actions: Actions = {
 					background: 'variant-filled-error'
 				} as const;
 			}
+			setFlash(t, event);
+			return fail(400, { form });
+		}
+	},
+	updateFTP: async (event) => {
+		const { locals, request } = event;
+		const form = await superValidate(request, update_ftp_schema);
+		const session = await locals.auth.validate();
+		let t: ToastSettings;
+		try {
+			if (!form.valid) throw new Error('Must provide valid ftp values');
+			await prisma.user.update({
+				where:{
+					id:session.user.userId
+				},
+				data:{
+					...form.data
+				}
+			})
+			t = {
+				message: 'Updated FTP Settings',
+				background: 'variant-filled-success'
+			} as const;
+			setFlash(t, event);
+			return { form };
+		} catch (e) {
+			t = {
+				message: 'Failed to update FTP Settings',
+				background: 'variant-filled-error'
+			} as const;
 			setFlash(t, event);
 			return fail(400, { form });
 		}

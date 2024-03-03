@@ -86,7 +86,7 @@ export const ActivitiesApiFetchParamCreator = function (configuration?: Configur
          * @summary Create an Activity
          * @param {string} name The name of the activity.
          * @param {string} sportType Sport type of activity. For example - Run, MountainBikeRide, Ride, etc.
-         * @param {Date} startDateLocal ISO 8601 formatted date time.
+         * @param {Date} start_date_local ISO 8601 formatted date time.
          * @param {number} elapsedTime In seconds.
          * @param {string} [type] Type of activity. For example - Run, Ride etc.
          * @param {string} [description] Description of the activity.
@@ -96,7 +96,7 @@ export const ActivitiesApiFetchParamCreator = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createActivity(name: string, sportType: string, startDateLocal: Date, elapsedTime: number, type?: string, description?: string, distance?: number, trainer?: number, commute?: number, options: unknown = {}): FetchArgs {
+        createActivity(name: string, sportType: string, start_date_local: Date, elapsedTime: number, type?: string, description?: string, distance?: number, trainer?: number, commute?: number, options: unknown = {}): FetchArgs {
             // verify required parameter 'name' is not null or undefined
             if (name === null || name === undefined) {
                 throw new RequiredError('name','Required parameter name was null or undefined when calling createActivity.');
@@ -105,9 +105,9 @@ export const ActivitiesApiFetchParamCreator = function (configuration?: Configur
             if (sportType === null || sportType === undefined) {
                 throw new RequiredError('sportType','Required parameter sportType was null or undefined when calling createActivity.');
             }
-            // verify required parameter 'startDateLocal' is not null or undefined
-            if (startDateLocal === null || startDateLocal === undefined) {
-                throw new RequiredError('startDateLocal','Required parameter startDateLocal was null or undefined when calling createActivity.');
+            // verify required parameter 'start_date_local' is not null or undefined
+            if (start_date_local === null || start_date_local === undefined) {
+                throw new RequiredError('start_date_local','Required parameter start_date_local was null or undefined when calling createActivity.');
             }
             // verify required parameter 'elapsedTime' is not null or undefined
             if (elapsedTime === null || elapsedTime === undefined) {
@@ -141,8 +141,8 @@ export const ActivitiesApiFetchParamCreator = function (configuration?: Configur
                 localVarFormParams.set('sport_type', sportType as unknown);
             }
 
-            if (startDateLocal !== undefined) {
-                localVarFormParams.set('start_date_local', startDateLocal as unknown);
+            if (start_date_local !== undefined) {
+                localVarFormParams.set('start_date_local', start_date_local as unknown);
             }
 
             if (elapsedTime !== undefined) {
@@ -512,7 +512,7 @@ export const ActivitiesApiFp = function(configuration?: Configuration) {
          * @summary Create an Activity
          * @param {string} name The name of the activity.
          * @param {string} sportType Sport type of activity. For example - Run, MountainBikeRide, Ride, etc.
-         * @param {Date} startDateLocal ISO 8601 formatted date time.
+         * @param {Date} start_date_local ISO 8601 formatted date time.
          * @param {number} elapsedTime In seconds.
          * @param {string} [type] Type of activity. For example - Run, Ride etc.
          * @param {string} [description] Description of the activity.
@@ -522,8 +522,8 @@ export const ActivitiesApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createActivity(name: string, sportType: string, startDateLocal: Date, elapsedTime: number, type?: string, description?: string, distance?: number, trainer?: number, commute?: number, options?: unknown): (fetch?: FetchAPI, basePath?: string) => Promise<DetailedActivity> {
-            const localVarFetchArgs = ActivitiesApiFetchParamCreator(configuration).createActivity(name, sportType, startDateLocal, elapsedTime, type, description, distance, trainer, commute, options);
+        createActivity(name: string, sportType: string, start_date_local: Date, elapsedTime: number, type?: string, description?: string, distance?: number, trainer?: number, commute?: number, options?: unknown): (fetch?: FetchAPI, basePath?: string) => Promise<DetailedActivity> {
+            const localVarFetchArgs = ActivitiesApiFetchParamCreator(configuration).createActivity(name, sportType, start_date_local, elapsedTime, type, description, distance, trainer, commute, options);
             return (fetch: FetchAPI = portableFetch, basePath: string = BASE_PATH) => {
                 return fetch(basePath + localVarFetchArgs.url, localVarFetchArgs.options).then((response) => {
                     if (response.status >= 200 && response.status < 300) {
@@ -692,7 +692,7 @@ export const ActivitiesApiFactory = function (configuration?: Configuration, fet
          * @summary Create an Activity
          * @param {string} name The name of the activity.
          * @param {string} sportType Sport type of activity. For example - Run, MountainBikeRide, Ride, etc.
-         * @param {Date} startDateLocal ISO 8601 formatted date time.
+         * @param {Date} start_date_local ISO 8601 formatted date time.
          * @param {number} elapsedTime In seconds.
          * @param {string} [type] Type of activity. For example - Run, Ride etc.
          * @param {string} [description] Description of the activity.
@@ -702,8 +702,8 @@ export const ActivitiesApiFactory = function (configuration?: Configuration, fet
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createActivity(name: string, sportType: string, startDateLocal: Date, elapsedTime: number, type?: string, description?: string, distance?: number, trainer?: number, commute?: number, options?: unknown) {
-            return ActivitiesApiFp(configuration).createActivity(name, sportType, startDateLocal, elapsedTime, type, description, distance, trainer, commute, options)(fetch, basePath);
+        createActivity(name: string, sportType: string, start_date_local: Date, elapsedTime: number, type?: string, description?: string, distance?: number, trainer?: number, commute?: number, options?: unknown) {
+            return ActivitiesApiFp(configuration).createActivity(name, sportType, start_date_local, elapsedTime, type, description, distance, trainer, commute, options)(fetch, basePath);
         },
         /**
          * Returns the given activity that is owned by the authenticated athlete. Requires activity:read for Everyone and Followers activities. Requires activity:read_all for Only Me activities.
@@ -801,7 +801,7 @@ export class ActivitiesApi extends BaseAPI {
      * @summary Create an Activity
      * @param {string} name The name of the activity.
      * @param {string} sportType Sport type of activity. For example - Run, MountainBikeRide, Ride, etc.
-     * @param {Date} startDateLocal ISO 8601 formatted date time.
+     * @param {Date} start_date_local ISO 8601 formatted date time.
      * @param {number} elapsedTime In seconds.
      * @param {string} [type] Type of activity. For example - Run, Ride etc.
      * @param {string} [description] Description of the activity.
@@ -812,8 +812,8 @@ export class ActivitiesApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ActivitiesApi
      */
-    public createActivity(name: string, sportType: string, startDateLocal: Date, elapsedTime: number, type?: string, description?: string, distance?: number, trainer?: number, commute?: number, options?: unknown) {
-        return ActivitiesApiFp(this.configuration).createActivity(name, sportType, startDateLocal, elapsedTime, type, description, distance, trainer, commute, options)(this.fetch, this.basePath);
+    public createActivity(name: string, sportType: string, start_date_local: Date, elapsedTime: number, type?: string, description?: string, distance?: number, trainer?: number, commute?: number, options?: unknown) {
+        return ActivitiesApiFp(this.configuration).createActivity(name, sportType, start_date_local, elapsedTime, type, description, distance, trainer, commute, options)(this.fetch, this.basePath);
     }
 
     /**
@@ -2208,13 +2208,13 @@ export const SegmentEffortsApiFetchParamCreator = function (configuration?: Conf
          * Returns a set of the authenticated athlete's segment efforts for a given segment.  Requires subscription.
          * @summary List Segment Efforts
          * @param {number} segmentId The identifier of the segment.
-         * @param {Date} [startDateLocal] ISO 8601 formatted date time.
+         * @param {Date} [start_date_local] ISO 8601 formatted date time.
          * @param {Date} [endDateLocal] ISO 8601 formatted date time.
          * @param {number} [perPage] Number of items per page. Defaults to 30.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEffortsBySegmentId(segmentId: number, startDateLocal?: Date, endDateLocal?: Date, perPage?: number, options: unknown = {}): FetchArgs {
+        getEffortsBySegmentId(segmentId: number, start_date_local?: Date, endDateLocal?: Date, perPage?: number, options: unknown = {}): FetchArgs {
             // verify required parameter 'segmentId' is not null or undefined
             if (segmentId === null || segmentId === undefined) {
                 throw new RequiredError('segmentId','Required parameter segmentId was null or undefined when calling getEffortsBySegmentId.');
@@ -2238,8 +2238,8 @@ export const SegmentEffortsApiFetchParamCreator = function (configuration?: Conf
                 localVarQueryParameter['segment_id'] = segmentId;
             }
 
-            if (startDateLocal !== undefined) {
-                localVarQueryParameter['start_date_local'] = (startDateLocal as unknown).toISOString();
+            if (start_date_local !== undefined) {
+                localVarQueryParameter['start_date_local'] = (start_date_local as unknown).toISOString();
             }
 
             if (endDateLocal !== undefined) {
@@ -2311,14 +2311,14 @@ export const SegmentEffortsApiFp = function(configuration?: Configuration) {
          * Returns a set of the authenticated athlete's segment efforts for a given segment.  Requires subscription.
          * @summary List Segment Efforts
          * @param {number} segmentId The identifier of the segment.
-         * @param {Date} [startDateLocal] ISO 8601 formatted date time.
+         * @param {Date} [start_date_local] ISO 8601 formatted date time.
          * @param {Date} [endDateLocal] ISO 8601 formatted date time.
          * @param {number} [perPage] Number of items per page. Defaults to 30.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEffortsBySegmentId(segmentId: number, startDateLocal?: Date, endDateLocal?: Date, perPage?: number, options?: unknown): (fetch?: FetchAPI, basePath?: string) => Promise<Array<DetailedSegmentEffort>> {
-            const localVarFetchArgs = SegmentEffortsApiFetchParamCreator(configuration).getEffortsBySegmentId(segmentId, startDateLocal, endDateLocal, perPage, options);
+        getEffortsBySegmentId(segmentId: number, start_date_local?: Date, endDateLocal?: Date, perPage?: number, options?: unknown): (fetch?: FetchAPI, basePath?: string) => Promise<Array<DetailedSegmentEffort>> {
+            const localVarFetchArgs = SegmentEffortsApiFetchParamCreator(configuration).getEffortsBySegmentId(segmentId, start_date_local, endDateLocal, perPage, options);
             return (fetch: FetchAPI = portableFetch, basePath: string = BASE_PATH) => {
                 return fetch(basePath + localVarFetchArgs.url, localVarFetchArgs.options).then((response) => {
                     if (response.status >= 200 && response.status < 300) {
@@ -2361,14 +2361,14 @@ export const SegmentEffortsApiFactory = function (configuration?: Configuration,
          * Returns a set of the authenticated athlete's segment efforts for a given segment.  Requires subscription.
          * @summary List Segment Efforts
          * @param {number} segmentId The identifier of the segment.
-         * @param {Date} [startDateLocal] ISO 8601 formatted date time.
+         * @param {Date} [start_date_local] ISO 8601 formatted date time.
          * @param {Date} [endDateLocal] ISO 8601 formatted date time.
          * @param {number} [perPage] Number of items per page. Defaults to 30.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEffortsBySegmentId(segmentId: number, startDateLocal?: Date, endDateLocal?: Date, perPage?: number, options?: unknown) {
-            return SegmentEffortsApiFp(configuration).getEffortsBySegmentId(segmentId, startDateLocal, endDateLocal, perPage, options)(fetch, basePath);
+        getEffortsBySegmentId(segmentId: number, start_date_local?: Date, endDateLocal?: Date, perPage?: number, options?: unknown) {
+            return SegmentEffortsApiFp(configuration).getEffortsBySegmentId(segmentId, start_date_local, endDateLocal, perPage, options)(fetch, basePath);
         },
         /**
          * Returns a segment effort from an activity that is owned by the authenticated athlete. Requires subscription.
@@ -2394,15 +2394,15 @@ export class SegmentEffortsApi extends BaseAPI {
      * Returns a set of the authenticated athlete's segment efforts for a given segment.  Requires subscription.
      * @summary List Segment Efforts
      * @param {number} segmentId The identifier of the segment.
-     * @param {Date} [startDateLocal] ISO 8601 formatted date time.
+     * @param {Date} [start_date_local] ISO 8601 formatted date time.
      * @param {Date} [endDateLocal] ISO 8601 formatted date time.
      * @param {number} [perPage] Number of items per page. Defaults to 30.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof SegmentEffortsApi
      */
-    public getEffortsBySegmentId(segmentId: number, startDateLocal?: Date, endDateLocal?: Date, perPage?: number, options?: unknown) {
-        return SegmentEffortsApiFp(this.configuration).getEffortsBySegmentId(segmentId, startDateLocal, endDateLocal, perPage, options)(this.fetch, this.basePath);
+    public getEffortsBySegmentId(segmentId: number, start_date_local?: Date, endDateLocal?: Date, perPage?: number, options?: unknown) {
+        return SegmentEffortsApiFp(this.configuration).getEffortsBySegmentId(segmentId, start_date_local, endDateLocal, perPage, options)(this.fetch, this.basePath);
     }
 
     /**

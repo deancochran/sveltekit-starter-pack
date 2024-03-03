@@ -1,10 +1,10 @@
-import { ActivityType, ThirdPartyIntegrationProvider, type activities, type thirdPartyIntegrationLogs, type thirdPartyIntegrationToken, type user } from '@prisma/client';
+import { ActivityType, ThirdPartyIntegrationProvider, type thirdPartyIntegrationLogs, type thirdPartyIntegrationToken, type user } from '@prisma/client';
 import type { StravaSubscriptionWebhookEvent } from '$lib/utils/integrations/strava/types.js';
 import { error, json } from '@sveltejs/kit';
 import { getUserActivityByID } from '$lib/utils/integrations/strava/utils';
-import { SportType, type DetailedActivity } from '$lib/utils/integrations/strava/typescript-fetch-client/models';
-import { calcSwimPace, calc_sTss } from '$lib/utils/tss/stss';
-import { calcRunPace, calc_rTss } from '$lib/utils/tss/rtss';
+import { SportType } from '$lib/utils/integrations/strava/typescript-fetch-client/models';
+import { calcSwimPace, calc_sIF, calc_sTss } from '$lib/utils/tss/stss';
+import { calcRunPace, calc_rIF, calc_rTss } from '$lib/utils/tss/rtss';
 import { calc_cTss } from '$lib/utils/tss/ctss';
 
 const valid_cTss_sport_types = [SportType.EMountainBikeRide, SportType.GravelRide, SportType.Handcycle, SportType.MountainBikeRide, SportType.Ride, SportType.VirtualRide]
@@ -27,7 +27,7 @@ export async function POST(event) {
 	const { request } = event;
 	const hook_data: StravaSubscriptionWebhookEvent = await request.json();
 
-	let integration = await prisma.thirdPartyIntegrationToken.findFirstOrThrow({
+	const integration = await prisma.thirdPartyIntegrationToken.findFirstOrThrow({
 		where: {
 			AND: [
 				{
@@ -49,14 +49,15 @@ export async function POST(event) {
 						provider: ThirdPartyIntegrationProvider.STRAVA,
 						metadata: hook_data
 					},
-					include:{
-						token:true,
-						user:true
+					include: {
+						token: true,
+						user: true
 					}
 				});
 				await createActivityFromHook(log)
 				return json({ message: 'successful create' }, { status: 200 });
 			} catch (e) {
+				console.log(e)
 				return json({ message: 'failed create' }, { status: 400 });
 			}
 		case 'update':
@@ -64,7 +65,7 @@ export async function POST(event) {
 				await prisma.thirdPartyIntegrationLogs.updateMany({
 					data: {
 						metadata: hook_data
-						
+
 					},
 					where: {
 						AND: [
@@ -136,66 +137,71 @@ export async function POST(event) {
 }
 
 
-async function createActivityFromHook(log: { token: thirdPartyIntegrationToken, user: user} & thirdPartyIntegrationLogs) {
-	
-	if(log.provider==ThirdPartyIntegrationProvider.STRAVA){
-		const strava_activity=(log.metadata as StravaSubscriptionWebhookEvent)
-		if(strava_activity.object_type != "activity") error(400)
+async function createActivityFromHook(log: { token: thirdPartyIntegrationToken, user: user } & thirdPartyIntegrationLogs) {
+
+	if (log.provider == ThirdPartyIntegrationProvider.STRAVA) {
+		const strava_activity = (log.metadata as StravaSubscriptionWebhookEvent)
+		if (strava_activity.object_type != "activity") error(400)
 		const activity = await getUserActivityByID(Number(strava_activity.object_id), log.token.access_token)
-		if(!activity.sport_type) error(400)
-		if(!activity.distance) error(400)
-		if(!activity.moving_time) error(400)
-		if(!valid_type(activity.sport_type!)) error(400)
-		const type_of_activity = getActivityType(activity.sport_type)
-		const tss = await calc_Strava_TSS(log.user,activity)
-		// await prisma.activities.create({
-		// 	data:{
-		// 		type:type_of_activity
-		// 		distance:activity.distance,
-		// 		duration:activity.moving_time,
-		// 		user_id:log.user_id,
-		// 		stress_score: tss,
-		// 	}
-		// })
-		throw new Error('Strava Integration not implemented.');
-	}else{
-		throw new Error('Function not implemented.');
+
+		if (!activity.sport_type) return json({ "message": `Sport Type: ${activity.sport_type} is not valid` }, { status: 400 });
+		if (valid_rTss_sport_types.includes(activity.sport_type)) {
+			const requirements = [activity.distance, activity.moving_time]
+			if (requirements.some(value => !value)) return json({ "message": "activity.distance, activity.moving_time are required" }, { status: 400 });
+			const GAP = calcRunPace(activity.distance!, activity.moving_time!)
+            const rIF = calc_rIF(GAP, log.user.run_ftp)
+            const tss = calc_rTss(activity.moving_time!, GAP, log.user.run_ftp, rIF)
+			return await prisma.activities.create({
+				data: {
+					type: ActivityType.RUNNING,
+					distance: activity.distance ?? 0,
+					duration: activity.moving_time ?? 0,
+					date: activity.start_date_local,
+					user_id: log.user_id,
+					stress_score: tss,
+					intensity_factor_score: rIF,
+					thirdparty_log_id: log.id
+				}
+			});
+		} else if (valid_cTss_sport_types.includes(activity.sport_type)) {
+			const requirements = [activity.weighted_average_watts, activity.moving_time]
+			if (requirements.some(value => !value)) return json({ "message": "activity.weighted_average_watts, activity.moving_time are required" }, { status: 400 });
+            const cIF = calc_rIF(activity.weighted_average_watts!, log.user.run_ftp)
+            const tss = calc_cTss(activity.moving_time!, activity.weighted_average_watts!, log.user.bike_ftp, cIF)
+			return await prisma.activities.create({
+				data: {
+					type: ActivityType.CYCLING,
+					distance: activity.distance ?? 0,
+					duration: activity.moving_time ?? 0,
+					date: activity.start_date_local,
+					user_id: log.user_id,
+					stress_score: tss,
+					intensity_factor_score: cIF,
+					thirdparty_log_id: log.id
+				}
+			});
+		} else if (valid_sTss_sport_types.includes(activity.sport_type)) {
+			const requirements = [activity.distance, activity.moving_time]
+			if (requirements.some(value => !value)) return json({ "message": "activity.distance, activity.moving_time are required" }, { status: 400 });
+			const GAP = calcSwimPace(activity.distance!, activity.moving_time!)
+			const sIF = calc_sIF(GAP, log.user.swim_ftp)
+			const tss = calc_sTss(activity.moving_time!, GAP, log.user.swim_ftp, sIF)
+			return await prisma.activities.create({
+				data: {
+					type: ActivityType.SWIMMING,
+					distance: activity.distance ?? 0,
+					duration: activity.moving_time ?? 0,
+					date: activity.start_date,
+					user_id: log.user_id,
+					stress_score: tss,
+					intensity_factor_score: sIF,
+					thirdparty_log_id: log.id
+				}
+			});
+		} else {
+			throw new Error(`Function for sport type: ${activity.sport_type} not implemented`);
+		}
+	} else {
+		throw new Error('Function not implemented for non strava integration.');
 	}
-}
-
-function valid_type(sport_type:SportType){
-	
-	const requirements = [
-		valid_sTss_sport_types.includes(sport_type),
-		valid_cTss_sport_types.includes(sport_type),
-		valid_rTss_sport_types.includes(sport_type),
-	]
-	// const even = (element) => element % 2 === 0;
-	return requirements.some((condition)=>condition===true)
-	// 
-	// arr.every(fn)
-}
-
-function getActivityType(sport_type:SportType):ActivityType{
-	if(valid_sTss_sport_types.includes(sport_type)) return ActivityType.SWIMMING
-	else if(valid_cTss_sport_types.includes(sport_type)) return ActivityType.CYCLING
-	else if(valid_rTss_sport_types.includes(sport_type)) return ActivityType.RUNNING
-	else error(400)
-}
-
-
-async function calc_Strava_TSS(user: user,activity:DetailedActivity){
-	const type_of_activity = getActivityType(activity.sport_type!)
-	switch (type_of_activity) {
-		case ActivityType.SWIMMING:
-            return calc_sTss(activity.moving_time!, calcSwimPace(activity.distance!, activity.moving_time!), user.swim_ftp)
-		case ActivityType.CYCLING:
-			return calc_cTss(activity.moving_time!, activity.weighted_average_watts!, user.bike_ftp)
-		case ActivityType.RUNNING:
-            return calc_rTss(activity.moving_time!, calcRunPace(activity.distance!, activity.moving_time!), user.run_ftp)
-		default:
-			error(400);
-	}
-
-	
 }

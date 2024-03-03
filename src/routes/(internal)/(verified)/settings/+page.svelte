@@ -5,6 +5,7 @@
 	import UpdateUserEmailForm from '$lib/forms/UpdateUserEmailForm.svelte';
 	import UpdateUserPasswordForm from '$lib/forms/UpdateUserPasswordForm.svelte';
 	import UpdateUserProfileForm from '$lib/forms/UpdateUserProfileForm.svelte';
+	import UpdateFtpForm from '$lib/forms/UpdateFTPForm.svelte';
 
 export let data;
 </script>
@@ -14,6 +15,8 @@ export let data;
 		<div class="card p-4 flex-col gap-2 flex items-center justify-center align-middle">
 			<h1 class="h1 font-serif">Settings Page</h1>
 		</div>
+
+		<UpdateFtpForm form_data={data.updateFTPForm} />
 		<UpdateUserProfileForm form_data={data.updateUserForm} />
 		<UpdateUserEmailForm
 			form_data={data.updateUserEmailForm}
@@ -24,8 +27,8 @@ export let data;
 		<DeleteUserForm form_data={data.deleteUserForm} />
 
 		<div class="flex">
-			<div class="flex">Strava Integration</div>
-			<div class="flex">Trainging Peaks Integration</div>
+			<!-- <div class="flex">Strava Integration</div> -->
+			<!-- <div class="flex">Trainging Peaks Integration</div> -->
 		</div>
 	</div>
 </div>

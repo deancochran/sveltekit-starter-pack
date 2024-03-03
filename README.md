@@ -55,7 +55,7 @@ This SvelteKit SaaS Starter Kit provides a foundation for building modern web ap
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/deancochran/skauth.git
+   git clone https://github.com/deancochran/cadence.git
    ```
 
 2. Install dependencies:
@@ -145,3 +145,29 @@ pnpm run stripe-webhook
 # or
 stripe listen --forward-to localhost:5173/stripe/webhook
 ```
+
+# Fun Calculations
+Fitness: CTL(t) = CTL(t-1) + (TSS(t) – CTL(t-1))*(1-e^(-1/42))
+
+  This equation says that the one-day change in CTL equals the incremental load (over your CTL) * 0.024, so you only gain about 2.4% of your incremental load in fitness per day. (That’s why it is so important to build a good base during the winter/early season as you cannot build CTL quickly.)
+
+Fatigue: ATL(t) = ATL(t-1) + (TSS(t) – ATL(t-1))*(1-e^(-1/7))
+
+  It is similar to CTL but focuses on the last 7 days (1 week) instead of 6 weeks (42 days). The computation is similarly done using exponential smoothing but only over 7 days
+
+Form: TSB(t) = CTL(t-1) – ATL(t-1)
+
+  Positive TSB means you are “on form” and have higher fitness than fatigue. The goal of a training plan is not only getting the fitness (building CTL) but also timing it such that you have positive TSB before the start of the race. Peaking exactly accomplishes that: after a peak in workload, fatigue and fitness, the workload is reduced below the CTL one to two weeks before the race. Given that CTL moves slowly, fitness falls little but ATL responds quickly (falling below CTL) leading to a big positive spike in TSB.
+
+# 80/20 Rule:
+- its been studied that elite professionals have seen sucess from training on the 80/20 method.
+- the method simply suggests that 80% of all the active trainging time logged should be below lactate threshold, whilst 20% should be above
+- lactate threshold in a vague sense, is the highest exercise intensity that can be sustained for up to 60 minutes
+- FTP is not the same as lactate threshold. But within the constraints of providing web app clients a feature to visualize through over all intensity ratio for the week. We can measure the amount of training time over / under FTP for a given sport
+
+
+# TODO for implementation...
+- add the intensity factor as a column to the activity table. 
+- update the typing accordingly in the frontend 'StressDays' is in need of updating
+- on the dashboard, use the data.activites to calculate the total percentage of training done above threshold and below threshold  
+- add a message to encourage training at a 80% below threshold and 20% above threshold ratio as per the 80/20 method

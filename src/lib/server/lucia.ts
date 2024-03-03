@@ -16,7 +16,10 @@ export const auth = lucia({
 			email_verified: data.email_verified,
 			created_at: data.created_at,
 			stripe_id: data.stripe_id,
-			role: data.role
+			role: data.role,
+			swim_ftp: data.swim_ftp,
+			bike_ftp: data.bike_ftp,
+			run_ftp: data.run_ftp,
 		};
 	},
 	sessionCookie: {

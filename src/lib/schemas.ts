@@ -113,6 +113,16 @@ export const reset_pass_schema = z
 	});
 export type ResetPassSchema = typeof reset_pass_schema;
 
+export const update_ftp_schema = z
+	.object({
+		run_ftp: z.number(),
+		bike_ftp: z.number(),
+		swim_ftp: z.number(),
+	})
+export type UpdateFTPSchema = typeof update_ftp_schema;
+
+
+
 export const resend_reset_pass_schema = z.object({});
 export type ResendResetPassSchema = typeof resend_reset_pass_schema;
 

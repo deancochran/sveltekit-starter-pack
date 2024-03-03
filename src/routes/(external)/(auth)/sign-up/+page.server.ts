@@ -89,6 +89,7 @@ export const actions: Actions = {
 					} as const;
 				}
 				setFlash(t, event);
+				console.log(error)
 				return fail(500, { form });
 			}
 			const t: ToastSettings = {

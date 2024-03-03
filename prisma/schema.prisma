@@ -15,9 +15,9 @@ model user {
   created_at              DateTime                     @default(now())
   stripe_id               String?                      @unique
   role                    UserRole?                    @default(BASE)
-  bike_ftp                Int                          @default(150)
-  run_ftp                 Int                          @default(10)
-  swim_ftp                Int                          @default(5)
+  bike_ftp                Int                          @default(100)
+  run_ftp                 Int                          @default(480)
+  swim_ftp                Int                          @default(240)
   unitType                UnitType                     @default(METRIC)
   activities              activities[]
   emailVerificationTokens emailVerificationToken[]
@@ -27,6 +27,7 @@ model user {
   subscriptions           subscription?
   integration_logs        thirdPartyIntegrationLogs[]
   integrations            thirdPartyIntegrationToken[]
+  userCalendar            userCalendar[]
 
   @@index([id])
 }
@@ -96,17 +97,16 @@ model thirdPartyIntegrationToken {
 }
 
 model thirdPartyIntegrationLogs {
-  id          Int                            @id @default(autoincrement())
-  provider    ThirdPartyIntegrationProvider?
-  createdAt   DateTime                       @default(now())
-  updatedAt   DateTime                       @updatedAt
-  metadata    Json
-  user_id     String
-  token_id    Int
-  activity_id Int?                           @unique
-  activity    activities?                    @relation(fields: [activity_id], references: [id], onDelete: Cascade)
-  token       thirdPartyIntegrationToken     @relation(fields: [token_id], references: [id], onDelete: Cascade)
-  user        user                           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  id        Int                            @id @default(autoincrement())
+  provider  ThirdPartyIntegrationProvider?
+  createdAt DateTime                       @default(now())
+  updatedAt DateTime                       @updatedAt
+  metadata  Json
+  user_id   String
+  token_id  Int
+  activity  activities?
+  token     thirdPartyIntegrationToken     @relation(fields: [token_id], references: [id], onDelete: Cascade)
+  user      user                           @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model activities {
@@ -117,8 +117,30 @@ model activities {
   date                     DateTime                   @default(now())
   user_id                  String
   stress_score             Int
+  thirdparty_log_id        Int?                       @unique
+  intensity_factor_score   Int
+  thirdPartyIntegrationLog thirdPartyIntegrationLogs? @relation(fields: [thirdparty_log_id], references: [id], onDelete: Cascade)
   user                     user                       @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  thirdPartyIntegrationLog thirdPartyIntegrationLogs?
+}
+
+model userCalendar {
+  id      Int     @id @default(autoincrement())
+  user_id String
+  events  event[]
+  user    user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model event {
+  id          Int          @id @default(autoincrement())
+  eventType   EventType
+  date        DateTime     @default(now())
+  // Add other event-related fields as needed
+  user_cal_id Int
+  user_cal    userCalendar @relation(fields: [user_cal_id], references: [id], onDelete: Cascade)
+}
+
+enum EventType {
+  WORKOUT
 }
 
 enum ActivityType {

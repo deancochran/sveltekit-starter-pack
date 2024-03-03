@@ -61,9 +61,9 @@
 			>
 		</Link>
 		<Link
-			label={'Skauth'}
+			label={'cadence'}
 			type="logo-item"
-			href="https://github.com/deancochran/skauth/"
+			href="https://github.com/deancochran/cadence/"
 			target="_blank"
 			rel="noreferrer"
 		>

@@ -1143,13 +1143,13 @@ export interface Lap {
      * @type {Date}
      * @memberof Lap
      */
-    startDate?: Date;
+    start_date?: Date;
     /**
      * The time at which the lap was started in the local timezone.
      * @type {Date}
      * @memberof Lap
      */
-    startDateLocal?: Date;
+    start_date_local?: Date;
     /**
      * The elevation gain of this lap, in meters
      * @type {number}
@@ -1780,13 +1780,13 @@ export interface SummaryActivity extends MetaActivity {
      * @type {Date}
      * @memberof SummaryActivity
      */
-    startDate?: Date;
+    start_date?: Date;
     /**
      * The time at which the activity was started in the local timezone.
      * @type {Date}
      * @memberof SummaryActivity
      */
-    startDateLocal?: Date;
+    start_date_local?: Date;
     /**
      * The timezone of the activity
      * @type {string}
@@ -2389,13 +2389,13 @@ export interface SummarySegmentEffort {
      * @type {Date}
      * @memberof SummarySegmentEffort
      */
-    startDate?: Date;
+    start_date?: Date;
     /**
      * The time at which the effort was started in the local timezone.
      * @type {Date}
      * @memberof SummarySegmentEffort
      */
-    startDateLocal?: Date;
+    start_date_local?: Date;
     /**
      * The effort's distance in meters
      * @type {number}

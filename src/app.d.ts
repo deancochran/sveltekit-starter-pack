@@ -32,6 +32,9 @@ declare global {
 			created_at: Date | undefined;
 			stripe_id: string | undefined;
 			role: UserRole | undefined;
+			bike_ftp: number | undefined;
+			swim_ftp: number | undefined;
+			run_ftp: number| undefined;
 		};
 		type DatabaseSessionAttributes = object;
 	}
