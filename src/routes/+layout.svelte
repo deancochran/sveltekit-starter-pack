@@ -10,7 +10,9 @@
 		getDrawerStore,
 		type DrawerSettings,
 		Modal,
-		type ModalComponent
+		type ModalComponent,
+		type ModalSettings,
+		getModalStore
 	} from '@skeletonlabs/skeleton';
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 	import { getToastStore } from '@skeletonlabs/skeleton';
@@ -28,6 +30,7 @@
 	import DeleteUserForm from '$lib/forms/DeleteUserForm.svelte';
 	import Seo from '$lib/components/Seo.svelte';
 	import { setMapContext } from '$lib/components/Map/stores';
+	import { onMount } from 'svelte';
 	export let data: LayoutData;
 
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
@@ -63,10 +66,39 @@
 		drawerStore.close();
 	};
 
+	const modalStore = getModalStore();
 	const modalRegistry: Record<string, ModalComponent> = {
 		// Set a unique modal ID, then pass the component reference
 		DeleteUserForm: { ref: DeleteUserForm }
 	};
+
+	const swUpdateModal: ModalSettings = {
+		type: 'confirm',
+		title: 'Please refresh your page',
+		body: 'Changes in your app have been detected.',
+		response: (r: boolean) => {
+			if (r) {
+				window.location.reload();
+			}
+		}
+	};
+
+	async function dectectServiceWorkerUpdate() {
+		const registry = await navigator.serviceWorker.ready;
+		registry.addEventListener('updatefound', (event) => {
+			const sw = registry.installing;
+			sw?.addEventListener('statechange', (event) => {
+				if (sw.state == 'installed') {
+					modalStore.trigger(swUpdateModal);
+					if (confirm('Want to Reload?')) {
+					}
+				}
+			});
+		});
+	}
+	onMount(() => {
+		dectectServiceWorkerUpdate();
+	});
 </script>
 
 <Seo />
@@ -84,11 +116,11 @@
 			slotTrail="place-content-end"
 		>
 			<svelte:fragment slot="lead">
-				<Link label={'Skauth'} href="/">
+				<Link label={'cadence'} href="/">
 					<h1 class="h1 font-serif bg-op font-bold text-4xl">
 						<span
 							class="bg-gradient-to-br from-primary-500 to-tertiary-500 bg-clip-text text-transparent box-decoration-clone"
-							>skauth</span
+							>cadence</span
 						>
 					</h1>
 				</Link>
@@ -126,13 +158,13 @@
 			<svelte:fragment slot="lead">
 				<div class="flex flex-col">
 					<h1 class="h1 font-serif bg-op font-bold text-4xl">
-						<span class="text-surface">skauth</span>
+						<span class="text-surface">cadence</span>
 					</h1>
 					<p>Modern Sveltekit Auth and Billing</p>
 				</div>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
-				<Link label={'skauth'} type="btn-icon" href="https://github.com/deancochran/skauth">
+				<Link label={'cadence'} type="btn-icon" href="https://github.com/deancochran/cadence">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="32"
