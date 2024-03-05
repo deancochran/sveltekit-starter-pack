@@ -20,6 +20,7 @@ model user {
   swim_ftp                Int                          @default(240)
   unitType                UnitType                     @default(METRIC)
   activities              activities[]
+  calendar                calendar[]
   emailVerificationTokens emailVerificationToken[]
   keys                    key[]
   passwordResetTokens     passwordResetToken[]
@@ -27,7 +28,6 @@ model user {
   subscriptions           subscription?
   integration_logs        thirdPartyIntegrationLogs[]
   integrations            thirdPartyIntegrationToken[]
-  userCalendar            userCalendar[]
 
   @@index([id])
 }
@@ -119,34 +119,37 @@ model activities {
   stress_score             Int
   thirdparty_log_id        Int?                       @unique
   intensity_factor_score   Int
+  event_id                 Int?
+  event                    event?                     @relation(fields: [event_id], references: [id])
   thirdPartyIntegrationLog thirdPartyIntegrationLogs? @relation(fields: [thirdparty_log_id], references: [id], onDelete: Cascade)
   user                     user                       @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
-model userCalendar {
+model calendar {
   id      Int     @id @default(autoincrement())
   user_id String
-  events  event[]
   user    user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  events  event[]
 }
 
 model event {
   id          Int          @id @default(autoincrement())
-  eventType   EventType
+  eventType   ActivityType
   date        DateTime     @default(now())
-  // Add other event-related fields as needed
-  user_cal_id Int
-  user_cal    userCalendar @relation(fields: [user_cal_id], references: [id], onDelete: Cascade)
-}
-
-enum EventType {
-  WORKOUT
+  all_day     Boolean
+  start       DateTime
+  end         DateTime
+  title       String
+  description String
+  calendar_id Int
+  activities  activities[]
+  calendar    calendar     @relation(fields: [calendar_id], references: [id], onDelete: Cascade)
 }
 
 enum ActivityType {
-  CYCLING
-  SWIMMING
-  RUNNING
+  SWIM
+  BIKE
+  RUN
 }
 
 enum UserRole {

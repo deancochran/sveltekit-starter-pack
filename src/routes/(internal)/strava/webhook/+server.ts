@@ -153,7 +153,7 @@ async function createActivityFromHook(log: { token: thirdPartyIntegrationToken, 
             const tss = calc_rTss(activity.moving_time!, GAP, log.user.run_ftp, rIF)
 			return await prisma.activities.create({
 				data: {
-					type: ActivityType.RUNNING,
+					type: ActivityType.RUN,
 					distance: activity.distance ?? 0,
 					duration: activity.moving_time ?? 0,
 					date: activity.start_date_local,
@@ -170,7 +170,7 @@ async function createActivityFromHook(log: { token: thirdPartyIntegrationToken, 
             const tss = calc_cTss(activity.moving_time!, activity.weighted_average_watts!, log.user.bike_ftp, cIF)
 			return await prisma.activities.create({
 				data: {
-					type: ActivityType.CYCLING,
+					type: ActivityType.BIKE,
 					distance: activity.distance ?? 0,
 					duration: activity.moving_time ?? 0,
 					date: activity.start_date_local,
@@ -188,7 +188,7 @@ async function createActivityFromHook(log: { token: thirdPartyIntegrationToken, 
 			const tss = calc_sTss(activity.moving_time!, GAP, log.user.swim_ftp, sIF)
 			return await prisma.activities.create({
 				data: {
-					type: ActivityType.SWIMMING,
+					type: ActivityType.SWIM,
 					distance: activity.distance ?? 0,
 					duration: activity.moving_time ?? 0,
 					date: activity.start_date,
