@@ -3,3 +3,10 @@ export const toDateTime = (secs: number): Date => {
 	t.setSeconds(secs);
 	return t;
 };
+
+// Helper function to add days to the current date
+export function addDays(date: Date, days: number): Date {
+    const newDate = new Date(date);
+    newDate.setDate(date.getDate() + days);
+    return newDate;
+};

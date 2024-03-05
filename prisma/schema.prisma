@@ -20,7 +20,6 @@ model user {
   swim_ftp                Int                          @default(240)
   unitType                UnitType                     @default(METRIC)
   activities              activities[]
-  calendar                calendar[]
   emailVerificationTokens emailVerificationToken[]
   keys                    key[]
   passwordResetTokens     passwordResetToken[]
@@ -28,6 +27,8 @@ model user {
   subscriptions           subscription?
   integration_logs        thirdPartyIntegrationLogs[]
   integrations            thirdPartyIntegrationToken[]
+  calendar                calendar?
+  training_plans          trainingPlan[]
 
   @@index([id])
 }
@@ -116,9 +117,9 @@ model activities {
   duration                 Int
   date                     DateTime                   @default(now())
   user_id                  String
-  stress_score             Int
+  stress_score             Decimal
   thirdparty_log_id        Int?                       @unique
-  intensity_factor_score   Int
+  intensity_factor_score   Decimal
   event_id                 Int?
   event                    event?                     @relation(fields: [event_id], references: [id])
   thirdPartyIntegrationLog thirdPartyIntegrationLogs? @relation(fields: [thirdparty_log_id], references: [id], onDelete: Cascade)
@@ -127,23 +128,40 @@ model activities {
 
 model calendar {
   id      Int     @id @default(autoincrement())
-  user_id String
+  user_id String  @unique
   user    user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
   events  event[]
 }
 
 model event {
-  id          Int          @id @default(autoincrement())
-  eventType   ActivityType
-  date        DateTime     @default(now())
-  all_day     Boolean
-  start       DateTime
-  end         DateTime
-  title       String
+  id               Int           @id @default(autoincrement())
+  eventType        ActivityType
+  date             DateTime      @default(now())
+  all_day          Boolean
+  start            DateTime?
+  end              DateTime?
+  title            String
+  description      String
+  calendar_id      Int
+  training_plan_id Int?
+  activities       activities[]
+  calendar         calendar      @relation(fields: [calendar_id], references: [id], onDelete: Cascade)
+  trainingPlan     trainingPlan? @relation(fields: [training_plan_id], references: [id])
+
+  @@index([date])
+}
+
+model trainingPlan {
+  id          Int      @id @default(autoincrement())
+  name        String
   description String
-  calendar_id Int
-  activities  activities[]
-  calendar    calendar     @relation(fields: [calendar_id], references: [id], onDelete: Cascade)
+  startDate   DateTime
+  endDate     DateTime
+  events      event[] // Add this line to create a relationship with events
+  user        user     @relation(fields: [userId], references: [id])
+  userId      String
+
+  @@index([startDate, endDate])
 }
 
 enum ActivityType {
