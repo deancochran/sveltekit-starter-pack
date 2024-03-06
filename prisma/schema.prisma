@@ -117,9 +117,9 @@ model activities {
   duration                 Int
   date                     DateTime                   @default(now())
   user_id                  String
-  stress_score             Decimal
+  stress_score             Decimal                    @db.Decimal(10, 2)
   thirdparty_log_id        Int?                       @unique
-  intensity_factor_score   Decimal
+  intensity_factor_score   Decimal                    @db.Decimal(10, 2)
   event_id                 Int?
   event                    event?                     @relation(fields: [event_id], references: [id])
   thirdPartyIntegrationLog thirdPartyIntegrationLogs? @relation(fields: [thirdparty_log_id], references: [id], onDelete: Cascade)

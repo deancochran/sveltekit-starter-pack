@@ -85,7 +85,7 @@
 			.reduce((a, b) => a + b, 0);
 		let total_time_above_threshold = data
 			.user!.activities.filter((act) => {
-				return act.intensity_factor_score >= 1;
+				return act.intensity_factor_score.toNumber() >= 1;
 			})
 			.map((act, i) => {
 				return act.duration;

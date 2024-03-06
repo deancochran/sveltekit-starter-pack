@@ -52,9 +52,9 @@ export const load: PageServerLoad = async ({ parent }) => {
         const date = act.date.toLocaleDateString()
         if (Object.keys(agg_activities).includes(date)) {
             const current = agg_activities[date]
-            agg_activities[date] = { stress_score: current.stress_score + act.stress_score, activities: [act, ...current.activities] }
+            agg_activities[date] = { stress_score: current.stress_score + act.stress_score.toNumber(), activities: [act, ...current.activities] }
         } else {
-            agg_activities[date] = { stress_score: act.stress_score, activities: [act] }
+            agg_activities[date] = { stress_score: act.stress_score.toNumber(), activities: [act] }
         }
         if (user!.activities.at(i + 1)) {
             const endDate = user!.activities[i + 1].date.toLocaleDateString()
