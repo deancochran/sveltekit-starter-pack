@@ -31,6 +31,8 @@
 	import Seo from '$lib/components/Seo.svelte';
 	import { setMapContext } from '$lib/components/Map/stores';
 	import { onMount } from 'svelte';
+	import SearchWorker from '$lib/utils/posts/search-worker?worker';
+	import SearchPostsModal from '$lib/modals/SearchPostsModal.svelte';
 	export let data: LayoutData;
 
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
@@ -69,7 +71,8 @@
 	const modalStore = getModalStore();
 	const modalRegistry: Record<string, ModalComponent> = {
 		// Set a unique modal ID, then pass the component reference
-		DeleteUserForm: { ref: DeleteUserForm }
+		DeleteUserForm: { ref: DeleteUserForm },
+		SearchPostsModal: { ref: SearchPostsModal }
 	};
 
 	const swUpdateModal: ModalSettings = {
@@ -96,10 +99,31 @@
 			});
 		});
 	}
+
+	function triggerSearchPostsModal() {
+		modalStore.trigger({
+			type: 'component',
+			component: 'SearchPostsModal'
+		});
+	}
+
 	onMount(() => {
 		dectectServiceWorkerUpdate();
 	});
 </script>
+
+<svelte:window
+	on:keydown={(e) => {
+		if (e.ctrlKey || e.metaKey) {
+			if (e.key === 'k' || e.key === 'K') {
+				modalStore.close()
+				e.preventDefault()
+				e.stopPropagation()
+				triggerSearchPostsModal()
+			}
+		}
+	}}
+/>
 
 <Seo />
 <Toast />
@@ -129,6 +153,13 @@
 				<SideBarButton on:click={openDrawer} />
 
 				<nav class="hidden md:flex space-x-2 h-[5vh]">
+					<button on:click={triggerSearchPostsModal}>
+						<!-- <SearchIcon /> -->
+						<span>Search</span>
+						<div class="shortcut">
+							<kbd>{data.platform === 'MacIntel' ? '⌘' : 'Ctrl'}</kbd> + <kbd>K</kbd>
+						</div>
+					</button>
 					{#if data.session}
 						<ProfilePopup session={data.session} />
 					{:else}

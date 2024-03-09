@@ -10,7 +10,7 @@
 		| undefined = undefined;
 	export let shadow: 'shadow-md' | undefined = undefined;
 	export let label:string
-	let classes = `${type} ${color} ${shadow}`;
+	let classes = `${type} ${color} ${shadow} ${$$props.class}`;
 </script>
 
 <a

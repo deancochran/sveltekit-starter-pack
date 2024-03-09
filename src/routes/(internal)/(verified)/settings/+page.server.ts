@@ -36,7 +36,6 @@ export const load: PageServerLoad = async ({ parent }) => {
 	const updateFTPForm = await superValidate(
 		initialData,
 		update_ftp_schema);
-	console.log(initialData)
 	return {
 		updateUserForm,
 		updateFTPForm,

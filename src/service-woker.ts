@@ -85,3 +85,15 @@ sw.addEventListener('fetch', (event) => {
 
     event.respondWith(respond());
 });
+
+sw.addEventListener('message', (event) => {
+    // Remove previous cached data from disk
+    async function deleteOldCaches() {
+        for (const key of await caches.keys()) {
+            if (key !== CACHE) await caches.delete(key);
+        }
+    }
+
+    event.waitUntil(deleteOldCaches());
+});
+

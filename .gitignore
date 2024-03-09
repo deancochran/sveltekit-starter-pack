@@ -11,6 +11,7 @@ vite.config.ts.timestamp-*
 .DS_Store
 node_modules
 /dist
+/erd
 .env
 .vscode
 /.vscode/*

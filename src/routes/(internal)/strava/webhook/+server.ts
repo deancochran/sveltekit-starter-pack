@@ -57,7 +57,6 @@ export async function POST(event) {
 				await createActivityFromHook(log)
 				return json({ message: 'successful create' }, { status: 200 });
 			} catch (e) {
-				console.log(e)
 				return json({ message: 'failed create' }, { status: 400 });
 			}
 		case 'update':

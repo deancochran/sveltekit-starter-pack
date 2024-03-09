@@ -10,3 +10,12 @@ export function addDays(date: Date, days: number): Date {
     newDate.setDate(date.getDate() + days);
     return newDate;
 };
+
+type DateStyle = Intl.DateTimeFormatOptions['dateStyle']
+
+export function formatDate(date: string, dateStyle: DateStyle = 'medium', locales = 'en') {
+	// Safari is mad about dashes in the date
+	const dateToFormat = new Date(date.replace('-', '/'))
+	const dateFormatter = new Intl.DateTimeFormat(locales, { dateStyle })
+	return dateFormatter.format(dateToFormat)
+}

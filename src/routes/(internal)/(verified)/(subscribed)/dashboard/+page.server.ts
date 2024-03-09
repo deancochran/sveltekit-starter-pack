@@ -33,7 +33,6 @@ function generateDateRange(startDate: string, endDate: string) {
 
 
 export const load: PageServerLoad = async ({ parent }) => {
-    await parent();
     const data = await parent();
     const user = await prisma.user.findUnique({
         where: {
@@ -52,9 +51,9 @@ export const load: PageServerLoad = async ({ parent }) => {
         const date = act.date.toLocaleDateString()
         if (Object.keys(agg_activities).includes(date)) {
             const current = agg_activities[date]
-            agg_activities[date] = { stress_score: current.stress_score + act.stress_score.toNumber(), activities: [act, ...current.activities] }
+            agg_activities[date] = { stress_score: current.stress_score + act.stress_score, activities: [act, ...current.activities] }
         } else {
-            agg_activities[date] = { stress_score: act.stress_score.toNumber(), activities: [act] }
+            agg_activities[date] = { stress_score: act.stress_score, activities: [act] }
         }
         if (user!.activities.at(i + 1)) {
             const endDate = user!.activities[i + 1].date.toLocaleDateString()
@@ -63,7 +62,6 @@ export const load: PageServerLoad = async ({ parent }) => {
                 agg_activities[dateString] = { stress_score: 0, activities: [] }
             })
         }
-        console.log(agg_activities)
     })
 
 
@@ -72,5 +70,6 @@ export const load: PageServerLoad = async ({ parent }) => {
         user,
         agg_activities,
         ...data
+
     }
 }

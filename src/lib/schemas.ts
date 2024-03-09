@@ -11,6 +11,7 @@ const username_schema = z
 	.regex(alphanumeric_with_underscore, 'Must must be alaphanumeric, "_" is allowed')
 	.max(20, 'Must be at most 20 characters in length')
 	.min(8, 'Must be at least 8 characters in length');
+
 const password_schema = z
 	.string()
 	.regex(one_upper_case_letter, 'One uppercase character')

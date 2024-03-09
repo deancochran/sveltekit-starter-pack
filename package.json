@@ -19,6 +19,7 @@
 		"stripe-webhook": "stripe listen --forward-to localhost:5173/stripe/webhook"
 	},
 	"devDependencies": {
+		"@mermaid-js/mermaid-cli": "^10.8.0",
 		"@playwright/test": "^1.42.1",
 		"@skeletonlabs/skeleton": "^2.9.0",
 		"@skeletonlabs/tw-plugin": "^0.3.1",
@@ -41,6 +42,7 @@
 		"prettier": "^3.2.5",
 		"prettier-plugin-svelte": "^3.2.2",
 		"prisma": "^5.10.2",
+		"prisma-erd-generator": "^1.11.2",
 		"stripe": "^14.19.0",
 		"svelte": "^4.2.12",
 		"svelte-check": "^3.6.6",
@@ -72,12 +74,24 @@
 		"@types/d3": "^7.4.3",
 		"@types/stripe-v3": "^3.1.33",
 		"d3": "^7.8.5",
+		"flexsearch": "^0.7.43",
+		"gray-matter": "^4.0.3",
 		"lucia": "^2.7.7",
 		"lucide-svelte": "^0.294.0",
 		"maplibre-gl": "^3.6.2",
+		"mdsvex": "^0.11.0",
 		"nodemailer": "^6.9.11",
+		"rehype-raw": "^7.0.0",
+		"rehype-slug": "^6.0.0",
+		"rehype-stringify": "^10.0.0",
+		"remark-parse": "^11.0.0",
+		"remark-rehype": "^11.1.0",
+		"remark-toc": "^9.0.0",
+		"remark-unwrap-images": "^4.0.0",
+		"shiki": "^1.1.7",
 		"svelte-email": "^0.0.4",
 		"sveltekit-flash-message": "^2.4.2",
+		"unified": "^11.0.4",
 		"uuid": "^9.0.1"
 	}
 }

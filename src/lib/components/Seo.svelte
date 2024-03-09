@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+    //@ts-expect-error
     import SvelteSeo from 'svelte-seo';
     import { PUBLIC_CANONICAL_URL } from '$env/static/public';
 	import { APP_NAME, APP_DESCRIPTION } from '$lib/constants';

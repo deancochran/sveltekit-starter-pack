@@ -2,6 +2,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator erd {
+  provider = "prisma-erd-generator"
+  theme = "forest"
+  output = "../erd/ERD.svg"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -20,6 +26,7 @@ model user {
   swim_ftp                Int                          @default(240)
   unitType                UnitType                     @default(METRIC)
   activities              activities[]
+  calendar                calendar?
   emailVerificationTokens emailVerificationToken[]
   keys                    key[]
   passwordResetTokens     passwordResetToken[]
@@ -27,7 +34,6 @@ model user {
   subscriptions           subscription?
   integration_logs        thirdPartyIntegrationLogs[]
   integrations            thirdPartyIntegrationToken[]
-  calendar                calendar?
   training_plans          trainingPlan[]
 
   @@index([id])
@@ -117,9 +123,9 @@ model activities {
   duration                 Int
   date                     DateTime                   @default(now())
   user_id                  String
-  stress_score             Decimal                    @db.Decimal(10, 2)
+  stress_score             Float
   thirdparty_log_id        Int?                       @unique
-  intensity_factor_score   Decimal                    @db.Decimal(10, 2)
+  intensity_factor_score   Float
   event_id                 Int?
   event                    event?                     @relation(fields: [event_id], references: [id])
   thirdPartyIntegrationLog thirdPartyIntegrationLogs? @relation(fields: [thirdparty_log_id], references: [id], onDelete: Cascade)
@@ -157,9 +163,9 @@ model trainingPlan {
   description String
   startDate   DateTime
   endDate     DateTime
-  events      event[] // Add this line to create a relationship with events
-  user        user     @relation(fields: [userId], references: [id])
   userId      String
+  events      event[]
+  user        user     @relation(fields: [userId], references: [id])
 
   @@index([startDate, endDate])
 }

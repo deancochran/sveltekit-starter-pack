@@ -54,7 +54,6 @@ export async function GET(event) {
 				background: 'variant-filled-success'
 			} as const;
 		} catch (e) {
-			console.log(e);
 			t = {
 				message: 'Case 3 Failed to create strava integration',
 				background: 'variant-filled-error'

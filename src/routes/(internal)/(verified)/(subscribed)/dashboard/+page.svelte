@@ -85,7 +85,7 @@
 			.reduce((a, b) => a + b, 0);
 		let total_time_above_threshold = data
 			.user!.activities.filter((act) => {
-				return act.intensity_factor_score.toNumber() >= 1;
+				return act.intensity_factor_score >= 1;
 			})
 			.map((act, i) => {
 				return act.duration;
@@ -118,7 +118,7 @@
 		<svg bind:this={svg} class="m-auto w-full h-[50vh]">
 			<g bind:this={gx} transform="translate(0,{height - marginBottom})"> </g>
 			<g bind:this={gy} transform="translate({marginLeft},0)"></g>
-
+			
 			<!-- TSS POINTS -->
 			<g>
 				{#each values as [date, score], i}

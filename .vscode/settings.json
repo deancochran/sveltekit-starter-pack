@@ -9,5 +9,6 @@
 		"Strava",
 		"superforms",
 		"tailwindcss"
-	]
+	],
+	"svg.preview.background": "dark-transparent"
 }

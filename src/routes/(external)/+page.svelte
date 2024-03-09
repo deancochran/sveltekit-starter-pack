@@ -1,7 +1,11 @@
 <script lang="ts">
 	import Link from '$lib/components/Link.svelte';
 	import type { PageData } from './$types';
+
+
 	export let data: PageData;
+
+
 </script>
 
 <div class="page-container flex items-center justify-center align-middle">
