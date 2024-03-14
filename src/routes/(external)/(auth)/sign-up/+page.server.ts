@@ -12,6 +12,8 @@ import {
 } from '@prisma/client/runtime/library';
 import { stripe } from '$lib/server/stripe';
 import { sendEmailVerificationLink } from '$lib/utils/emails';
+import { generateId, type User } from 'lucia';
+import * as argon from 'argon2';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
@@ -22,9 +24,8 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
 	signup: async (event) => {
-		const { request, locals, url } = event;
+		const { request, url } = event;
 		const form = await superValidate(request, signup_schema);
-		let session;
 		if (form.valid) {
 			try {
 				const existingCustomers = await stripe.customers.list({ email: form.data.email });
@@ -36,28 +37,25 @@ export const actions: Actions = {
 				const customer = await stripe.customers.create({
 					email: form.data.email
 				});
-				const user = await auth.createUser({
-					key: {
-						providerId: 'email', // auth method
-						providerUserId: form.data.email.toLocaleLowerCase(), // unique id when using "email" auth method
-						password: form.data.password // hashed by Lucia
-					},
-					attributes: {
-						email: form.data.email,
+
+				const hashedPassword = await argon.hash(form.data.password);
+				const user = await prisma.user.create({
+					data: {
+						id: generateId(15),
 						username: form.data.username,
-						email_verified: false,
-						stripe_id: customer.id,
-						created_at: undefined,
-						role: undefined
+						email: form.data.email,
+						hashed_password: hashedPassword,
+						stripe_id: customer.id
 					}
 				});
 
-				session = await auth.createSession({
-					userId: user.userId,
-					attributes: {}
+				const session = await auth.createSession(user.id, {});
+				const sessionCookie = auth.createSessionCookie(session.id);
+				event.cookies.set(sessionCookie.name, sessionCookie.value, {
+					path: '.',
+					...sessionCookie.attributes
 				});
-				await sendEmailVerificationLink(user, url.origin);
-				locals.auth.setSession(session);
+				await sendEmailVerificationLink(user as unknown as User, url.origin);
 			} catch (error) {
 				let t: ToastSettings;
 				if (error instanceof PrismaClientKnownRequestError) {
@@ -89,7 +87,7 @@ export const actions: Actions = {
 					} as const;
 				}
 				setFlash(t, event);
-				console.log(error)
+				console.log(error);
 				return fail(500, { form });
 			}
 			const t: ToastSettings = {

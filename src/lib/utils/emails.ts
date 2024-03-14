@@ -39,42 +39,30 @@ export async function sendEmail(to_email: string, to_subject: string, html: stri
 }
 
 export async function sendForgottenPasswordResetLink(user: User, url_origin: string) {
-	const token = await generatePasswordResetToken(user.id);
+	const code = await generatePasswordResetToken(user.id);
 	const emailHtml = render({
 		template: ForgottenPassword,
 		props: {
 			origin: url_origin,
-			token: token
+			code: code
 		}
 	});
 	await sendEmail(user.email, 'Reset your Forgotten Password', emailHtml);
 }
 
 export async function sendPasswordResetLink(user: User, url_origin: string) {
-	const token = await generatePasswordResetToken(user.id);
+	const code = await generatePasswordResetToken(user.id);
 	const emailHtml = render({
 		template: ResetPassword,
 		props: {
 			origin: url_origin,
-			token: token
+			code: code
 		}
 	});
 	await sendEmail(user.email, 'Reset your Password', emailHtml);
 }
 
 export async function sendEmailVerificationLink(user: User, url_origin: string) {
-	const token = await generateEmailVerificationToken(user.userId);
-	const emailHtml = render({
-		template: VerifyEmail,
-		props: {
-			origin: url_origin,
-			token: token
-		}
-	});
-	await sendEmail(user.email, 'Verify your email', emailHtml);
-}
-
-export async function resendEmailVerificationLink(user: User, url_origin: string) {
 	const token = await generateEmailVerificationToken(user.id);
 	const emailHtml = render({
 		template: VerifyEmail,
@@ -86,8 +74,10 @@ export async function resendEmailVerificationLink(user: User, url_origin: string
 	await sendEmail(user.email, 'Verify your email', emailHtml);
 }
 
+
+
 export async function sendEmailChangeCode(user: User, email: string) {
-	const token = await generateEmailVerificationToken(user.userId);
+	const token = await generateEmailVerificationToken(user.id);
 	const emailHtml = render({
 		template: NewEmailCode,
 		props: {
@@ -95,15 +85,4 @@ export async function sendEmailChangeCode(user: User, email: string) {
 		}
 	});
 	await sendEmail(email, 'Validate your change of email', emailHtml);
-}
-
-export async function reSendEmailChangeCode(user: User) {
-	const token = await generateEmailVerificationToken(user.userId);
-	const emailHtml = render({
-		template: NewEmailCode,
-		props: {
-			token: token
-		}
-	});
-	await sendEmail(user.email, 'Validate your change of email', emailHtml);
 }

@@ -1,28 +1,56 @@
 import { fail, type Actions } from '@sveltejs/kit';
-import { resendEmailVerificationLink } from '$lib/utils/emails';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
-import { setFlash, redirect } from 'sveltekit-flash-message/server';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
+import { sendEmailVerificationLink } from '$lib/utils/emails';
+import { superValidate } from 'sveltekit-superforms/client';
+import { auth } from '$lib/server/lucia';
+import { validateEmailVerificationToken } from '$lib/utils/token';
+import { verify_user_email_schema } from '$lib/schemas';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
 	const data = await parent();
-	if (data.session.user.email_verified) {
-		throw redirect(302, '/');
-	}
+	const verifyEmailForm = await superValidate(verify_user_email_schema);
+	return { verifyEmailForm, ...data };
 };
 
 export const actions: Actions = {
+	verify: async (event) => {
+		const { request } = event;
+		const form = await superValidate(request, verify_user_email_schema);
+		let t: ToastSettings
+		try {
+			const user = await validateEmailVerificationToken(form.data.code);
+			const session = await auth.createSession(user.id, {});
+			const sessionCookie = auth.createSessionCookie(session.id);
+			event.cookies.set(sessionCookie.name, sessionCookie.value, {
+				path: '.',
+				...sessionCookie.attributes
+			});
+
+			t = {
+				message: 'Your Email has Successfully been Verified',
+				background: 'variant-filled-success'
+			};
+		} catch (error) {
+			console.log(error)
+			t = {
+				message: 'Failed to verify your email',
+				background: 'variant-filled-success'
+			};
+			setFlash(t, event);
+			return fail(400, {form});
+		}
+		return redirect('/', t, event);
+	},
 	resend: async (event) => {
 		const { url, locals } = event;
-		const session = await locals.auth.validate();
-		if (!session) throw redirect(302, '/sign-in');
 		let t: ToastSettings;
 		try {
-			const user = await prisma.user.findUniqueOrThrow({ where: { email: session.user.email } });
-			await resendEmailVerificationLink(user, url.origin);
+			await sendEmailVerificationLink(locals.user!, url.origin);
 			t = {
-				message: `New Email Verification Link Sent ${session.user.username}`,
+				message: `New Email Verification Link Sent ${locals.user?.username}`,
 				background: 'variant-filled-success'
 			} as const;
 		} catch (error) {

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import Link from './Link.svelte';
 	import {  popup, type PopupSettings } from '@skeletonlabs/skeleton';
-	import type { Session } from 'lucia';
+	import type { User } from 'lucia';
 
 	import UserAvatar from './UserAvatar/UserAvatar.svelte';
 
-	export let session: Session;
+	export let user: User;
 
 	const profilePopup: PopupSettings = {
 		event: 'click',
@@ -20,7 +20,7 @@
 </button>
 
 <div class="card p-4 soft-filled-primary" data-popup="profilePopup">
-	<h3 class="h4 w-full font-serif">@{session.user.username}</h3>
+	<h3 class="h4 w-full font-serif">@{user.username}</h3>
 	<hr class="py-2" />
 	<div class="flex flex-col items-center justify-center align-middle gap-1">
 		<Link label={'Dashboard'} href="/dashboard">Dashboard</Link>

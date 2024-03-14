@@ -14,32 +14,19 @@ export const load: PageServerLoad = async () => {
 
 export const actions: Actions = {
 	reset: async (event) => {
-		const { request, locals, params } = event;
+		const { request, params } = event;
 		const form = await superValidate(request, reset_pass_schema);
 		let t: ToastSettings;
 		let valid;
 		if (form.valid) {
 			try {
-				const token: string = String(params.token);
-				const userId = await validatePasswordResetToken(token);
-				let user = await auth.getUser(userId);
-				await auth.invalidateAllUserSessions(user.userId);
-				await auth.updateKeyPassword('email', user.email, form.data.password);
-				if (!user.email_verified) {
-					user = await auth.updateUserAttributes(user.userId, {
-						email_verified: true
-					});
-					t = {
-						message: 'Your Email has Successfully been Verified',
-						background: 'variant-filled-success'
-					} as const;
-					setFlash(t, event);
-				}
-				const session = await auth.createSession({
-					userId: user.userId,
-					attributes: {}
+				const user = await validatePasswordResetToken(String(params.code), form.data.password);
+				const session = await auth.createSession(user.id, {});
+				const sessionCookie = auth.createSessionCookie(session.id);
+				event.cookies.set(sessionCookie.name, sessionCookie.value, {
+					path: '.',
+					...sessionCookie.attributes
 				});
-				locals.auth.setSession(session); // set session cookie
 				t = {
 					message: `Your Password has been Updated`,
 					background: 'variant-filled-success'

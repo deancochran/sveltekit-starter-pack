@@ -5,8 +5,6 @@
 	import { onMount } from 'svelte';
 	import type { ContentType } from '$lib/utils/posts/types';
 	import Link from '$lib/components/Link.svelte';
-	import Button from '$lib/components/Button.svelte';
-	export let parent: any;
 
 	const modal = getModalStore();
 

@@ -50,6 +50,12 @@ export const update_user_schema = z.object({
 
 export type UpdateUserSchema = typeof update_user_schema;
 
+export const verify_user_email_schema = z.object({
+	code: z.string()
+});
+export type VerifyUserEmailSchema = typeof verify_user_email_schema;
+
+
 export const update_user_email_schema = z.object({
 	email: z.string().email(),
 	code: z.string()

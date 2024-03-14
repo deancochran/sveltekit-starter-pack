@@ -7,7 +7,7 @@ import { signin_schema } from '$lib/schemas';
 import { fail } from '@sveltejs/kit';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { setFlash } from 'sveltekit-flash-message/server';
-import { LuciaError } from 'lucia';
+import * as argon from 'argon2';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
@@ -18,43 +18,46 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
 	signin: async (event) => {
-		const { request, locals } = event;
+		const { request } = event;
 		const form = await superValidate(request, signin_schema);
-		let session;
 		if (form.valid) {
 			try {
-				const key = await auth.useKey(
-					'email',
-					form.data.email.toLocaleLowerCase(),
-					form.data.password
-				);
-				session = await auth.createSession({
-					userId: key.userId,
-					attributes: {}
-				});
-				locals.auth.setSession(session); // set session cookie
-			} catch (error) {
-				if (
-					error instanceof LuciaError &&
-					(error.message === 'AUTH_INVALID_KEY_ID' || error.message === 'AUTH_INVALID_PASSWORD')
-				) {
+				const user = await prisma.user.findUnique({ where: { email: form.data.email } });
+				if (!user) {
 					const t: ToastSettings = {
 						message: 'Invalid Credentials Provided',
 						background: 'variant-filled-warning'
 					} as const;
 					setFlash(t, event);
-				} else {
+					return fail(500, { form });
+				}
+				const validPassword = await argon.verify(user.hashed_password, form.data.password);
+				if (!validPassword) {
 					const t: ToastSettings = {
-						message: 'Unknown Error',
+						message: 'Invalid Credentials Provided',
 						background: 'variant-filled-warning'
 					} as const;
 					setFlash(t, event);
+					return fail(500, { form });
 				}
+
+				const session = await auth.createSession(user.id, {});
+				const sessionCookie = auth.createSessionCookie(session.id);
+				event.cookies.set(sessionCookie.name, sessionCookie.value, {
+					path: '.',
+					...sessionCookie.attributes
+				});
+			} catch (error) {
+				const t: ToastSettings = {
+					message: 'Unknown Error: Contact Support',
+					background: 'variant-filled-warning'
+				} as const;
+				setFlash(t, event);
 
 				return fail(500, { form });
 			}
 			const t: ToastSettings = {
-				message: `Welcome ${session.user.username}`,
+				message: `Welcome ${event.locals.user?.username}`,
 				background: 'variant-filled-success'
 			} as const;
 			throw redirect('/', t, event);

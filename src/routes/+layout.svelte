@@ -157,11 +157,11 @@
 						<!-- <SearchIcon /> -->
 						<span>Search</span>
 						<div class="shortcut">
-							<kbd>{data.platform === 'MacIntel' ? '⌘' : 'Ctrl'}</kbd> + <kbd>K</kbd>
+							<kbd>{'Ctrl'}</kbd> + <kbd>K</kbd>
 						</div>
 					</button>
-					{#if data.session}
-						<ProfilePopup session={data.session} />
+					{#if data.user}
+						<ProfilePopup bind:user={data.user} />
 					{:else}
 						<Link
 							label={'Sign In'}

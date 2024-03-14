@@ -1,6 +1,7 @@
-import { dev } from '$app/environment'
+import { dev } from "$app/environment";
 
-//TODO add domain
-export const title = 'Shakespeare'
-export const description = 'SvelteKit blog for poets'
-export const url = dev ? 'http://localhost:5173/' : 'MY REAL DOMAIN!'
+export const site_name = 'Cadence'
+
+export const title = 'Cadence Blog'
+export const description = 'Edurance Athletics Insights, findings, and news'
+export const url = dev ? 'http://localhost:5173/' : 'http://example.com'

@@ -1,93 +1,95 @@
-import { generateRandomString, isWithinExpiration } from 'lucia/utils';
+import type { emailVerificationToken, user } from '@prisma/client';
+import { error } from '@sveltejs/kit';
+import { TimeSpan, createDate, isWithinExpirationDate } from 'oslo';
+import { generateRandomString, alphabet } from 'oslo/crypto';
+import { sha256 } from 'oslo/crypto';
+import { encodeHex } from 'oslo/encoding';
+import * as argon from 'argon2';
 
-const EXPIRES_IN = 1000 * 60 * 60 * 2; // 2 hours
-
-export const generatePasswordResetToken = async (userId: string) => {
-	const storedUserTokens = await prisma.passwordResetToken.findMany({
-		where: { user_id: userId }
-	});
-	if (storedUserTokens.length > 0) {
-		const reusableStoredToken = storedUserTokens.find((token) => {
-			return isWithinExpiration(Number(token.expires) - EXPIRES_IN / 2);
-		});
-		if (reusableStoredToken) return reusableStoredToken.id;
-	}
-	const newToken = await prisma.passwordResetToken.create({
-		data: {
-			id: generateRandomString(63),
-			expires: new Date().getTime() + EXPIRES_IN,
-			user_id: userId
-		}
-		
-	});
-	return newToken.id;
-};
-
-export const checkPasswordResetToken = async (token: string) => {
-	const storedToken = await prisma.passwordResetToken.findUnique({
-		where: { id: token }
-	});
-	if (!storedToken) return false;
-	const tokenExpires = Number(storedToken.expires); // bigint => number conversion
-	if (!isWithinExpiration(tokenExpires)) {
-		return false;
-	}
-	return true;
-};
-
-export const validatePasswordResetToken = async (token: string): Promise<string> => {
-	const storedToken = await prisma.$transaction(async (db) => {
-		const obj = await db.passwordResetToken.findUnique({
-			where: { id: token }
-		});
-		if (!obj) throw new Error('Invalid token');
+export async function generatePasswordResetToken(user_id: string): Promise<string> {
+	const new_code = await prisma.$transaction(async (db) => {
 		await db.passwordResetToken.deleteMany({
-			where: { user_id: obj.user_id }
+			where: { user_id: user_id }
 		});
-		return obj;
+		const new_code = generateRandomString(8, alphabet('0-9', 'A-Z', 'a-z'));
+		const hashed_code = encodeHex(await sha256(new TextEncoder().encode(new_code)));
+		await db.passwordResetToken.create({
+			data: {
+				hashed_code: hashed_code,
+				expires_at: createDate(new TimeSpan(15, 'm')), // 15 minutes
+				user_id: user_id
+			}
+		});
+		return new_code;
 	});
-	const tokenExpires = Number(storedToken.expires); // bigint => number conversion
-	if (!isWithinExpiration(tokenExpires)) {
-		throw new Error('Expired token');
-	}
-	return storedToken.user_id;
-};
+	return new_code;
+}
 
-export const generateEmailVerificationToken = async (userId: string) => {
-	const storedUserTokens = await prisma.emailVerificationToken.findMany({
-		where: { user_id: userId }
-	});
-	if (storedUserTokens.length > 0) {
-		const reusableStoredToken = storedUserTokens.find((token) => {
-			return isWithinExpiration(Number(token.expires) - EXPIRES_IN / 2);
+export const validatePasswordResetToken = async (code: string, password: string): Promise<user> => {
+	const user = await prisma.$transaction(async (db) => {
+		const hashed_code = encodeHex(await sha256(new TextEncoder().encode(code)));
+		const token = await db.passwordResetToken.findFirstOrThrow({
+			where: { hashed_code: hashed_code }
 		});
-		if (reusableStoredToken) return reusableStoredToken.id;
-	}
-	const newToken = await prisma.emailVerificationToken.create({
-		data: {
-			id: generateRandomString(8),
-			expires: new Date().getTime() + EXPIRES_IN,
-			user_id: userId
+		if (!isWithinExpirationDate(token.expires_at)) {
+			throw error(404, { code: '404', message: 'expired code' });
 		}
+		const hashed_password = await argon.hash(password);
+		const user = await prisma.user.update({
+			where: {
+				id: token.user_id
+			},
+			data: {
+				hashed_password: hashed_password
+			}
+		});
+		await db.passwordResetToken.deleteMany({
+			where: { user_id: token.user_id }
+		});
+		return user;
 	});
-	return newToken.id;
+	return user;
 };
 
-export const validateEmailVerificationToken = async (token: string) => {
-	const storedToken = await prisma.$transaction(async (db) => {
-		const obj = await db.emailVerificationToken.findUnique({
-			where: { id: token }
-		});
-		if (!obj) throw new Error('Invalid token');
+export async function generateEmailVerificationToken(
+	userId: string
+): Promise<emailVerificationToken> {
+	const new_token = await prisma.$transaction(async (db) => {
 		await db.emailVerificationToken.deleteMany({
-			where: { user_id: obj.user_id }
+			where: { user_id: userId }
 		});
-		return obj;
+		const new_code = generateRandomString(8, alphabet('0-9'));
+		return await db.emailVerificationToken.create({
+			data: {
+				code: new_code,
+				expires_at: createDate(new TimeSpan(15, 'm')), // 15 minutes
+				user_id: userId
+			}
+		});
 	});
-	if (!storedToken) throw new Error('Invalid token');
-	const tokenExpires = Number(storedToken.expires); // bigint => number conversion
-	if (!isWithinExpiration(tokenExpires)) {
-		throw new Error('Expired token');
-	}
-	return storedToken.user_id;
+	return new_token;
+}
+
+export const validateEmailVerificationToken = async (code: string): Promise<user> => {
+	const user = await prisma.$transaction(async (db) => {
+		const token = await db.emailVerificationToken.findFirstOrThrow({
+			where: { code: code }
+		});
+		if (!isWithinExpirationDate(token.expires_at)) {
+			throw error(404, { code: '404', message: 'expired code' });
+		}
+		const user = await prisma.user.update({
+			where: {
+				id: token.user_id
+			},
+			data: {
+				email_verified: true
+			}
+		});
+		await db.emailVerificationToken.deleteMany({
+			where: { user_id: token.user_id }
+		});
+		return user;
+	});
+	return user;
 };

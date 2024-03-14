@@ -1,30 +1,60 @@
-import { lucia, type UserSchema  } from 'lucia';
-import { sveltekit } from 'lucia/middleware';
 import { dev } from '$app/environment';
+import { Lucia } from 'lucia';
+import { TimeSpan } from 'oslo';
+import type { UserRole } from '@prisma/client';
+import { adapter } from './prisma';
 
-import { prisma as Adapter } from '@lucia-auth/adapter-prisma';
-import { prisma } from '$lib/server/prisma';
-
-export const auth = lucia({
-	env: dev ? 'DEV' : 'PROD',
-	middleware: sveltekit(),
-	adapter: Adapter(prisma),
-	getUserAttributes: (data: UserSchema) => {
+export const auth = new Lucia(adapter, {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	getSessionAttributes: (attributes) => {
 		return {
-			username: data.username,
-			email: data.email,
-			email_verified: data.email_verified,
-			created_at: data.created_at,
-			stripe_id: data.stripe_id,
-			role: data.role,
-			swim_ftp: data.swim_ftp,
-			bike_ftp: data.bike_ftp,
-			run_ftp: data.run_ftp,
+			// country: attributes.country
 		};
 	},
+	getUserAttributes: (attributes) => {
+		return {
+			email: attributes.email,
+			username: attributes.username,
+			email_verified: attributes.email_verified,
+			created_at: attributes.created_at,
+			stripe_id: attributes.stripe_id,
+			role: attributes.role,
+			bike_ftp: attributes.bike_ftp,
+			swim_ftp: attributes.swim_ftp,
+			run_ftp: attributes.run_ftp
+		};
+	},
+	sessionExpiresIn: new TimeSpan(1, 'w'), // no more active/idle
 	sessionCookie: {
-		expires: false
+		name: 'session',
+		expires: false, // session cookies have very long lifespan (2 years)
+		attributes: {
+			secure: !dev,
+			sameSite: 'strict',
+			domain: process.env.PUBLIC_DOMAIN
+		}
 	}
 });
 
-export type Auth = typeof auth;
+interface DatabaseSessionAttributes {
+	// country: string;
+}
+interface DatabaseUserAttributes {
+	email: string;
+	username: string;
+	email_verified: boolean;
+	created_at: Date;
+	stripe_id: string | undefined;
+	role: typeof UserRole;
+	bike_ftp: number | undefined;
+	swim_ftp: number | undefined;
+	run_ftp: number | undefined;
+}
+
+declare module 'lucia' {
+	interface Register {
+		Lucia: typeof auth;
+		DatabaseSessionAttributes: DatabaseSessionAttributes;
+		DatabaseUserAttributes: DatabaseUserAttributes;
+	}
+}

@@ -1,4 +1,4 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import type { PageServerLoad } from './$types';
 import { sendPasswordResetLink } from '$lib/utils/emails';
@@ -6,7 +6,6 @@ import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { resend_reset_pass_schema } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms/server';
-import { handleSignInRedirect } from '$lib/utils/redirects/loginRedirect';
 
 export const load: PageServerLoad = async ({ parent }) => {
 	await parent();
@@ -19,14 +18,11 @@ export const actions: Actions = {
 		const { url, request, locals } = event;
 		const form = await superValidate(request, resend_reset_pass_schema);
 
-		const session = await locals.auth.validate();
-		if (!session) redirect(302, handleSignInRedirect(event));
 		if (form.valid) {
 			try {
-				const user = await prisma.user.findUniqueOrThrow({ where: { email: session.user.email } });
-				await sendPasswordResetLink(user, url.origin);
+				await sendPasswordResetLink(locals.user!, url.origin);
 				const t: ToastSettings = {
-					message: `A New Password Reset Link was sent to ${session.user.email}`,
+					message: `A New Password Reset Link was sent to ${locals.user!.email}`,
 					background: 'variant-filled-success'
 				} as const;
 				setFlash(t, event);

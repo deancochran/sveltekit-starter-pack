@@ -1,21 +1,31 @@
-// src/hooks.server.ts
 import { auth } from '$lib/server/lucia';
-import type { Handle, HandleServerError } from '@sveltejs/kit';
-import type { Session } from 'lucia';
+import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
-	event.locals.auth = auth.handleRequest(event);
-	let user_email;
-	let session:Session
-	if (event.locals?.auth) {
-		session = await event.locals.auth.validate();
-		if (session) {
-			user_email = session.user.email;
-		} else {
-			user_email = 'unknown_user';
-		}
+	const session_id = event.cookies.get(auth.sessionCookieName);
+	if (!session_id) {
+		event.locals.user = undefined;
+		event.locals.session = undefined;
 	} else {
-		session = undefined;
+		const { session, user } = await auth.validateSession(session_id);
+		if (session && session.fresh) {
+			const sessionCookie = auth.createSessionCookie(session.id);
+			// sveltekit types deviates from the de-facto standard
+			// you can use 'as any' too
+			event.cookies.set(sessionCookie.name, sessionCookie.value, {
+				path: '/',
+				...sessionCookie.attributes
+			});
+		}
+		if (!session) {
+			const sessionCookie = auth.createBlankSessionCookie();
+			event.cookies.set(sessionCookie.name, sessionCookie.value, {
+				path: '/',
+				...sessionCookie.attributes
+			});
+		}
+		event.locals.user = user ?? undefined;
+		event.locals.session = session ?? undefined;
 	}
 
 	let theme = '';
@@ -28,36 +38,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 		event.cookies.set('theme', 'skeleton', { path: '/' });
 		theme = 'skeleton';
 	}
+	console.log(`${event.locals.user?.email ?? 'alien'} at ${event.route.id}`);
 
-	const start = performance.now();
-	const response = await resolve(event, {
+	return await resolve(event, {
 		transformPageChunk: ({ html }) => html.replace('data-theme=""', `data-theme="${theme}"`)
 	});
-	const end = performance.now();
-
-	const responseTime = end - start;
-
-	const route = event.url;
-	if (responseTime > 2000) {
-		console.log(`${user_email} at ${route} took 🐢 ${responseTime.toFixed(2)} ms`);
-	}
-
-	if (responseTime < 1000) {
-		console.log(`${user_email} at ${route} took 🚀 ${responseTime.toFixed(2)} ms`);
-	}
-
-	return response;
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const handleError: HandleServerError = ({ error, event }) => {
-	
-	// example integration with https://sentry.io/
-	// Sentry.captureException(error, { extra: { event } });
-	console.log(error)
-
-	return {
-		message: 'Whoops!',
-		code: 'Errors Occurred',
-	};
 };
