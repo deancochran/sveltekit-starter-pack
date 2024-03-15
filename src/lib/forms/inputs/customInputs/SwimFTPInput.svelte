@@ -1,11 +1,13 @@
 <script lang="ts">
 	import type { InputConstraint } from 'sveltekit-superforms';
-    
+
 	export let value: number;
 	export let label: string | undefined = undefined;
 	export let errors: string[] | undefined = undefined;
 	export let constraints: InputConstraint | undefined = undefined;
-    $:swim_ftp_display = `${Math.floor(value/60).toString().padStart(2,'0')}:${(value % 60).toFixed(0).padStart(2, '0')}`
+	$: swim_ftp_display = `${Math.floor(value / 60)
+		.toString()
+		.padStart(2, '0')}:${(value % 60).toFixed(0).padStart(2, '0')}`;
 </script>
 
 <label class="label w-full">

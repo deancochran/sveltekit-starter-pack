@@ -15,23 +15,23 @@ Authentication is one of the most fundamental, and frankly underappreciated feat
 
 **Cadence** uses Lucia Auth for authenticating it's users. [Lucia](https://lucia-auth.com/) provides open source tools for managing users, user sessions, and login credentials.
 
-"*Lucia is an auth library for your server that abstracts away the complexity of handling sessions.*"
+"_Lucia is an auth library for your server that abstracts away the complexity of handling sessions._"
 
 The tradeoff for implementing Lucia initially was development time, with the understanding of possible maintenance given a major update in the open source package.
 
-**Cadence** has previously implemented *Lucia v2*, however as of March 2024, Lucia v3 has been release with major changes.
+**Cadence** has previously implemented _Lucia v2_, however as of March 2024, Lucia v3 has been release with major changes.
 
 ## Lucia v3
 
 Version 3.0 of [Lucia](https://lucia-auth.com/) generally makes authentication a bit more refined, whilst maintaining the functionality of previous versions.
 
-*"We estimate it will take about an hour or two to upgrade your project, though it depends on how big your application is."- Lucia*
+_"We estimate it will take about an hour or two to upgrade your project, though it depends on how big your application is."- Lucia_
 
 ### Notable Changes
 
 The biggest change to Lucia is that **keys have been removed entirely**.
 
-We've essentially had to rework our database and all of our associated configuration for Lucia. With new ways to provide typing in Lucia, and a new initialization of the authentication client. *I would be lying if I told you this change was simple*
+We've essentially had to rework our database and all of our associated configuration for Lucia. With new ways to provide typing in Lucia, and a new initialization of the authentication client. _I would be lying if I told you this change was simple_
 
 ## Improvements to Cadence
 
@@ -39,15 +39,13 @@ In retrospect this was a great tool to upgrade. Lucia supports our authenticatio
 
 There were a handful of performance enhancing changes to our authentication. There are few database calls, and a general "tidiness" to our authentication code.
 
-
 ### Email and Password Verification Codes
+
 In the past Cadence provided links inside of emails to users so they could verify their account email or password. The issue with this approach is that that is not a safe way that we have identified to validate user accounts with this approach given our tooling stack.
 
 Lucia Auth also encourages the usage of user prompted codes, instead of verification links.
 
-*"We recommend using email verification codes instead as it's more user-friendly. We also recommend reading through the email verification guide in the Copenhagen Book. - Lucia"*
-
-
+_"We recommend using email verification codes instead as it's more user-friendly. We also recommend reading through the email verification guide in the Copenhagen Book. - Lucia"_
 
 ### Moving Forward
 

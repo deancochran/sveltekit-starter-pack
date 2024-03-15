@@ -1,19 +1,20 @@
 <script lang="ts">
 	import { update_user_schema, type UpdateUserSchema } from '$lib/schemas';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
 	import TextInput from './inputs/TextInput.svelte';
 	import Button from '$lib/components/Button.svelte';
-	export let form_data: SuperValidated<UpdateUserSchema>;
+	import { zod } from 'sveltekit-superforms/adapters';
+	export let form_data: SuperValidated<Infer<UpdateUserSchema>>;
 
 	const { form, errors, constraints, enhance, delayed } = superForm(form_data, {
 		id: 'updateUser',
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: false,
-		validators: update_user_schema,
+		validators: zod(update_user_schema),
 		delayMs: 0,
 		timeoutMs: 8000
 	});

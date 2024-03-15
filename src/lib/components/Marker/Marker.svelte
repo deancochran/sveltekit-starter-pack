@@ -31,9 +31,7 @@
 		};
 	}
 	function addMarker(element: HTMLDivElement) {
-		new maplibre.Marker({ element})
-			.setLngLat(lngLat)
-			.addTo(map);
+		new maplibre.Marker({ element }).setLngLat(lngLat).addTo(map);
 	}
 
 	function sendEvent() {
@@ -62,8 +60,7 @@
 	}
 </script>
 
-<div use:addMarker use:manageClasses={classNames} role={undefined} on:click={sendEvent} >
-	
+<div use:addMarker use:manageClasses={classNames} role={undefined} on:click={sendEvent}>
 	<slot>
 		<MapPin size={48} color="#000000" />
 	</slot>

@@ -5,19 +5,18 @@
 		type SendNewUserEmailCode,
 		type UpdateUserEmailSchema
 	} from '$lib/schemas';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { focusTrap, Step, Stepper } from '@skeletonlabs/skeleton';
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
 	import TextInput from './inputs/TextInput.svelte';
 	import EmailInput from './inputs/EmailInput.svelte';
-	import {  invalidateAll } from '$app/navigation';
-	import type { Writable } from 'svelte/store';
+	import { invalidateAll } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
+	import { zod } from 'sveltekit-superforms/adapters';
 
-	export let form_data: SuperValidated<UpdateUserEmailSchema>;
-	export let send_new_user_email_code_form_data: SuperValidated<SendNewUserEmailCode>;
-	let completeState: Writable<StepperState>;
+	export let form_data: SuperValidated<Infer<UpdateUserEmailSchema>>;
+	export let send_new_user_email_code_form_data: SuperValidated<Infer<SendNewUserEmailCode>>;
 	$: successfullySentCode = false;
 	$: lock_verify_code = !successfullySentCode;
 
@@ -25,15 +24,14 @@
 		id: 'updateUserEmailForm',
 		applyAction: true,
 		invalidateAll: true,
-		resetForm: false,
-		validators: update_user_email_schema,
+		resetForm: true,
+		validators: zod(update_user_email_schema),
 		delayMs: 0,
 		timeoutMs: 8000,
 		onResult(event) {
 			const { result, formEl, cancel } = event;
 			if (result.type == 'success') {
 				invalidateAll();
-				$completeState.current = 0;
 			}
 			return;
 		}
@@ -51,7 +49,7 @@
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: false,
-		validators: send_new_user_email_code_schema,
+		validators: zod(send_new_user_email_code_schema),
 		delayMs: 0,
 		timeoutMs: 8000,
 		onResult(event) {
@@ -118,11 +116,7 @@
 				action="/settings/?/updateUserEmail"
 				use:enhance
 			>
-				<Step
-					bind:state={completeState}
-					buttonCompleteLabel="Update Email"
-					buttonCompleteType="submit"
-				>
+				<Step buttonCompleteLabel="Update Email" buttonCompleteType="submit">
 					<svelte:fragment slot="header">Submit Your Code</svelte:fragment>
 					<input hidden={true} name="email" bind:value={$form.email} />
 					<div class="relative flex space-x-4 flex-row h-full">

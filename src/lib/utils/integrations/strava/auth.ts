@@ -3,6 +3,7 @@ import { PUBLIC_STRAVA_CLIENT_ID } from '$env/static/public';
 import { ThirdPartyIntegrationProvider } from '@prisma/client';
 import { error } from '@sveltejs/kit';
 import { SummaryAthlete } from './typescript-fetch-client/models';
+import { isWithinExpirationDate } from 'oslo';
 
 export type StravaOAuth = {
 	token_type: string;
@@ -65,7 +66,7 @@ export async function authenticateStravaIntegration(user_id: string) {
 				]
 			}
 		});
-		if (integration.expires_at < Date.now()) {
+		if (isWithinExpirationDate(integration.expires_at)) {
 			// needs new refresh token
 			const token_obj: StravaOAuthRefresh = await refreshAccessToken(integration.refresh_token);
 			await prisma.thirdPartyIntegrationToken.update({
@@ -73,8 +74,7 @@ export async function authenticateStravaIntegration(user_id: string) {
 					id: integration.id
 				},
 				data: {
-					expires_at: token_obj.expires_at,
-					expires_in: token_obj.expires_in,
+					expires_at: new Date(token_obj.expires_at),
 					access_token: token_obj.access_token,
 					refresh_token: token_obj.refresh_token
 				}
@@ -84,4 +84,3 @@ export async function authenticateStravaIntegration(user_id: string) {
 		error(404);
 	}
 }
-

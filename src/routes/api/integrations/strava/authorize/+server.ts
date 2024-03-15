@@ -1,12 +1,10 @@
 import { getTokenFromAuthCode, type StravaOAuth } from '$lib/utils/integrations/strava/auth';
 import { ThirdPartyIntegrationProvider } from '@prisma/client';
-import type { Session } from 'lucia';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { redirect } from 'sveltekit-flash-message/server';
 
 export async function GET(event) {
 	const { locals, url } = event;
-	const session: Session = await locals.auth.validate();
 	let t: ToastSettings;
 	if (url.searchParams.has('error')) {
 		t = {
@@ -29,25 +27,23 @@ export async function GET(event) {
 		try {
 			const token_obj: StravaOAuth = await getTokenFromAuthCode(code);
 			await prisma.thirdPartyIntegrationToken.upsert({
-				create: {
-					user_id: session.user.userId,
-					integration_id: String(token_obj.athlete.id),
-					provider: ThirdPartyIntegrationProvider.STRAVA,
-					expires_at: token_obj.expires_at,
-					expires_in: token_obj.expires_in,
-					access_token: token_obj.access_token,
-					refresh_token: token_obj.refresh_token
+				where: {
+					integration_id: String(token_obj.athlete.id)
 				},
 				update: {
 					integration_id: String(token_obj.athlete.id),
-					expires_at: token_obj.expires_at,
-					expires_in: token_obj.expires_in,
+					expires_at: new Date(token_obj.expires_at),
 					access_token: token_obj.access_token,
 					refresh_token: token_obj.refresh_token
 				},
-				where: {
-						integration_id: String(token_obj.athlete.id),
-					}
+				create: {
+					user_id: locals.user!.id,
+					integration_id: String(token_obj.athlete.id),
+					provider: ThirdPartyIntegrationProvider.STRAVA,
+					expires_at: new Date(token_obj.expires_at),
+					access_token: token_obj.access_token,
+					refresh_token: token_obj.refresh_token
+				}
 			});
 			t = {
 				message: 'Successfully created strava integration',

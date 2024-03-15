@@ -9,7 +9,7 @@
 		| 'variant-soft-tertiary'
 		| undefined = undefined;
 	export let shadow: 'shadow-md' | undefined = undefined;
-	export let label:string
+	export let label: string;
 	let classes = `${type} ${color} ${shadow} ${$$props.class}`;
 </script>
 

@@ -1,21 +1,22 @@
 <script lang="ts">
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
 	import { delete_user_schema, type DeleteUserSchema } from '$lib/schemas';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import { superForm } from 'sveltekit-superforms/client';
 	import PasswordInput from './inputs/PasswordInput.svelte';
 	import { AlertCircle } from 'lucide-svelte';
 	import Button from '$lib/components/Button.svelte';
+	import { zod } from 'sveltekit-superforms/adapters';
 
-	export let form_data: SuperValidated<DeleteUserSchema>;
+	export let form_data: SuperValidated<Infer<DeleteUserSchema>>;
 
 	const { form, errors, constraints, enhance, delayed } = superForm(form_data, {
 		id: 'deleteUser',
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: false,
-		validators: delete_user_schema,
+		validators: zod(delete_user_schema),
 		delayMs: 0,
 		timeoutMs: 8000
 	});

@@ -3,17 +3,19 @@
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
 	import SendEmailVerificationLinkForm from '$lib/forms/SendEmailVerificationLinkForm.svelte';
 	import TextInput from '$lib/forms/inputs/TextInput.svelte';
-	import { verify_user_email_schema, type VerifyUserEmailSchema } from '$lib/schemas';
+	import { verify_user_email_schema } from '$lib/schemas';
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import { superForm } from 'sveltekit-superforms/client';
-	export let data;
+	import type { PageData } from './$types';
+	import { zod } from 'sveltekit-superforms/adapters';
+	export let data:PageData;
 
 	const { form, errors, constraints, enhance, delayed } = superForm(data.verifyEmailForm, {
 		id: 'updateUser',
 		applyAction: true,
 		invalidateAll: false,
 		resetForm: true,
-		validators: verify_user_email_schema,
+		validators: zod(verify_user_email_schema),
 		delayMs: 0,
 		timeoutMs: 8000
 	});

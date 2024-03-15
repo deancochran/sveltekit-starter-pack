@@ -44,7 +44,7 @@ interface DatabaseUserAttributes {
 	username: string;
 	email_verified: boolean;
 	created_at: Date;
-	stripe_id: string | undefined;
+	stripe_id: string | null;
 	role: typeof UserRole;
 	bike_ftp: number | undefined;
 	swim_ftp: number | undefined;

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { PUBLIC_STRAVA_CLIENT_ID, PUBLIC_CANONICAL_URL } from '$env/static/public';
 	import { userHasStravaIntegration } from '$lib/utils/integrations/strava/utils';
-
 </script>
 
 <div class="page-container">

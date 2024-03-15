@@ -5,7 +5,8 @@
 	import { getMapContext } from './stores';
 
 	export let map_id = 'map';
-	export let map_style = 'https://api.maptiler.com/maps/outdoor-v2/style.json?key=vcLMPIc3W2UdFOStWLDw'; 
+	export let map_style =
+		'https://api.maptiler.com/maps/outdoor-v2/style.json?key=vcLMPIc3W2UdFOStWLDw';
 	export let center: LngLatLike = [0, 0];
 	export let zoom = 1;
 
@@ -34,7 +35,6 @@
 			}
 		};
 	}
-	
 </script>
 
 <div class="relative h-full w-full">

@@ -77,40 +77,40 @@
 		({ width, height } = svg.getBoundingClientRect());
 	}
 
-	function hanleConicStops8020(): ConicStop[] {
-		let total_moving_time = data
-			.user!.activities.map((act, i) => {
-				return act.duration;
-			})
-			.reduce((a, b) => a + b, 0);
-		let total_time_above_threshold = data
-			.user!.activities.filter((act) => {
-				return act.intensity_factor_score >= 1;
-			})
-			.map((act, i) => {
-				return act.duration;
-			})
-			.reduce((a, b) => a + b, 0);
+	// function hanleConicStops8020(): ConicStop[] {
+	// 	let total_moving_time = data
+	// 		.user!.activities.map((act, i) => {
+	// 			return act.duration;
+	// 		})
+	// 		.reduce((a, b) => a + b, 0);
+	// 	let total_time_above_threshold = data
+	// 		.user!.activities.filter((act) => {
+	// 			return act.intensity_factor_score >= 1;
+	// 		})
+	// 		.map((act, i) => {
+	// 			return act.duration;
+	// 		})
+	// 		.reduce((a, b) => a + b, 0);
 
-		let percent_above_threshold = total_time_above_threshold / total_moving_time;
-		let display_percent_above_threshold = percent_above_threshold * 100;
+	// 	let percent_above_threshold = total_time_above_threshold / total_moving_time;
+	// 	let display_percent_above_threshold = percent_above_threshold * 100;
 
-		const conicStops: ConicStop[] = [
-			{
-				label: 'Above Threshold',
-				color: 'rgb(var(--color-primary-500))',
-				start: 0,
-				end: display_percent_above_threshold
-			},
-			{
-				label: 'Below Threshold',
-				color: 'rgb(var(--color-secondary-500))',
-				start: display_percent_above_threshold,
-				end: 100
-			}
-		];
-		return conicStops;
-	}
+	// 	const conicStops: ConicStop[] = [
+	// 		{
+	// 			label: 'Above Threshold',
+	// 			color: 'rgb(var(--color-primary-500))',
+	// 			start: 0,
+	// 			end: display_percent_above_threshold
+	// 		},
+	// 		{
+	// 			label: 'Below Threshold',
+	// 			color: 'rgb(var(--color-secondary-500))',
+	// 			start: display_percent_above_threshold,
+	// 			end: 100
+	// 		}
+	// 	];
+	// 	return conicStops;
+	// }
 </script>
 
 <div class=" flex md:flex-row flex-col">
@@ -118,7 +118,7 @@
 		<svg bind:this={svg} class="m-auto w-full h-[50vh]">
 			<g bind:this={gx} transform="translate(0,{height - marginBottom})"> </g>
 			<g bind:this={gy} transform="translate({marginLeft},0)"></g>
-			
+
 			<!-- TSS POINTS -->
 			<g>
 				{#each values as [date, score], i}
@@ -163,8 +163,8 @@
 		</svg>
 	</div>
 	<div class="card w-full p-8 flex items-center align-middle justify-center">
-		{#await hanleConicStops8020() then conicStops}
+		<!-- {#await hanleConicStops8020() then conicStops}
 			<ConicGradient stops={conicStops} legend>80/20 Chart</ConicGradient>
-		{/await}
+		{/await} -->
 	</div>
 </div>

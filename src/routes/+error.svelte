@@ -31,9 +31,9 @@
 	<div class="realtive flex flex-col items-center justify-center align-middle">
 		{#key currentQuote}
 			<h1 in:fade class="z-10 -mb-[5vw] font-serif text-[20vw] font-semibold text-white">
-				{currentQuote?$page.status:""}
+				{currentQuote ? $page.status : ''}
 			</h1>
-			<p in:fade class="z-10 font-serif text-[2vw] text-white">{currentQuote??""}</p>
+			<p in:fade class="z-10 font-serif text-[2vw] text-white">{currentQuote ?? ''}</p>
 		{/key}
 		<img class="absolute z-0 w-full resize-none brightness-75" src="/lost.gif" alt="lost" />
 	</div>

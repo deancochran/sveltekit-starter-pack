@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Rss } from 'lucide-svelte';
-	export let data
-
+	export let data;
 </script>
 
 <div class="page-container-wide page-padding">
@@ -41,5 +40,3 @@
 	</section>
 	<hr />
 </div>
-
-

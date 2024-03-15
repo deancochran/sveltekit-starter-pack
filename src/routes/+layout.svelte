@@ -116,10 +116,10 @@
 	on:keydown={(e) => {
 		if (e.ctrlKey || e.metaKey) {
 			if (e.key === 'k' || e.key === 'K') {
-				modalStore.close()
-				e.preventDefault()
-				e.stopPropagation()
-				triggerSearchPostsModal()
+				modalStore.close();
+				e.preventDefault();
+				e.stopPropagation();
+				triggerSearchPostsModal();
 			}
 		}
 	}}

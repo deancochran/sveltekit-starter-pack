@@ -8,8 +8,7 @@
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
 		"sourceMap": true,
-		"strict": true,
-		
+		"strict": true
 	},
-	"files": ["src/app.d.ts"],
+	"files": ["src/app.d.ts"]
 }

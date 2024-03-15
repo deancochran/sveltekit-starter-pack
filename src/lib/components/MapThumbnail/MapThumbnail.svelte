@@ -18,31 +18,43 @@
 			coordinates: coordinates
 		}
 	};
-	const bounds = coordinates.reduce( (bounds, coord) => { return bounds.extend(coord); }, new maplibre.LngLatBounds(coordinates[0], coordinates[0]));
+	const bounds = coordinates.reduce(
+		(bounds, coord) => {
+			return bounds.extend(coord);
+		},
+		new maplibre.LngLatBounds(coordinates[0], coordinates[0])
+	);
 	function createMap(mapContainer: HTMLDivElement): any {
-		map = new maplibre.Map({ container: mapContainer, style, center, zoom, bounds, fitBoundsOptions:{ padding:{top:20, bottom:20, left: 20, right: 20}}, interactive: false });
-		map.on('load', () => {
-			try{
-
-				map.addSource('trace_source', { type: 'geojson', data });
-				map.addLayer({
-					id: 'trace_layer',
-					type: 'line',
-					source: 'trace_source',
-					layout: {
-						'line-join': 'round',
-						'line-cap': 'round'
-					},
-					paint: {
-						'line-color': '#FFFFFF',
-						'line-width': 5
-					}
-				});
-			}catch(e){
-				console.log('error', e)
-			}
+		map = new maplibre.Map({
+			container: mapContainer,
+			style,
+			center,
+			zoom,
+			bounds,
+			fitBoundsOptions: { padding: { top: 20, bottom: 20, left: 20, right: 20 } },
+			interactive: false
 		});
-	
+		// map.on('load', () => {
+		// 	try {
+		// 		map.addSource('trace_source', { type: 'geojson', data });
+		// 		map.addLayer({
+		// 			id: 'trace_layer',
+		// 			type: 'line',
+		// 			source: 'trace_source',
+		// 			layout: {
+		// 				'line-join': 'round',
+		// 				'line-cap': 'round'
+		// 			},
+		// 			paint: {
+		// 				'line-color': '#FFFFFF',
+		// 				'line-width': 5
+		// 			}
+		// 		});
+		// 	} catch (e) {
+		// 		console.log('error', e);
+		// 	}
+		// });
+
 		return {
 			destroy() {
 				map?.remove();

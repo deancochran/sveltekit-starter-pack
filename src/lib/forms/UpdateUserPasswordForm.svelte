@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import PasswordInput from './inputs/PasswordInput.svelte';
@@ -8,15 +8,16 @@
 	import { update_user_password_schema, type UpdateUserPasswordSchema } from '$lib/schemas';
 	import { invalidateAll } from '$app/navigation';
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
+	import { zod } from 'sveltekit-superforms/adapters';
 
-	export let form_data: SuperValidated<UpdateUserPasswordSchema>;
+	export let form_data: SuperValidated<Infer<UpdateUserPasswordSchema>>;
 
 	const { form, errors, constraints, enhance, delayed } = superForm(form_data, {
 		id: 'updateUserPassword',
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: true,
-		validators: update_user_password_schema,
+		validators: zod(update_user_password_schema),
 		delayMs: 0,
 		timeoutMs: 8000
 	});

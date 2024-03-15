@@ -55,7 +55,6 @@ export const verify_user_email_schema = z.object({
 });
 export type VerifyUserEmailSchema = typeof verify_user_email_schema;
 
-
 export const update_user_email_schema = z.object({
 	email: z.string().email(),
 	code: z.string()
@@ -90,6 +89,7 @@ export type ForgotPassSchema = typeof forgot_pass_schema;
 
 export const reset_forgot_pass_schema = z
 	.object({
+		code: z.string(),
 		password: password_schema,
 		val_password: z.string()
 	})
@@ -120,18 +120,12 @@ export const reset_pass_schema = z
 	});
 export type ResetPassSchema = typeof reset_pass_schema;
 
-export const update_ftp_schema = z
-	.object({
-		run_ftp: z.number(),
-		bike_ftp: z.number(),
-		swim_ftp: z.number(),
-	})
+export const update_ftp_schema = z.object({
+	run_ftp: z.number(),
+	bike_ftp: z.number(),
+	swim_ftp: z.number()
+});
 export type UpdateFTPSchema = typeof update_ftp_schema;
-
-
-
-export const resend_reset_pass_schema = z.object({});
-export type ResendResetPassSchema = typeof resend_reset_pass_schema;
 
 export const cancel_user_subscription_schema = z.object({
 	password: z.string()

@@ -14,18 +14,19 @@ import {
 import { sendEmailVerificationLink } from '$lib/utils/emails';
 import { generateId, type User } from 'lucia';
 import * as argon from 'argon2';
+import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
 	await parent();
-	const signupForm = await superValidate(signup_schema);
+	const signupForm = await superValidate(zod(signup_schema));
 	return { signupForm };
 };
 
 export const actions: Actions = {
 	signup: async (event) => {
 		const { request, url } = event;
-		const form = await superValidate(request, signup_schema);
+		const form = await superValidate(request, zod(signup_schema));
 		if (form.valid) {
 			try {
 				// const existingCustomers = await stripe.customers.list({ email: form.data.email });
@@ -44,7 +45,7 @@ export const actions: Actions = {
 						id: generateId(15),
 						username: form.data.username,
 						email: form.data.email,
-						hashed_password: hashedPassword,
+						hashed_password: hashedPassword
 					}
 				});
 

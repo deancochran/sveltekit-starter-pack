@@ -7,19 +7,20 @@ import { auth } from '$lib/server/lucia';
 import { validateEmailVerificationToken } from '$lib/utils/token';
 import { verify_user_email_schema } from '$lib/schemas';
 import type { PageServerLoad } from './$types';
+import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
 	const data = await parent();
-	const verifyEmailForm = await superValidate(verify_user_email_schema);
+	const verifyEmailForm = await superValidate(zod(verify_user_email_schema));
 	return { verifyEmailForm, ...data };
 };
 
 export const actions: Actions = {
 	verify: async (event) => {
 		const { request } = event;
-		const form = await superValidate(request, verify_user_email_schema);
-		let t: ToastSettings
+		const form = await superValidate(request, zod(verify_user_email_schema));
+		let t: ToastSettings;
 		try {
 			const user = await validateEmailVerificationToken(form.data.code);
 			const session = await auth.createSession(user.id, {});
@@ -34,13 +35,13 @@ export const actions: Actions = {
 				background: 'variant-filled-success'
 			};
 		} catch (error) {
-			console.log(error)
+			console.log(error);
 			t = {
 				message: 'Failed to verify your email',
 				background: 'variant-filled-success'
 			};
 			setFlash(t, event);
-			return fail(400, {form});
+			return fail(400, { form });
 		}
 		redirect('/', t, event);
 	},

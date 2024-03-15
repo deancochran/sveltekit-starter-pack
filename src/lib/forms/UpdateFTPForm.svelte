@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { update_ftp_schema, type UpdateFTPSchema } from '$lib/schemas';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
@@ -8,14 +8,15 @@
 	import SwimFtpInput from './inputs/customInputs/SwimFTPInput.svelte';
 	import BikeFtpInput from './inputs/customInputs/BikeFTPInput.svelte';
 	import RunFtpInput from './inputs/customInputs/RunFTPInput.svelte';
-	export let form_data: SuperValidated<UpdateFTPSchema>;
+	import { zod } from 'sveltekit-superforms/adapters';
+	export let form_data: SuperValidated<Infer<UpdateFTPSchema>>;
 
 	const { form, errors, constraints, enhance, delayed } = superForm(form_data, {
 		id: 'updateFTP',
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: false,
-		validators: update_ftp_schema,
+		validators: zod(update_ftp_schema),
 		delayMs: 0,
 		timeoutMs: 8000
 	});

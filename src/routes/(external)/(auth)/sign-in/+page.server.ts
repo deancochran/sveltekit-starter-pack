@@ -8,18 +8,20 @@ import { fail } from '@sveltejs/kit';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { setFlash } from 'sveltekit-flash-message/server';
 import * as argon from 'argon2';
+import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
 	const data = await parent();
-	const signinForm = await superValidate(signin_schema);
+	const signinForm = await superValidate(zod(signin_schema));
 	return { signinForm, ...data };
 };
 
 export const actions: Actions = {
 	signin: async (event) => {
+
 		const { request } = event;
-		const form = await superValidate(request, signin_schema);
+		const form = await superValidate(request, zod(signin_schema));
 		if (form.valid) {
 			try {
 				const user = await prisma.user.findUnique({ where: { email: form.data.email } });

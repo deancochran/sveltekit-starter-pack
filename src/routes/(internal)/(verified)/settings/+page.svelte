@@ -7,7 +7,7 @@
 	import UpdateUserProfileForm from '$lib/forms/UpdateUserProfileForm.svelte';
 	import UpdateFtpForm from '$lib/forms/UpdateFTPForm.svelte';
 
-export let data;
+	export let data;
 </script>
 
 <div class="page-container">
@@ -23,7 +23,7 @@ export let data;
 			send_new_user_email_code_form_data={data.sendNewUserEmailCodeForm}
 		/>
 		<UpdateUserPasswordForm form_data={data.updateUserEmailPasswordForm} />
-		<CancelUserSubscription form_data={data.cancelUserSubscriptionForm} />
+		<!-- <CancelUserSubscription form_data={data.cancelUserSubscriptionForm} /> -->
 		<DeleteUserForm form_data={data.deleteUserForm} />
 
 		<div class="flex">

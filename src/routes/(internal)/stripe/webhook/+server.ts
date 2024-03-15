@@ -20,7 +20,7 @@ export async function POST(event) {
 	}
 	if (!stripe_event.data.object) throw Error('Something went wrong');
 
-	let subscription
+	let subscription;
 	switch (stripe_event_type) {
 		case 'customer.subscription.created':
 		case 'customer.subscription.updated':
@@ -34,7 +34,7 @@ export async function POST(event) {
 			await upsertSubscription(subscription.id, subscription.customer as string);
 			return json({ message: 'success' }, { status: 200 });
 		default:
-			// console.log('loooking for missing event', stripe_event_type);
+		// console.log('loooking for missing event', stripe_event_type);
 	}
 
 	return json({ message: 'success' }, { status: 201 });

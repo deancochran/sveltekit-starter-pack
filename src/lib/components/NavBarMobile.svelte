@@ -3,7 +3,7 @@
 	import type { Session } from 'lucia';
 	import { createEventDispatcher } from 'svelte';
 	import UserAvatar from './UserAvatar/UserAvatar.svelte';
-	export let session: Session|undefined;
+	export let session: Session | undefined;
 
 	const dispatch = createEventDispatcher();
 </script>
@@ -19,7 +19,7 @@
 				on:click={() => dispatch('close')}
 			>
 				<div class="relative flex">
-					<UserAvatar/>
+					<UserAvatar />
 				</div>
 
 				<div class="relative flex gap-2">

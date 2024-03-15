@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type { InputConstraint } from 'sveltekit-superforms';
-    
+
 	export let value: number;
 	export let label: string | undefined = undefined;
 	export let errors: string[] | undefined = undefined;
 	export let constraints: InputConstraint | undefined = undefined;
-    $:bike_ftp_display = `${value.toString().padStart(3,'0')}`
+	$: bike_ftp_display = `${value.toString().padStart(3, '0')}`;
 </script>
 
 <label class="label w-full">

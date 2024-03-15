@@ -2,11 +2,11 @@
 	import { type GeoJSONSource, type LngLatLike, type Map } from 'maplibre-gl';
 
 	export let map: Map;
-	
+
 	let zoom: number = 15;
 
-	export let coordinates: Array<LngLatLike>
-	let center: LngLatLike = coordinates[0]
+	export let coordinates: Array<LngLatLike>;
+	let center: LngLatLike = coordinates[0];
 
 	let data = {
 		type: 'Feature',
@@ -22,7 +22,7 @@
 		map.setCenter(center);
 
 		// add it to the map
-		map.addSource('trace', { type: 'geojson', data });
+		// map.addSource('trace', { type: 'geojson', data });
 		map.addLayer({
 			id: 'traceLayer',
 			type: 'line',
@@ -41,8 +41,8 @@
 		const timer = window.setInterval(() => {
 			if (i < coordinates.length) {
 				data.geometry.coordinates.push(coordinates[i]);
-                // @ts-expect-error
-				(map.getSource('trace') as GeoJSONSource).setData(data)
+				// @ts-expect-error
+				(map.getSource('trace') as GeoJSONSource).setData(data);
 				map.panTo(coordinates[i]);
 				i++;
 			} else {
@@ -52,6 +52,6 @@
 	}
 </script>
 
-<div class="linestring" use:createLine >
-    <slot/>
+<div class="linestring" use:createLine>
+	<slot />
 </div>

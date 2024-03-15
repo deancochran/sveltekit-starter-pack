@@ -1,21 +1,22 @@
 <script lang="ts">
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import { superForm } from 'sveltekit-superforms/client';
 	import PasswordInput from './inputs/PasswordInput.svelte';
 	import { AlertCircle } from 'lucide-svelte';
 	import Button from '$lib/components/Button.svelte';
 	import { cancel_user_subscription_schema, type CancelUserSubscription } from '$lib/schemas';
+	import { zod } from 'sveltekit-superforms/adapters';
 
-	export let form_data: SuperValidated<CancelUserSubscription>;
+	export let form_data: SuperValidated<Infer<CancelUserSubscription>>;
 
 	const { form, errors, constraints, enhance, delayed } = superForm(form_data, {
 		id: 'cancelSubscription',
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: false,
-		validators: cancel_user_subscription_schema,
+		validators: zod(cancel_user_subscription_schema),
 		delayMs: 0,
 		timeoutMs: 8000
 	});

@@ -15,25 +15,26 @@ import {
 } from '$lib/schemas';
 import { validateEmailVerificationToken } from '$lib/utils/token';
 import { auth } from '$lib/server/lucia';
-import * as argon from 'argon2'
+import * as argon from 'argon2';
 import { sendEmailChangeCode } from '$lib/utils/emails';
 import { fail } from '@sveltejs/kit';
 import { getActiveSubscription } from '$lib/utils/stripe/subscriptions';
+import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async ({ parent }) => {
 	await parent();
 	const data = await parent();
 	const initialData = { ...data.user };
-	const updateUserForm = await superValidate(initialData, update_user_schema);
-	const updateUserEmailForm = await superValidate(update_user_email_schema);
+	const updateUserForm = await superValidate(initialData, zod(update_user_schema));
+	const updateUserEmailForm = await superValidate(zod(update_user_email_schema));
 	const sendNewUserEmailCodeForm = await superValidate(
 		initialData,
-		send_new_user_email_code_schema
+		zod(send_new_user_email_code_schema)
 	);
-	const deleteUserForm = await superValidate(delete_user_schema);
-	const updateUserEmailPasswordForm = await superValidate(update_user_password_schema);
-	const cancelUserSubscriptionForm = await superValidate(cancel_user_subscription_schema);
-	const updateFTPForm = await superValidate(initialData, update_ftp_schema);
+	const deleteUserForm = await superValidate(zod(delete_user_schema));
+	const updateUserEmailPasswordForm = await superValidate(zod(update_user_password_schema));
+	const cancelUserSubscriptionForm = await superValidate(zod(cancel_user_subscription_schema));
+	const updateFTPForm = await superValidate(initialData, zod(update_ftp_schema));
 	return {
 		updateUserForm,
 		updateFTPForm,
@@ -49,7 +50,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 export const actions: Actions = {
 	deleteUser: async (event) => {
 		const { locals, request } = event;
-		const form = await superValidate(request, delete_user_schema);
+		const form = await superValidate(request, zod(delete_user_schema));
 
 		let success = false;
 		try {
@@ -80,12 +81,16 @@ export const actions: Actions = {
 	},
 	updateUser: async (event) => {
 		const { locals, request } = event;
-		const form = await superValidate(request, update_user_schema);
+		const form = await superValidate(request, zod(update_user_schema));
 
 		try {
 			if (!form.valid) throw new Error('Must provide valid credentials');
-			if (form.data.username === locals.user!.username) throw new Error('Must choose a new username');
-			await prisma.user.update({ where: { id: locals.user!.id }, data: { username: form.data.username } });
+			if (form.data.username === locals.user!.username)
+				throw new Error('Must choose a new username');
+			await prisma.user.update({
+				where: { id: locals.user!.id },
+				data: { username: form.data.username }
+			});
 			const session = await auth.createSession(locals.user!.id, {});
 			const sessionCookie = auth.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
@@ -117,13 +122,16 @@ export const actions: Actions = {
 	},
 	updateUserEmail: async (event) => {
 		const { locals, request } = event;
-		const form = await superValidate(request, update_user_email_schema);
+		const form = await superValidate(request, zod(update_user_email_schema));
 
 		let t: ToastSettings;
 		try {
 			if (!form.valid) throw new Error('Must provide a valid email and code');
 			await validateEmailVerificationToken(form.data.code);
-			await prisma.user.update({ where: { id: locals.user!.id }, data: { email: form.data.email } });
+			await prisma.user.update({
+				where: { id: locals.user!.id },
+				data: { email: form.data.email }
+			});
 			const session = await auth.createSession(locals.user!.id, {});
 			const sessionCookie = auth.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
@@ -147,7 +155,8 @@ export const actions: Actions = {
 	},
 	sendUserEmailCode: async (event) => {
 		const { locals, request } = event;
-		const form = await superValidate(request, send_new_user_email_code_schema);
+		const form = await superValidate(request, zod(send_new_user_email_code_schema));
+		console.log('submitting email for new code');
 
 		let t: ToastSettings;
 		try {
@@ -178,7 +187,7 @@ export const actions: Actions = {
 	},
 	updateFTP: async (event) => {
 		const { locals, request } = event;
-		const form = await superValidate(request, update_ftp_schema);
+		const form = await superValidate(request, zod(update_ftp_schema));
 
 		let t: ToastSettings;
 		try {
@@ -208,7 +217,7 @@ export const actions: Actions = {
 	},
 	updateUserPassword: async (event) => {
 		const { locals, request } = event;
-		const form = await superValidate(request, update_user_password_schema);
+		const form = await superValidate(request, zod(update_user_password_schema));
 
 		let t: ToastSettings;
 		try {
@@ -246,7 +255,7 @@ export const actions: Actions = {
 	},
 	cancelSubscription: async (event) => {
 		const { locals, request } = event;
-		const form = await superValidate(request, cancel_user_subscription_schema);
+		const form = await superValidate(request, zod(cancel_user_subscription_schema));
 
 		let t: ToastSettings;
 		try {

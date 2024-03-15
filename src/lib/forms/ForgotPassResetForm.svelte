@@ -1,19 +1,21 @@
 <script lang="ts">
 	import { reset_forgot_pass_schema, type ResetForgotPassSchema } from '$lib/schemas';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { superForm } from 'sveltekit-superforms/client';
-	export let form_data: SuperValidated<ResetForgotPassSchema>;
+	export let form_data: SuperValidated<Infer<ResetForgotPassSchema>>;
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import PasswordInput from './inputs/PasswordInput.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import TextInput from './inputs/TextInput.svelte';
+	import { zod } from 'sveltekit-superforms/adapters';
 
 	const { form, errors, constraints, enhance } = superForm(form_data, {
 		applyAction: true,
 		invalidateAll: true,
-		resetForm: false,
-		validators: reset_forgot_pass_schema
+		resetForm: true,
+		validators: zod(reset_forgot_pass_schema)
 	});
-	let isFocused: boolean = true;
+	let isFocused: boolean = false;
 </script>
 
 <div class="card">
@@ -28,16 +30,23 @@
 			action="?/reset_forgot"
 			use:enhance
 		>
+			<TextInput
+				name="code"
+				label="Password Reset Code"
+				bind:value={$form.code}
+				errors={$errors.code}
+				constraints={$constraints.code}
+			/>
 			<PasswordInput
 				name="password"
-				label="Password"
+				label="New Password"
 				bind:value={$form.password}
 				errors={$errors.password}
 				constraints={$constraints.password}
 			/>
 			<PasswordInput
 				name="val_password"
-				label="Password"
+				label="Verify Password"
 				bind:value={$form.val_password}
 				errors={$errors.val_password}
 				constraints={$constraints.val_password}

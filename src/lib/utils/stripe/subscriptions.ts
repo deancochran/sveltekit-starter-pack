@@ -89,7 +89,7 @@ export async function upsertSubscription(subscriptionId: string, stripe_user_id:
 				: null,
 			current_period_start: toDateTime(subscription.current_period_start).toISOString(),
 			current_period_end: toDateTime(subscription.current_period_end).toISOString(),
-			created: toDateTime(subscription.created).toISOString(),
+			created_at: toDateTime(subscription.created).toISOString(),
 			ended_at: subscription.ended_at ? toDateTime(subscription.ended_at).toISOString() : null,
 			start_date: toDateTime(subscription.start_date).toISOString(),
 			trial_start: subscription.trial_start
@@ -109,7 +109,7 @@ export async function upsertSubscription(subscriptionId: string, stripe_user_id:
 				: null,
 			current_period_start: toDateTime(subscription.current_period_start).toISOString(),
 			current_period_end: toDateTime(subscription.current_period_end).toISOString(),
-			created: toDateTime(subscription.created).toISOString(),
+			created_at: toDateTime(subscription.created).toISOString(),
 			ended_at: subscription.ended_at ? toDateTime(subscription.ended_at).toISOString() : null,
 			trial_start: subscription.trial_start
 				? toDateTime(subscription.trial_start).toISOString()

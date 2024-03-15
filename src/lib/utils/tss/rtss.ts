@@ -3,8 +3,7 @@
 // https://medium.com/strava-engineering/an-improved-gap-model-8b07ae8886c3
 // https://github.com/andrewhao/stressfactor
 
-import { SportType } from "../integrations/strava/typescript-fetch-client/models"
-
+import { SportType } from '../integrations/strava/typescript-fetch-client/models';
 
 // The most useful tools to quantify how hard you're training are those that account for both the volume and the intensity of your running.
 // Running Training Stress ScoreTM (rTSS) is a trademark metric of TrainingPeaks
@@ -17,50 +16,58 @@ import { SportType } from "../integrations/strava/typescript-fetch-client/models
 //ftp:number= functional threshold pace (avg pace you can hold when running all out for one hour)
 //s:number= duration of workout in seconds
 
-export const valid_cTss_sport_types = [SportType.EMountainBikeRide, SportType.GravelRide, SportType.Handcycle, SportType.MountainBikeRide, SportType.Ride, SportType.VirtualRide]
+export const valid_cTss_sport_types = [
+	SportType.EMountainBikeRide,
+	SportType.GravelRide,
+	SportType.Handcycle,
+	SportType.MountainBikeRide,
+	SportType.Ride,
+	SportType.VirtualRide
+];
 
-export const valid_rTss_sport_types = [SportType.Run, SportType.TrailRun, SportType.VirtualRun]
+export const valid_rTss_sport_types = [SportType.Run, SportType.TrailRun, SportType.VirtualRun];
 
-export function calcRunPace(metersParam:number, secondsParam:number, unit:'min'|'sec'='sec'){
-    const km=metersParam/1000
-    const min=secondsParam/60
-    const hr=min/60
+export function calcRunPace(
+	metersParam: number,
+	secondsParam: number,
+	unit: 'min' | 'sec' = 'sec'
+) {
+	const km = metersParam / 1000;
+	const min = secondsParam / 60;
+	const hr = min / 60;
 
-    if(unit=='min'){
-        // Convert meters per second to kilometers per hour
-        const speedKph: number = (km / hr)
-        // Calculate minutes per mile
-        const minPerKm: number = 60 / speedKph;
-        return minPerKm
-    }else{
-
-        // Calculate minutes per mile
-        const secPerKm: number = secondsParam / km;
-        return secPerKm
-    }
+	if (unit == 'min') {
+		// Convert meters per second to kilometers per hour
+		const speedKph: number = km / hr;
+		// Calculate minutes per mile
+		const minPerKm: number = 60 / speedKph;
+		return minPerKm;
+	} else {
+		// Calculate minutes per mile
+		const secPerKm: number = secondsParam / km;
+		return secPerKm;
+	}
 }
 
-export function calc_rIF(NGP:number, FTP:number):number{
-    return  NGP / FTP;
+export function calc_rIF(NGP: number, FTP: number): number {
+	return NGP / FTP;
 }
 
+export function calc_rTss(S: number, NGP: number, FTP: number, INTENSITY_FACTOR: number) {
+	// returns effort score 0-X (X>=100)
+	// ru ngp given in best sec/km for an activity
+	// run ftp give in best sec/km pace that you can hold over 1 hour
 
-export function calc_rTss(S:number, NGP:number, FTP:number, INTENSITY_FACTOR:number){
-    // returns effort score 0-X (X>=100)
-    // ru ngp given in best sec/km for an activity
-    // run ftp give in best sec/km pace that you can hold over 1 hour
+	// Convert pace to speed (miles per hour)
+	// const NGP_speed: number = 60 / NGP; // Convert pace to speed: 1 minute per mile is equivalent to 60 miles per hour
+	// const FTP_speed: number = 60 / FTP;
 
-    // Convert pace to speed (miles per hour)
-    // const NGP_speed: number = 60 / NGP; // Convert pace to speed: 1 minute per mile is equivalent to 60 miles per hour
-    // const FTP_speed: number = 60 / FTP;
+	// Constants
+	const MAX_HOUR_FTP_POWER_OUTPUT: number = FTP * 3600;
 
+	// Calculate rTSS
+	const EFFORT_POWER_OUTPUT: number = S * (NGP * INTENSITY_FACTOR);
+	const rTSS: number = (EFFORT_POWER_OUTPUT / MAX_HOUR_FTP_POWER_OUTPUT) * 100;
 
-    // Constants
-    const MAX_HOUR_FTP_POWER_OUTPUT: number = FTP * 3600;
-
-    // Calculate rTSS
-    const EFFORT_POWER_OUTPUT: number = S * (NGP * INTENSITY_FACTOR);
-    const rTSS: number = (EFFORT_POWER_OUTPUT / MAX_HOUR_FTP_POWER_OUTPUT) * 100;
-
-    return rTSS;
+	return rTSS;
 }

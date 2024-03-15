@@ -1,6 +1,6 @@
-import type { ToastSettings } from "@skeletonlabs/skeleton";
-import type { RequestEvent } from "@sveltejs/kit";
-import { setFlash } from "sveltekit-flash-message/server";
+import type { ToastSettings } from '@skeletonlabs/skeleton';
+import type { RequestEvent } from '@sveltejs/kit';
+import { setFlash } from 'sveltekit-flash-message/server';
 
 export function handleVerifyEmailRedirect(
 	event: RequestEvent,

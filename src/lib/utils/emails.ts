@@ -3,7 +3,6 @@ import { NODEMAILER_GMAIL_PASSWORD, NODEMAILER_GMAIL } from '$env/static/private
 import { render } from 'svelte-email';
 
 import VerifyEmail from '$lib/emails/VerifyEmail.svelte';
-import ResetPassword from '$lib/emails/ResetPassword.svelte';
 import ForgottenPassword from '$lib/emails/FogottenPassword.svelte';
 import { generateEmailVerificationToken, generatePasswordResetToken } from './token';
 import type { User } from 'lucia';
@@ -50,18 +49,6 @@ export async function sendForgottenPasswordResetLink(user: User, url_origin: str
 	await sendEmail(user.email, 'Reset your Forgotten Password', emailHtml);
 }
 
-export async function sendPasswordResetLink(user: User, url_origin: string) {
-	const code = await generatePasswordResetToken(user.id);
-	const emailHtml = render({
-		template: ResetPassword,
-		props: {
-			origin: url_origin,
-			code: code
-		}
-	});
-	await sendEmail(user.email, 'Reset your Password', emailHtml);
-}
-
 export async function sendEmailVerificationLink(user: User, url_origin: string) {
 	const token = await generateEmailVerificationToken(user.id);
 	const emailHtml = render({
@@ -73,8 +60,6 @@ export async function sendEmailVerificationLink(user: User, url_origin: string) 
 	});
 	await sendEmail(user.email, 'Verify your email', emailHtml);
 }
-
-
 
 export async function sendEmailChangeCode(user: User, email: string) {
 	const token = await generateEmailVerificationToken(user.id);

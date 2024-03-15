@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Link from './Link.svelte';
-	import {  popup, type PopupSettings } from '@skeletonlabs/skeleton';
+	import { popup, type PopupSettings } from '@skeletonlabs/skeleton';
 	import type { User } from 'lucia';
 
 	import UserAvatar from './UserAvatar/UserAvatar.svelte';
@@ -12,11 +12,10 @@
 		target: 'profilePopup',
 		placement: 'bottom'
 	};
-	
 </script>
 
 <button class="btn relative" use:popup={profilePopup}>
-	<UserAvatar/>
+	<UserAvatar />
 </button>
 
 <div class="card p-4 soft-filled-primary" data-popup="profilePopup">

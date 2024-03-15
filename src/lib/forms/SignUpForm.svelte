@@ -1,20 +1,21 @@
 <script lang="ts">
 	import { signup_schema, type SignUpSchema } from '$lib/schemas';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { superForm } from 'sveltekit-superforms/client';
-	export let form_data: SuperValidated<SignUpSchema>;
+	export let form_data: SuperValidated<Infer<SignUpSchema>>;
 	import TextInput from '$lib/forms/inputs/TextInput.svelte';
 	import EmailInput from '$lib/forms/inputs/EmailInput.svelte';
 	import PasswordInput from '$lib/forms/inputs/PasswordInput.svelte';
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import Link from '$lib/components/Link.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import { zod } from 'sveltekit-superforms/adapters';
 
 	const { form, errors, constraints, enhance, timeout } = superForm(form_data, {
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: true,
-		validators: signup_schema,
+		validators: zod(signup_schema),
 		timeoutMs: 8000
 	});
 	let isFocused: boolean = true;
@@ -64,8 +65,11 @@
 			type="submit"
 			class="btn variant-filled-primary">Sign Up</Button
 		>
-		<Link label={"Sign-In to your Account"} shadow="shadow-md" color="variant-soft-secondary" href="/sign-in"
-			>Sign-In to your Account</Link
+		<Link
+			label={'Sign-In to your Account'}
+			shadow="shadow-md"
+			color="variant-soft-secondary"
+			href="/sign-in">Sign-In to your Account</Link
 		>
 	</footer>
 </div>
