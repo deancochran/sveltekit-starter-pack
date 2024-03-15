@@ -1,13 +1,17 @@
 {
 	"cSpell.words": [
+		"cadence",
+		"flexsearch",
 		"latlng",
 		"maplibre",
+		"mdsvex",
 		"Minio",
+		"rehype",
 		"signin",
-		"cadence",
 		"skeletonlabs",
 		"Strava",
 		"superforms",
+		"Tableof",
 		"tailwindcss"
 	],
 	"svg.preview.background": "dark-transparent"

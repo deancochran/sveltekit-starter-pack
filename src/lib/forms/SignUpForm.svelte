@@ -57,7 +57,7 @@
 			/>
 		</form>
 	</section>
-	<footer class="w-full card-footer flex items-end align-middle justify-end gap-2">
+	<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">
 		<Button
 			shadow="shadow-md"
 			color="variant-filled-primary"
@@ -66,10 +66,10 @@
 			class="btn variant-filled-primary">Sign Up</Button
 		>
 		<Link
-			label={'Sign-In to your Account'}
+			label={'Sign In to your Account'}
 			shadow="shadow-md"
 			color="variant-soft-secondary"
-			href="/sign-in">Sign-In to your Account</Link
+			href="/sign-in">Sign In</Link
 		>
 	</footer>
 </div>

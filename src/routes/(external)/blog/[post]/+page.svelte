@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { formatDate } from '$lib/utils/datetime';
 	import { Avatar } from '@skeletonlabs/skeleton';
-	export let data;
+	import type { PageData } from './$types';
+	export let data:PageData;
 </script>
 
 <div class="max-w-5xl mx-auto p-4 md:p-12 space-y-8">
@@ -12,7 +13,7 @@
 	</ol>
 	<header class="space-y-4">
 		<h1 class="h1">{data.post.title}</h1>
-		<div class=" variant-glass-surface p-4 flex items-center align-middle justify-between">
+		<div class=" variant-soft-surface p-4 flex items-center align-middle justify-between">
 			<span class="flex flex-row items-center align-middle just-start gap-1">
 				<Avatar width="w-10" initials="DC" />
 				<div class="flex flex-col items-start align-middle just-start">
@@ -33,7 +34,7 @@
 			{@html data.content}
 		</article>
 	</main>
-	<footer class="card p-4 variant-glass-surface flex justify-between items-center mb-28">
+	<footer class="card p-4 variant-soft-surface flex justify-between items-center mb-28">
 		<!-- Tags -->
 		Fin.
 		<!-- <div class="flex items-center space-x-4">

@@ -4,6 +4,7 @@
 	import type { User } from 'lucia';
 
 	import UserAvatar from './UserAvatar/UserAvatar.svelte';
+	import { createEventDispatcher } from 'svelte';
 
 	export let user: User;
 
@@ -12,6 +13,7 @@
 		target: 'profilePopup',
 		placement: 'bottom'
 	};
+
 </script>
 
 <button class="btn relative" use:popup={profilePopup}>
@@ -22,8 +24,8 @@
 	<h3 class="h4 w-full font-serif">@{user.username}</h3>
 	<hr class="py-2" />
 	<div class="flex flex-col items-center justify-center align-middle gap-1">
-		<Link label={'Dashboard'} href="/dashboard">Dashboard</Link>
-		<Link label={'Settings'} href="/settings">Settings</Link>
-		<Link label={'Sign Out'} href="/sign-out">Sign-Out</Link>
+		<Link on:click label={'Dashboard'} href="/dashboard">Dashboard</Link>
+		<Link on:click label={'Settings'} href="/settings">Settings</Link>
+		<Link on:click label={'Sign Out'} href="/sign-out">Sign-Out</Link>
 	</div>
 </div>

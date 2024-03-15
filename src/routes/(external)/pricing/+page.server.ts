@@ -1,14 +1,8 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { stripe } from '$lib/server/stripe';
-import type { Session } from 'lucia';
-import { setFlash } from 'sveltekit-flash-message/server';
-import type { ToastSettings } from '@skeletonlabs/skeleton';
-import { getActiveSubscription, userIsAllowedFreeTrial } from '$lib/utils/stripe/subscriptions';
-import { auth } from '$lib/server/lucia.js';
 export const actions = {
 	checkout: async (event) => {
-		const { request, url, locals } = event;
-		let t: ToastSettings;
+		const { request, url } = event;
 		// if (!session) {
 		// 	t = {
 		// 		message: 'Must have an account to checkout',

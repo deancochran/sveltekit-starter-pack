@@ -19,7 +19,7 @@
 			<form id="resend" method="post" action="?/resend" use:enhance />
 		</div>
 	</section>
-	<footer class="card-footer flex p-4 items-center align-middle justify-center">
+	<footer class="card-footer flex flex-wrap p-4 items-center align-middle justify-center">
 		<Button
 			shadow="shadow-md"
 			color="variant-filled-primary"

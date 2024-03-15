@@ -44,7 +44,7 @@
 			/>
 		</form>
 	</section>
-	<footer class="w-full card-footer flex items-end align-middle justify-end gap-2">
+	<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">
 		{#if $delayed}
 			<LoadingIcon />
 		{:else}
@@ -60,12 +60,12 @@
 			label={'Create An Account'}
 			shadow="shadow-md"
 			color="variant-soft-secondary"
-			href="/sign-up">Create an Account</Link
+			href="/sign-up">Sign Up</Link
 		>
 		<Link
 			label={'Forgot your password?'}
 			shadow="shadow-md"
-			color="variant-soft-secondary"
+			color="variant-soft-tertiary"
 			href="/forgot-password">Forgot your password?</Link
 		>
 	</footer>

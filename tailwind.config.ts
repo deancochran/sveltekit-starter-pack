@@ -2,6 +2,7 @@ import { join } from 'path';
 import type { Config } from 'tailwindcss';
 
 import { skeleton } from '@skeletonlabs/tw-plugin';
+import plugin from 'tailwindcss/plugin';
 
 const config = {
 	darkMode: 'class',
@@ -34,7 +35,7 @@ const config = {
 					'wintry'
 				]
 			}
-		})
+		}),
 	]
 } satisfies Config;
 

@@ -1,34 +1,37 @@
 import adapter from '@sveltejs/adapter-auto';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { mdsvex, escapeSvelte } from 'mdsvex';
+import remarkUnwrapImages from 'remark-unwrap-images';
+import remarkMath from 'remark-math';
+import rehypeKatexSvelte from 'rehype-katex-svelte'
+import remarkToc from 'remark-toc';
+import rehypeSlug from 'rehype-slug';
 import { getHighlighter } from 'shiki';
 
 /** @type {import('mdsvex').MdsvexOptions} */
-export const mdsvexOptions = {
-	extensions: ['.md'],
-	// layout: {
-	// 	_: './src/lib/utils/posts/mdsvex_layout.svelte'
-	// },
+const mdsvexOptions = {
+	extensions: ['.md',".svx"],
+	layout: "./src/mdsvex.svelte",
 	highlight: {
 		highlighter: async (code, lang = 'text') => {
 			const highlighter = await getHighlighter({
 				themes: ['poimandres'],
-				langs: ['javascript', 'typescript']
+				langs: ['javascript', 'typescript', 'latex']
 			});
 			await highlighter.loadLanguage('javascript', 'typescript');
 			const html = escapeSvelte(highlighter.codeToHtml(code, { lang, theme: 'poimandres' }));
-			return `{@html \`${html}\` }`;
+			return html
 		}
-	}
-	// remarkPlugins: [remarkUnwrapImages, [remarkToc, { tight: true }]],
-	// rehypePlugins: [rehypeSlug]
+	},
+	remarkPlugins: [remarkUnwrapImages, [remarkToc, { tight: true }], remarkMath],
+	rehypePlugins: [rehypeSlug, [ rehypeKatexSvelte, { macros: { "\\CC": "\\mathbb{C}", "\\vec": "\\mathbf", }, },]]
 };
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	// Consult https://kit.svelte.dev/docs/integrations#preprocessors
 	// for more information about preprocessors
-	extensions: ['.svelte', '.md'],
+	extensions: ['.svelte', '.md', ".svx"],
 	preprocess: [vitePreprocess(), mdsvex(mdsvexOptions)],
 
 	kit: {

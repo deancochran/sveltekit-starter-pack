@@ -1,7 +1,7 @@
-import type { Post } from '$lib/utils/posts/types';
+import type { Post } from "$lib/utils/posts/types";
 
-export async function load({ fetch }) {
-	// error(404, (e as Error).message)
+export async function load({ fetch, parent }) {
+	await parent()
 	const response = await fetch('api/posts');
 	if (!response.ok) throw new Error(`Error fetching JSON from ${response.url}`);
 	const posts: Post[] = await response.json();

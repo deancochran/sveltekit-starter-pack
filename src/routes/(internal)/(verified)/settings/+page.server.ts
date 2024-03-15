@@ -156,8 +156,6 @@ export const actions: Actions = {
 	sendUserEmailCode: async (event) => {
 		const { locals, request } = event;
 		const form = await superValidate(request, zod(send_new_user_email_code_schema));
-		console.log('submitting email for new code');
-
 		let t: ToastSettings;
 		try {
 			if (!form.valid) throw new Error('Must provide a valid email');

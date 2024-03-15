@@ -19,9 +19,9 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
 	signin: async (event) => {
-
 		const { request } = event;
 		const form = await superValidate(request, zod(signin_schema));
+		let t: ToastSettings;
 		if (form.valid) {
 			try {
 				const user = await prisma.user.findUnique({ where: { email: form.data.email } });
@@ -49,19 +49,18 @@ export const actions: Actions = {
 					path: '.',
 					...sessionCookie.attributes
 				});
+				t = {
+					message: `Welcome ${user.username}`,
+					background: 'variant-filled-success'
+				} as const;
 			} catch (error) {
 				const t: ToastSettings = {
 					message: 'Unknown Error: Contact Support',
 					background: 'variant-filled-warning'
 				} as const;
 				setFlash(t, event);
-
 				return fail(500, { form });
 			}
-			const t: ToastSettings = {
-				message: `Welcome ${event.locals.user?.username}`,
-				background: 'variant-filled-success'
-			} as const;
 			throw redirect('/', t, event);
 		} else {
 			const t: ToastSettings = {

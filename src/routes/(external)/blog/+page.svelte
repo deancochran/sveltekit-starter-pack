@@ -9,10 +9,10 @@
 			<h2 class="h2">The Cadence Blog</h2>
 			<p>Keep up with the latest news for Cadence.</p>
 		</div>
-		<!-- RSS Icon -->
+		<!-- RSS Icon
 		<a href="/rss" class="btn-icon btn-icon-md bg-primary-500/50">
 			<Rss />
-		</a>
+		</a> -->
 	</header>
 	<hr />
 	<!-- Blog List -->

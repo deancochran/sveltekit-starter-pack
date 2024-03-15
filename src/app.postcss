@@ -15,18 +15,21 @@ body {
 .page-padding {
 	@apply p-4 md:p-10;
 }
+mark {
+	@apply bg-slate-300;
+}
 
 .post h2 {
-	@apply h2;
+	@apply h2 text-[5vh] leading-snug;
 }
 .post h3 {
-	@apply h3;
+	@apply h3 text-[4vh] leading-snug;
 }
 .post h4 {
-	@apply h4;
+	@apply h4 text-[3vh] leading-snug;
 }
 .post h5 {
-	@apply h5;
+	@apply h5 text-[2vh] leading-snug;
 }
 
 .post p:not(:is(h2, h3, h4, h5, h6) + p) {
@@ -47,4 +50,8 @@ body {
 
 .post :is(ul, ol) {
 	@apply list-disc pl-5;
+}
+
+.post pre {
+	@apply p-4;
 }

@@ -35,7 +35,6 @@ export const actions: Actions = {
 				background: 'variant-filled-success'
 			};
 		} catch (error) {
-			console.log(error);
 			t = {
 				message: 'Failed to verify your email',
 				background: 'variant-filled-success'

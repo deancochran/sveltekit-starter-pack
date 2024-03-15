@@ -4,7 +4,7 @@
 	import { storeTheme } from '$lib/stores/theme';
 	import { LightSwitch, popup, type PopupSettings } from '@skeletonlabs/skeleton';
 	import type { SubmitFunction } from '@sveltejs/kit';
-	import Button from './Button.svelte';
+	export let showLightSwitch = false
 
 	const themes = [
 		'crimson',
@@ -38,10 +38,12 @@
 	>Theme</button
 >
 <div class="card p-2 soft-filled-primary shadow-2xl" data-popup="popupClick">
-	<div class="flex py-2 items-center justify-center align-middle gap-1">
-		<LightSwitch />
-	</div>
-	<hr class="variant-filled-active py-2" />
+	{#if showLightSwitch}
+		<div class="flex py-2 items-center justify-center align-middle gap-1">
+			<LightSwitch />
+		</div>
+		<hr class="variant-filled-active py-2" />
+	{/if}
 
 	<form id="theme" action="/?/setTheme" method="POST" use:enhance={setTheme}>
 		<ul class="w-full h-full gap-2">
