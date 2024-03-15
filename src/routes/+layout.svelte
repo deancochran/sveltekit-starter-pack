@@ -143,7 +143,7 @@
 				</Link>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
-				<div class=" flex flex-row">
+				<div class=" flex flex-row items-center">
 					<button
 						type="button"
 						on:click={triggerSearchPostsModal}
