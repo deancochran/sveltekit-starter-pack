@@ -8,7 +8,7 @@
 	import { superForm } from 'sveltekit-superforms/client';
 	import type { PageData } from './$types';
 	import { zod } from 'sveltekit-superforms/adapters';
-	export let data:PageData;
+	export let data: PageData;
 
 	const { form, errors, constraints, enhance, delayed } = superForm(data.verifyEmailForm, {
 		id: 'updateUser',

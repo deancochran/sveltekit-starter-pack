@@ -88,7 +88,7 @@
 						class="btn bg-surface-backdrop-token w-full justify-start rounded-none overflow-hidden scale-100 active:scale-100"
 						href={nav.href}
 					>
-						<span><Icon icon_name={nav.icon_name}/></span>
+						<span><Icon icon_name={nav.icon_name} /></span>
 						<span>{nav.title}</span>
 					</Link>
 				{/if}

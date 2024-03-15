@@ -2,7 +2,7 @@
 	import { formatDate } from '$lib/utils/datetime';
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import type { PageData } from './$types';
-	export let data:PageData;
+	export let data: PageData;
 </script>
 
 <div class="max-w-5xl mx-auto p-4 md:p-12 space-y-8">

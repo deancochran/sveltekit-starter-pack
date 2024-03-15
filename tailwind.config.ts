@@ -35,7 +35,7 @@ const config = {
 					'wintry'
 				]
 			}
-		}),
+		})
 	]
 } satisfies Config;
 

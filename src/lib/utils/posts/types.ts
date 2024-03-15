@@ -1,7 +1,7 @@
 export type Categories = 'Changelog';
 
 export type Post = {
-	categories: Categories[]
+	categories: Categories[];
 	author: string;
 	slug: string;
 	title: string;
@@ -29,7 +29,7 @@ export type SearchPostsResult = {
 	slug: string;
 	title: string;
 	description: string;
-	categories: Categories[]
+	categories: Categories[];
 	content: string[];
 };
 

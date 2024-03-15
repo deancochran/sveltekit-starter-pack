@@ -6,6 +6,6 @@ export async function GET() {
 		const posts = await getPosts();
 		return json(posts);
 	} catch (e) {
-		error(400,{code:"400", message:'failed to fetch posts'});
+		error(400, { code: '400', message: 'failed to fetch posts' });
 	}
 }

@@ -13,7 +13,6 @@
 		target: 'profilePopup',
 		placement: 'bottom'
 	};
-
 </script>
 
 <button class="btn relative" use:popup={profilePopup}>

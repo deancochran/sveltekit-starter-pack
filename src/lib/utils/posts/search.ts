@@ -17,7 +17,7 @@ export function createPostsIndex(data: PostDetail[]) {
 	posts = data;
 }
 
-export function searchPostsIndex(searchTerm: string):SearchPostsResult[] {
+export function searchPostsIndex(searchTerm: string): SearchPostsResult[] {
 	const match = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 	const results = postsIndex.search(match);
 	return results

@@ -15,15 +15,17 @@
 <div
 	class="relative h-full w-full flex flex-col flex-wrap gap-4 items-center align-middle justify-between"
 >
-	<div
-		class="flex flex-row w-full items-center align-middle justify-between p-4 gap-4 shadow-sm"
-	>
+	<div class="flex flex-row w-full items-center align-middle justify-between p-4 gap-4 shadow-sm">
 		<h1 class="h1 font-serif bg-op font-bold text-surface text-4xl">cadence</h1>
 		{#if $page.data.user}
 			<ProfilePopup on:click={drawerClose} user={$page.data.user} />
 		{:else}
-			<Link on:click={drawerClose} label={'Sign In'} shadow="shadow-md" color="variant-filled-primary" href="/sign-in"
-				>Sign In</Link
+			<Link
+				on:click={drawerClose}
+				label={'Sign In'}
+				shadow="shadow-md"
+				color="variant-filled-primary"
+				href="/sign-in">Sign In</Link
 			>
 		{/if}
 	</div>

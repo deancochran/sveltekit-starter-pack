@@ -4,7 +4,7 @@
 	import { storeTheme } from '$lib/stores/theme';
 	import { LightSwitch, popup, type PopupSettings } from '@skeletonlabs/skeleton';
 	import type { SubmitFunction } from '@sveltejs/kit';
-	export let showLightSwitch = false
+	export let showLightSwitch = false;
 
 	const themes = [
 		'crimson',
