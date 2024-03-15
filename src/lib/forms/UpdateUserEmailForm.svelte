@@ -11,8 +11,7 @@
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
 	import TextInput from './inputs/TextInput.svelte';
 	import EmailInput from './inputs/EmailInput.svelte';
-	import { goto, invalidateAll } from '$app/navigation';
-	import type { StepperState } from '@skeletonlabs/skeleton/dist/components/Stepper/types';
+	import {  invalidateAll } from '$app/navigation';
 	import type { Writable } from 'svelte/store';
 	import Button from '$lib/components/Button.svelte';
 
@@ -51,7 +50,7 @@
 		id: 'sendUserEmailCode',
 		applyAction: true,
 		invalidateAll: true,
-		resetForm: true,
+		resetForm: false,
 		validators: send_new_user_email_code_schema,
 		delayMs: 0,
 		timeoutMs: 8000,

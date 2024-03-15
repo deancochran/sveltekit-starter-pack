@@ -29,10 +29,6 @@ export async function POST(event) {
 		case 'customer.subscription.pending_update_applied':
 		case 'customer.subscription.pending_update_expired':
 		case 'customer.subscription.trial_will_end':
-			subscription = stripe_event.data.object as Stripe.Subscription;
-			await upsertSubscription(subscription.id, subscription.customer as string);
-			return json({ message: 'success' }, { status: 200 });
-
 		case 'customer.subscription.deleted':
 			subscription = stripe_event.data.object as Stripe.Subscription;
 			await upsertSubscription(subscription.id, subscription.customer as string);

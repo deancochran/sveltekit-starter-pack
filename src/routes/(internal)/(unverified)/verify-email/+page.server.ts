@@ -42,7 +42,7 @@ export const actions: Actions = {
 			setFlash(t, event);
 			return fail(400, {form});
 		}
-		return redirect('/', t, event);
+		redirect('/', t, event);
 	},
 	resend: async (event) => {
 		const { url, locals } = event;
