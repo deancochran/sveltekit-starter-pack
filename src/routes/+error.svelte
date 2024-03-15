@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	const lostQuotes: string[] = [
 		'Lost in the vastness of my own mind, searching for a breadcrumb of clarity.',
@@ -15,26 +14,24 @@
 		'Wandering aimlessly, I find solace in the beauty of the unknown.'
 	];
 
-	let currentQuote: string | undefined = undefined;
-
-	function pickRandomQuote() {
+	async function pickRandomQuote() {
 		const randomIndex = Math.floor(Math.random() * 10);
-		currentQuote = lostQuotes[randomIndex];
+		return lostQuotes[randomIndex];
 	}
-
-	onMount(() => {
-		pickRandomQuote();
-	});
 </script>
 
-<div class="relative flex h-[80vh] w-[80vw] flex-col items-center justify-center align-middle">
-	<div class="realtive flex flex-col items-center justify-center align-middle">
+<div class="flex flex-col items-center align-middle justify-center h-[80vh] gap-4">
+	{#await pickRandomQuote()}
+		<br />
+		<br />
+		<br />
+	{:then currentQuote}
 		{#key currentQuote}
-			<h1 in:fade class="z-10 -mb-[5vw] font-serif text-[20vw] font-semibold text-white">
-				{currentQuote ? $page.status : ''}
+			<h1 in:fade class="font-serif font-semibold text-white z-10 text-4xl">
+				{currentQuote ? $page.status + ': ' + $page.error?.message : ''}
 			</h1>
-			<p in:fade class="z-10 font-serif text-[2vw] text-white">{currentQuote ?? ''}</p>
+			<p in:fade class="z-10 font-serif text-white">{currentQuote ?? ''}</p>
 		{/key}
-		<img class="absolute z-0 w-full resize-none brightness-75" src="/lost.gif" alt="lost" />
-	</div>
+	{/await}
+	<img class=" object-cover" src="/lost.gif" alt="lost" />
 </div>
