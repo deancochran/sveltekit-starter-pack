@@ -17,6 +17,6 @@ node_modules
 .prisma
 /prisma/*.db
 /prisma/migrations/*
+.pnpm-lock*
 /prisma/seed.ts
-/prisma/dev_data.ts
 pnpm-lock.yaml
