@@ -61,7 +61,7 @@ export const actions: Actions = {
 				setFlash(t, event);
 				return fail(500, { form });
 			}
-			throw redirect('/', t, event);
+			redirect('/', t, event);
 		} else {
 			const t: ToastSettings = {
 				message: 'Invalid Form',

@@ -13,7 +13,6 @@
 		type ModalComponent,
 		type ModalSettings,
 		getModalStore,
-		LightSwitch
 	} from '@skeletonlabs/skeleton';
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 	import { getToastStore } from '@skeletonlabs/skeleton';
@@ -42,7 +41,7 @@
 	const toastStore = getToastStore();
 	const toast = getFlash(page, {
 		clearOnNavigate: false,
-		flashCookieOptions: { sameSite: 'lax' }
+		// flashCookieOptions: { sameSite: 'lax' , secure: false},
 	});
 
 	toast.subscribe(($toast) => {

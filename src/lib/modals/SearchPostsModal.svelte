@@ -10,6 +10,7 @@
 	import { mainNav } from '$lib/constants';
 	import Icon from '$lib/components/Icon.svelte';
 	import { fly, slide } from 'svelte/transition';
+	import { page } from '$app/stores';
 
 	const modal = getModalStore();
 
@@ -81,7 +82,7 @@
 				{/each}
 			{/if}
 			{#each mainNav as nav}
-				{#if !nav.requires_account}
+				{#if !nav.requires_account || (nav.requires_account && $page.data.user)}
 					<Link
 						label={nav.title}
 						type="btn"

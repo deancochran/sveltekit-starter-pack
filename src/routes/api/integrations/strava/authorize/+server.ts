@@ -11,7 +11,7 @@ export async function GET(event) {
 			message: 'Case 1 Failed to create strava integration',
 			background: 'variant-filled-error'
 		} as const;
-		throw redirect('/settings', t, event);
+		redirect('/settings', t, event);
 	}
 	const scope = url.searchParams.get('scope');
 	const code = url.searchParams.get('code');
@@ -22,7 +22,7 @@ export async function GET(event) {
 				message: 'Case 2 Failed to create strava integration',
 				background: 'variant-filled-error'
 			} as const;
-			throw redirect('/settings', t, event);
+			redirect('/settings', t, event);
 		}
 		try {
 			const token_obj: StravaOAuth = await getTokenFromAuthCode(code);
@@ -55,12 +55,12 @@ export async function GET(event) {
 				background: 'variant-filled-error'
 			} as const;
 		}
-		throw redirect('/settings', t, event);
+		redirect('/settings', t, event);
 	} else {
 		t = {
 			message: 'Case 4 Failed to create strava integration',
 			background: 'variant-filled-error'
 		} as const;
-		throw redirect('/settings', t, event);
+		redirect('/settings', t, event);
 	}
 }

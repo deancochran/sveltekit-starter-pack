@@ -1,3 +1,4 @@
+import { dev } from '$app/environment';
 import { auth } from '$lib/server/lucia';
 import type { Handle } from '@sveltejs/kit';
 
@@ -38,7 +39,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 		event.cookies.set('theme', 'skeleton', { path: '/' });
 		theme = 'skeleton';
 	}
-	console.log(`${event.locals.user?.email ?? 'alien'} at ${event.route.id}`);
+	console.log(
+		`${dev ? '💻 DEV: ' : '🚀 PROD: '} ${'⏰ ' + new Date().toLocaleTimeString()} ${'📍' + event.route.id}`
+	);
 
 	return await resolve(event, {
 		transformPageChunk: ({ html }) => html.replace('data-theme=""', `data-theme="${theme}"`)

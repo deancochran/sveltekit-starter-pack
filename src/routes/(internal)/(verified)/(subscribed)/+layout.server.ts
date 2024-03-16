@@ -13,7 +13,7 @@ export const load: LayoutServerLoad = async (event) => {
 			message: `You must be a subscriber to view this page`,
 			background: 'variant-filled-warning'
 		} as const;
-		throw redirect('/pricing', t, event);
+		throw redirect('/pricing', t, event.cookies);
 	}
 
 	return data;

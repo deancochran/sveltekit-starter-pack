@@ -7,12 +7,14 @@ import ForgottenPassword from '$lib/emails/FogottenPassword.svelte';
 import { generateEmailVerificationToken, generatePasswordResetToken } from './token';
 import type { User } from 'lucia';
 import NewEmailCode from '$lib/emails/NewEmailCode.svelte';
+import { dev } from '$app/environment';
+
 
 const transporter = nodemailer.createTransport({
 	service: 'gmail',
 	host: 'smtp.gmail.com',
 	port: 587,
-	secure: false,
+	secure: !dev, //TODO figure out this config
 	auth: {
 		user: NODEMAILER_GMAIL,
 		pass: NODEMAILER_GMAIL_PASSWORD

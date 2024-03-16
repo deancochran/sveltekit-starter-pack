@@ -3,14 +3,16 @@
 <html lang="en" class="dark">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+		<link rel="icon" href="favicon.png" />
+		<link rel="apple-touch-icon" href="favicon.png">
+
 		<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" />
 		<!-- <script src='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js'></script> -->
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		%sveltekit.head%
 	</head>
 
-	<body data-theme="">
+	<body data-theme="" data-sveltekit-preload-data="tap">
 		<div class="h-full overflow-hidden contents">%sveltekit.body%</div>
 	</body>
 </html>

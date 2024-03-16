@@ -9,7 +9,7 @@ export const GET: RequestHandler = async (event) => {
 			message: `User must exist to sign-out`,
 			background: 'variant-filled-warning'
 		} as const;
-		throw redirect('/sign-in', t, event);
+		redirect('/sign-in', t, event);
 	}
 	await auth.invalidateSession(event.locals.session.id);
 	const sessionCookie = auth.createBlankSessionCookie();
@@ -21,5 +21,5 @@ export const GET: RequestHandler = async (event) => {
 		message: `Goodbye ${event.locals.user?.username}`,
 		background: 'variant-filled-success'
 	} as const;
-	throw redirect('/sign-in', t, event);
+	redirect('/sign-in', t, event);
 };

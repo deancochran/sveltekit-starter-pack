@@ -1,4 +1,3 @@
-import { dev } from '$app/environment';
 import { Lucia } from 'lucia';
 import { TimeSpan } from 'oslo';
 import type { UserRole } from '@prisma/client';
@@ -29,8 +28,9 @@ export const auth = new Lucia(adapter, {
 		name: 'session',
 		expires: false, // session cookies have very long lifespan (2 years)
 		attributes: {
-			secure: !dev,
-			sameSite: 'strict',
+			// secure: !dev, 
+			secure: false, 
+			sameSite: 'lax',
 			domain: process.env.PUBLIC_DOMAIN
 		}
 	}

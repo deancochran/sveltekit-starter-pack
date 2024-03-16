@@ -87,13 +87,13 @@ export const actions: Actions = {
 					background: 'variant-filled-warning'
 				} as const;
 			}
-			throw redirect('/', t, event);
+			redirect('/', t, event.cookies);
 		} else {
 			const t: ToastSettings = {
 				message: 'Invalid Form',
 				background: 'variant-filled-warning'
 			} as const;
-			setFlash(t, event);
+			setFlash(t, event.cookies);
 			return { form };
 		}
 	}

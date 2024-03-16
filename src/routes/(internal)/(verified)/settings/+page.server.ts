@@ -76,7 +76,7 @@ export const actions: Actions = {
 				message: 'Successfully deleted your account',
 				background: 'variant-filled-success'
 			} as const;
-			throw redirect('/', t, event);
+			redirect('/', t, event);
 		}
 	},
 	updateUser: async (event) => {

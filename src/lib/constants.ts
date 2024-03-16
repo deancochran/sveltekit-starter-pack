@@ -12,7 +12,7 @@ export const mainNav: NavItem[] = [
 	{
 		title: 'Dashboard',
 		icon_name: 'dashboard',
-		href: '/',
+		href: '/dashboard',
 		requires_account: true
 	},
 	{

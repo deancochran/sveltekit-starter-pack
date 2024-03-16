@@ -94,7 +94,7 @@ export const actions: Actions = {
 				message: `Successfully Registered`,
 				background: 'variant-filled-success'
 			} as const;
-			throw redirect('/verify-email', t, event);
+			redirect('/verify-email', t, event);
 		} else {
 			const t: ToastSettings = {
 				message: 'Invalid Form',
