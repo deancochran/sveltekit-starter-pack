@@ -1,5 +1,4 @@
 .DS_Store
-node_modules
 /build
 /.svelte-kit
 /package
@@ -20,3 +19,4 @@ node_modules
 /prisma/migrations/*
 /prisma/seed.ts
 /prisma/dev_data.ts
+pnpm-lock.yaml
