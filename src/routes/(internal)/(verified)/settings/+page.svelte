@@ -1,11 +1,10 @@
 <script lang="ts">
-	import CancelUserSubscription from '$lib/forms/CancelUserSubscription.svelte';
-
 	import DeleteUserForm from '$lib/forms/DeleteUserForm.svelte';
 	import UpdateUserEmailForm from '$lib/forms/UpdateUserEmailForm.svelte';
 	import UpdateUserPasswordForm from '$lib/forms/UpdateUserPasswordForm.svelte';
 	import UpdateUserProfileForm from '$lib/forms/UpdateUserProfileForm.svelte';
 	import UpdateFtpForm from '$lib/forms/UpdateFTPForm.svelte';
+	import IntegraitonsForm from '$lib/forms/integraitonsForm.svelte';
 
 	export let data;
 </script>
@@ -16,6 +15,7 @@
 			<h1 class="h1 font-serif">Settings Page</h1>
 		</div>
 
+		<IntegraitonsForm/>
 		<UpdateFtpForm form_data={data.updateFTPForm} />
 		<UpdateUserProfileForm form_data={data.updateUserForm} />
 		<UpdateUserEmailForm
@@ -23,12 +23,6 @@
 			send_new_user_email_code_form_data={data.sendNewUserEmailCodeForm}
 		/>
 		<UpdateUserPasswordForm form_data={data.updateUserEmailPasswordForm} />
-		<!-- <CancelUserSubscription form_data={data.cancelUserSubscriptionForm} /> -->
 		<DeleteUserForm form_data={data.deleteUserForm} />
-
-		<div class="flex">
-			<!-- <div class="flex">Strava Integration</div> -->
-			<!-- <div class="flex">Trainging Peaks Integration</div> -->
-		</div>
 	</div>
 </div>

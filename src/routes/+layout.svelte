@@ -12,7 +12,7 @@
 		Modal,
 		type ModalComponent,
 		type ModalSettings,
-		getModalStore,
+		getModalStore
 	} from '@skeletonlabs/skeleton';
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 	import { getToastStore } from '@skeletonlabs/skeleton';
@@ -40,7 +40,7 @@
 
 	const toastStore = getToastStore();
 	const toast = getFlash(page, {
-		clearOnNavigate: false,
+		clearOnNavigate: false
 		// flashCookieOptions: { sameSite: 'lax' , secure: false},
 	});
 
@@ -85,12 +85,13 @@
 
 	async function dectectServiceWorkerUpdate() {
 		const registry = await navigator.serviceWorker.ready;
-		registry.addEventListener('updatefound', (event) => {
+		registry.addEventListener('updatefound', () => {
 			const sw = registry.installing;
-			sw?.addEventListener('statechange', (event) => {
+			sw?.addEventListener('statechange', () => {
 				if (sw.state == 'installed') {
 					modalStore.trigger(swUpdateModal);
 					if (confirm('Want to Reload?')) {
+						window.location.reload();
 					}
 				}
 			});
@@ -142,7 +143,7 @@
 				</Link>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
-				<div class=" flex flex-row items-center">
+				<div class=" flex flex-row items-center sm:gap-2">
 					<button
 						type="button"
 						on:click={triggerSearchPostsModal}
