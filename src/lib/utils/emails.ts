@@ -9,7 +9,6 @@ import type { User } from 'lucia';
 import NewEmailCode from '$lib/emails/NewEmailCode.svelte';
 import { dev } from '$app/environment';
 
-
 const transporter = nodemailer.createTransport({
 	service: 'gmail',
 	host: 'smtp.gmail.com',

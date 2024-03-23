@@ -28,8 +28,8 @@ export const auth = new Lucia(adapter, {
 		name: 'session',
 		expires: false, // session cookies have very long lifespan (2 years)
 		attributes: {
-			// secure: !dev, 
-			secure: false, 
+			// secure: !dev,
+			secure: false,
 			sameSite: 'lax',
 			domain: process.env.PUBLIC_DOMAIN
 		}

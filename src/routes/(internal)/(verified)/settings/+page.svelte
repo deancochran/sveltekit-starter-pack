@@ -15,7 +15,7 @@
 			<h1 class="h1 font-serif">Settings Page</h1>
 		</div>
 
-		<IntegraitonsForm/>
+		<IntegraitonsForm />
 		<UpdateFtpForm form_data={data.updateFTPForm} />
 		<UpdateUserProfileForm form_data={data.updateUserForm} />
 		<UpdateUserEmailForm
