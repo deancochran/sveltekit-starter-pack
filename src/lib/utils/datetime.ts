@@ -19,3 +19,15 @@ export function formatDate(date: string, dateStyle: DateStyle = 'medium', locale
 	const dateFormatter = new Intl.DateTimeFormat(locales, { dateStyle });
 	return dateFormatter.format(dateToFormat);
 }
+
+export function getMostRecentSunday(): Date {
+	const today = new Date();
+	const dayOfWeek = today.getDay();
+	const sundayOffset = dayOfWeek === 0 ? 0 : dayOfWeek;
+	const mostRecentSunday = new Date(
+		today.getFullYear(),
+		today.getMonth(),
+		today.getDate() - sundayOffset
+	);
+	return mostRecentSunday;
+}
