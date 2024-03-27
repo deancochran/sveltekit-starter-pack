@@ -1,4 +1,6 @@
+import { ThirdPartyIntegrationProvider, type thirdPartyIntegrationToken } from '@prisma/client';
 import type { DetailedActivity, StreamSet } from './typescript-fetch-client/models';
+import {  authenticateStravaIntegration, deauthorizeStravaIntegration } from './auth';
 
 type userHasStravaIntegrationResponse = {
 	exists: boolean;
@@ -104,4 +106,33 @@ export async function getLoggedInAthleteZones(
 		}
 	});
 	return await res.json();
+}
+
+export async function unauthorize(strava_access_token: string): Promise<Array<DetailedActivity>> {
+	const res = await fetch('https://www.strava.com/api/v3/athlete/activities', {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${strava_access_token}`
+		}
+	});
+	return await res.json();
+}
+
+export async function disconnect_integration(integration: thirdPartyIntegrationToken) {
+	// Step: 1 Use a switch case statement to identify the provider type
+	// Step: 2 fetch with the correct endpoint of the provider type
+	// Step 3: Return the response
+	let res: Response;
+	const provider: ThirdPartyIntegrationProvider =
+		integration.provider as ThirdPartyIntegrationProvider;
+	switch (provider) {
+		case ThirdPartyIntegrationProvider.STRAVA: {
+			integration = await authenticateStravaIntegration(integration);
+			res = await deauthorizeStravaIntegration(integration.access_token);
+		}
+	}
+	if (!res.ok) {
+		throw new Error('Error Disconnecting Integration');
+	}
+	return integration;
 }

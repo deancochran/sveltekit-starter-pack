@@ -28,6 +28,8 @@
 
 <button
 	on:click={() => dispatch('click')}
+	on:mouseenter={() => dispatch('mouseenter')}
+	on:mouseleave={() => dispatch('mouseleave')}
 	{...$$props}
 	{type}
 	class:transition-colors={true}

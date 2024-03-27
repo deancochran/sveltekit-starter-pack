@@ -1,7 +1,6 @@
 import { SECRET_STRAVA_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_STRAVA_CLIENT_ID } from '$env/static/public';
-import { ThirdPartyIntegrationProvider } from '@prisma/client';
-import { error } from '@sveltejs/kit';
+import { type thirdPartyIntegrationToken } from '@prisma/client';
 import { SummaryAthlete } from './typescript-fetch-client/models';
 import { isWithinExpirationDate } from 'oslo';
 
@@ -51,36 +50,38 @@ export async function refreshAccessToken(refresh_token: string): Promise<StravaO
 			refresh_token: refresh_token
 		})
 	});
+	if(!response.ok){
+		throw new Error(await response.text());
+	}
 	return await response.json();
 }
 
-export async function authenticateStravaIntegration(user_id: string) {
-	try {
-		const integration = await prisma.thirdPartyIntegrationToken.findFirstOrThrow({
+export async function deauthorizeStravaIntegration(strava_access_token: string): Promise<Response> {
+	const response = await fetch(`https://www.strava.com/oauth/deauthorize`, {
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${strava_access_token}`,
+			'content-type': 'application/json'
+		}
+	});
+	return response;
+}
+
+export async function authenticateStravaIntegration(integration: thirdPartyIntegrationToken) {	
+	if (!isWithinExpirationDate(integration.expires_at)) {
+		console.log('user integration is not valid');
+		const token_obj: StravaOAuthRefresh = await refreshAccessToken(integration.refresh_token);
+		integration = await prisma.thirdPartyIntegrationToken.update({
 			where: {
-				AND: [
-					{
-						user_id: user_id,
-						provider: ThirdPartyIntegrationProvider.STRAVA
-					}
-				]
+				id: integration.id
+			},
+			data: {
+				expires_at: new Date(token_obj.expires_at),
+				access_token: token_obj.access_token,
+				refresh_token: token_obj.refresh_token
 			}
 		});
-		if (isWithinExpirationDate(integration.expires_at)) {
-			// needs new refresh token
-			const token_obj: StravaOAuthRefresh = await refreshAccessToken(integration.refresh_token);
-			await prisma.thirdPartyIntegrationToken.update({
-				where: {
-					id: integration.id
-				},
-				data: {
-					expires_at: new Date(token_obj.expires_at),
-					access_token: token_obj.access_token,
-					refresh_token: token_obj.refresh_token
-				}
-			});
-		}
-	} catch (e) {
-		error(404);
 	}
+
+	return integration;
 }

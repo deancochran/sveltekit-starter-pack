@@ -29,15 +29,7 @@ export const actions: Actions = {
 		const form = await superValidate(request, zod(signup_schema));
 		if (form.valid) {
 			try {
-				// const existingCustomers = await stripe.customers.list({ email: form.data.email });
-				// if (existingCustomers.data.length) {
-				// 	throw new PrismaClientUnknownRequestError(`Email ${form.data.email} already exists.`, {
-				// 		clientVersion: '2.19.0'
-				// 	});
-				// }
-				// const customer = await stripe.customers.create({
-				// 	email: form.data.email
-				// });
+
 
 				const hashedPassword = await argon.hash(form.data.password);
 				const user = await prisma.user.create({
@@ -87,7 +79,6 @@ export const actions: Actions = {
 					} as const;
 				}
 				setFlash(t, event);
-				console.log(error);
 				return fail(500, { form });
 			}
 			const t: ToastSettings = {

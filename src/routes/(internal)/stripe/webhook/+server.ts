@@ -34,7 +34,6 @@ export async function POST(event) {
 			await upsertSubscription(subscription.id, subscription.customer as string);
 			return json({ message: 'success' }, { status: 200 });
 		default:
-		// console.log('loooking for missing event', stripe_event_type);
 	}
 
 	return json({ message: 'success' }, { status: 201 });

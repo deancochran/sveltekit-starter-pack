@@ -4,7 +4,7 @@
 	import UpdateUserPasswordForm from '$lib/forms/UpdateUserPasswordForm.svelte';
 	import UpdateUserProfileForm from '$lib/forms/UpdateUserProfileForm.svelte';
 	import UpdateFtpForm from '$lib/forms/UpdateFTPForm.svelte';
-	import IntegraitonsForm from '$lib/forms/integraitonsForm.svelte';
+	import IntegrationsForm from '$lib/forms/IntegrationsForm.svelte';
 
 	export let data;
 </script>
@@ -15,7 +15,7 @@
 			<h1 class="h1 font-serif">Settings Page</h1>
 		</div>
 
-		<IntegraitonsForm />
+		<IntegrationsForm integrations={data.user_integrations} form_data={data.integrationsForm} />
 		<UpdateFtpForm form_data={data.updateFTPForm} />
 		<UpdateUserProfileForm form_data={data.updateUserForm} />
 		<UpdateUserEmailForm

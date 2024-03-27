@@ -32,7 +32,7 @@ model user {
   keys             key[]
   password_tokens  passwordResetToken[]
   auth_sessions    session[]
-  subscriptions    subscription?
+  subscription    subscription?
   integration_logs thirdPartyIntegrationLogs[]
   integrations     thirdPartyIntegrationToken[]
   training_plans   trainingPlan[]
@@ -93,7 +93,7 @@ model emailVerificationToken {
 model thirdPartyIntegrationToken {
   id             Int                            @id @default(autoincrement())
   user_id        String
-  provider       ThirdPartyIntegrationProvider?
+  provider       ThirdPartyIntegrationProvider
   expires_at     DateTime
   created_at     DateTime                       @default(now())
   updated_at     DateTime                       @updatedAt
@@ -106,7 +106,7 @@ model thirdPartyIntegrationToken {
 
 model thirdPartyIntegrationLogs {
   id         Int                            @id @default(autoincrement())
-  provider   ThirdPartyIntegrationProvider?
+  provider   ThirdPartyIntegrationProvider
   created_at DateTime                       @default(now())
   updated_at DateTime                       @updatedAt
   metadata   Json
@@ -179,6 +179,7 @@ enum ActivityType {
 
 enum UserRole {
   PRO
+  TRIAL
   BASE
 }
 

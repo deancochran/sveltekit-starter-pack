@@ -37,7 +37,7 @@ export const actions: Actions = {
 		} catch (error) {
 			t = {
 				message: 'Failed to verify your email',
-				background: 'variant-filled-success'
+				background: 'variant-filled-warning'
 			};
 			setFlash(t, event);
 			return fail(400, { form });

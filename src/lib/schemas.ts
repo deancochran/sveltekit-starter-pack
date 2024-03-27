@@ -1,3 +1,4 @@
+import { ThirdPartyIntegrationProvider } from '@prisma/client';
 import { z } from 'zod';
 
 const one_upper_case_letter: RegExp = new RegExp('.*[A-Z].*');
@@ -138,6 +139,14 @@ export const delete_user_schema = z.object({
 });
 
 export type DeleteUserSchema = typeof delete_user_schema;
+
+const ProviderEnum = z.nativeEnum(ThirdPartyIntegrationProvider);
+type ProviderEnum = z.infer<typeof ProviderEnum>; 
+export const disconnect_user_integration_schema = z.object({
+	provider: ProviderEnum
+});
+
+export type DisconnectUserIntegrationSchema = typeof disconnect_user_integration_schema;
 
 export const stripeProductSchema = z.object({
 	id: z.string(),

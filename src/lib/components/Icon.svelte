@@ -5,7 +5,6 @@
 	let component = handleIconName() as unknown as any;
 
 	function handleIconName() {
-		console.log(icon_name);
 		switch (icon_name) {
 			case 'dashboard': {
 				return Dock;

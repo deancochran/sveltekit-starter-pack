@@ -7,6 +7,7 @@ import { superValidate } from 'sveltekit-superforms/server';
 import {
 	cancel_user_subscription_schema,
 	delete_user_schema,
+	disconnect_user_integration_schema,
 	send_new_user_email_code_schema,
 	update_ftp_schema,
 	update_user_email_schema,
@@ -20,11 +21,15 @@ import { sendEmailChangeCode } from '$lib/utils/emails';
 import { fail } from '@sveltejs/kit';
 import { getActiveSubscription } from '$lib/utils/stripe/subscriptions';
 import { zod } from 'sveltekit-superforms/adapters';
+import { handleSignInRedirect } from '$lib/utils/redirects/loginRedirect';
+import { disconnect_integration } from '$lib/utils/integrations/strava/utils';
 
-export const load: PageServerLoad = async ({ parent }) => {
+export const load: PageServerLoad = async (event) => {
+	const { parent } = event;
 	await parent();
 	const data = await parent();
 	const initialData = { ...data.user };
+	if (!data.user) redirect(302, handleSignInRedirect(event));
 	const updateUserForm = await superValidate(initialData, zod(update_user_schema));
 	const updateUserEmailForm = await superValidate(zod(update_user_email_schema));
 	const sendNewUserEmailCodeForm = await superValidate(
@@ -35,6 +40,12 @@ export const load: PageServerLoad = async ({ parent }) => {
 	const updateUserEmailPasswordForm = await superValidate(zod(update_user_password_schema));
 	const cancelUserSubscriptionForm = await superValidate(zod(cancel_user_subscription_schema));
 	const updateFTPForm = await superValidate(initialData, zod(update_ftp_schema));
+	const integrationsForm = await superValidate(zod(disconnect_user_integration_schema));
+	const user_integrations = await prisma.thirdPartyIntegrationToken.findMany({
+		where: {
+			user_id: data.user.id
+		}
+	});
 	return {
 		updateUserForm,
 		updateFTPForm,
@@ -43,6 +54,8 @@ export const load: PageServerLoad = async ({ parent }) => {
 		deleteUserForm,
 		updateUserEmailPasswordForm,
 		cancelUserSubscriptionForm,
+		user_integrations,
+		integrationsForm,
 		...data
 	};
 };
@@ -276,6 +289,50 @@ export const actions: Actions = {
 			} else {
 				t = {
 					message: 'Failed to cancel Subscription',
+					background: 'variant-filled-error'
+				} as const;
+			}
+			setFlash(t, event);
+			return fail(400, { form });
+		}
+	},
+	disconnectIntegration: async (event) => {
+		const form = await superValidate(event.request, zod(disconnect_user_integration_schema));
+		let t: ToastSettings;
+		try {
+			if (!event.locals?.user) throw new Error('User must be logged in');
+			if (!form.valid) throw new Error('Must provide a valid integration');
+			await prisma.$transaction(async (db) => {
+				let integration = await db.thirdPartyIntegrationToken.findFirstOrThrow({
+					where: {
+						user_id: event.locals.user!.id,
+						provider: form.data.provider
+					}
+				});
+				integration = await disconnect_integration(integration);
+				
+				await db.thirdPartyIntegrationToken.delete({
+					where: {
+						id: integration.id
+					}
+				});
+			});
+			t = {
+				message: 'Disconnected Integration',
+				background: 'variant-filled-success'
+			} as const;
+			setFlash(t, event);
+			return { form };
+		} catch (e) {
+			console.log(e)
+			if (e instanceof Error) {
+				t = {
+					message: e.message,
+					background: 'variant-filled-error'
+				} as const;
+			} else {
+				t = {
+					message: 'Failed to disconnect Integration',
 					background: 'variant-filled-error'
 				} as const;
 			}

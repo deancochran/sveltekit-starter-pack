@@ -15,36 +15,19 @@ export async function userIsAllowedFreeTrial(user_id: string) {
 	return trial ? true : false;
 }
 
-export async function handleNewUserRole(
-	subscription: Stripe.Response<Stripe.Subscription>
-): Promise<UserRole> {
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	//@ts-expect-error
-	const product_id = subscription.plan.product; // plan not found in subscription object type
-	const product = await stripe.products.retrieve(product_id);
-	switch (product.metadata['TIER']) {
-		case UserRole.BASE:
-			return UserRole.BASE;
-		case UserRole.PRO:
-			return UserRole.PRO;
-		default:
-			return UserRole.BASE;
-	}
-}
-
-export async function handleSubsctiptionStatus(
-	subscription_tier: UserRole,
-	subscription_status: Stripe.Subscription.Status
-): Promise<UserRole> {
-	switch (subscription_status) {
+export async function handleSubscriptionStatus(subscription: Stripe.Subscription): Promise<UserRole> {
+	const status = subscription.status
+	switch (status) {
 		case 'incomplete':
+			return UserRole.BASE;
+		case 'paused':
 			return UserRole.BASE;
 		case 'incomplete_expired':
 			return UserRole.BASE;
 		case 'trialing':
-			break;
+			return UserRole.TRIAL;
 		case 'active':
-			break;
+			return UserRole.PRO;
 		case 'past_due':
 			return UserRole.BASE;
 		case 'canceled':
@@ -54,7 +37,6 @@ export async function handleSubsctiptionStatus(
 		default:
 			return UserRole.BASE;
 	}
-	return subscription_tier;
 }
 
 export type STRIPE_SUBSCRIPTION_EVENTS =
@@ -82,39 +64,39 @@ export async function upsertSubscription(subscriptionId: string, stripe_user_id:
 		create: {
 			stripe_sub_id: subscription.id,
 			user_id: user.id,
-			cancel_at: subscription.cancel_at ? toDateTime(subscription.cancel_at).toISOString() : null,
+			cancel_at: subscription.cancel_at ? toDateTime(subscription.cancel_at) : null,
 			cancel_at_period_end: subscription.cancel_at_period_end,
 			canceled_at: subscription.canceled_at
-				? toDateTime(subscription.canceled_at).toISOString()
+				? toDateTime(subscription.canceled_at)
 				: null,
-			current_period_start: toDateTime(subscription.current_period_start).toISOString(),
-			current_period_end: toDateTime(subscription.current_period_end).toISOString(),
-			created_at: toDateTime(subscription.created).toISOString(),
-			ended_at: subscription.ended_at ? toDateTime(subscription.ended_at).toISOString() : null,
-			start_date: toDateTime(subscription.start_date).toISOString(),
+			current_period_start: toDateTime(subscription.current_period_start),
+			current_period_end: toDateTime(subscription.current_period_end),
+			created_at: toDateTime(subscription.created),
+			ended_at: subscription.ended_at ? toDateTime(subscription.ended_at) : null,
+			start_date: toDateTime(subscription.start_date),
 			trial_start: subscription.trial_start
-				? toDateTime(subscription.trial_start).toISOString()
+				? toDateTime(subscription.trial_start)
 				: null,
-			trial_end: subscription.trial_end ? toDateTime(subscription.trial_end).toISOString() : null,
+			trial_end: subscription.trial_end ? toDateTime(subscription.trial_end) : null,
 			metadata: subscription.metadata,
 			status: subscription.status
 		},
 		update: {
 			stripe_sub_id: subscription.id,
 			user_id: user.id,
-			cancel_at: subscription.cancel_at ? toDateTime(subscription.cancel_at).toISOString() : null,
+			cancel_at: subscription.cancel_at ? toDateTime(subscription.cancel_at) : null,
 			cancel_at_period_end: subscription.cancel_at_period_end,
 			canceled_at: subscription.canceled_at
-				? toDateTime(subscription.canceled_at).toISOString()
+				? toDateTime(subscription.canceled_at)
 				: null,
-			current_period_start: toDateTime(subscription.current_period_start).toISOString(),
-			current_period_end: toDateTime(subscription.current_period_end).toISOString(),
-			created_at: toDateTime(subscription.created).toISOString(),
-			ended_at: subscription.ended_at ? toDateTime(subscription.ended_at).toISOString() : null,
+			current_period_start: toDateTime(subscription.current_period_start),
+			current_period_end: toDateTime(subscription.current_period_end),
+			created_at: toDateTime(subscription.created),
+			ended_at: subscription.ended_at ? toDateTime(subscription.ended_at) : null,
 			trial_start: subscription.trial_start
-				? toDateTime(subscription.trial_start).toISOString()
+				? toDateTime(subscription.trial_start)
 				: null,
-			trial_end: subscription.trial_end ? toDateTime(subscription.trial_end).toISOString() : null,
+			trial_end: subscription.trial_end ? toDateTime(subscription.trial_end) : null,
 			metadata: subscription.metadata,
 			status: subscription.status
 		},
@@ -122,17 +104,13 @@ export async function upsertSubscription(subscriptionId: string, stripe_user_id:
 			user_id: user.id
 		}
 	});
-
-	const subscription_tier = await handleSubsctiptionStatus(
-		await handleNewUserRole(subscription),
-		subscription.status
-	);
-	await prisma.user.update({
+	const subscription_tier = await handleSubscriptionStatus( subscription);
+	const new_user = await prisma.user.update({
 		where: { id: user.id },
 		data: { role: subscription_tier }
 	});
 
-	console.log(`Upserted subscription [${subscription.id}] for user [${user.id}]`);
+	console.log(`Upserted ${new_user.username}'s subscription to ${new_user.role} TIER`);
 }
 
 export async function deleteSubscription(subscriptionId: string, stripe_user_id: string) {
