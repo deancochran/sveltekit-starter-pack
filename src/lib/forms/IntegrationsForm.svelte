@@ -1,5 +1,5 @@
 <script lang="ts">
-	import IntegrationDisConnectButton from '$lib/components/IntegrationDisConnectButton.svelte';
+	import IntegrationDisconnectButton from '$lib/components/IntegrationDisconnectButton.svelte';
 	import IntegrationConnectButton from '$lib/components/IntegrationConnectButton.svelte';
 	import {
 		disconnect_user_integration_schema,
@@ -52,7 +52,7 @@
 					{#if unconnected_providers.includes(provider)}
 						<IntegrationConnectButton {provider} />
 					{:else}
-						<IntegrationDisConnectButton
+						<IntegrationDisconnectButton
 							on:disconnect={(e) => (selectedProvider = e.detail)}
 							{provider}
 						/>
