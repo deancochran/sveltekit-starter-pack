@@ -1,11 +1,11 @@
 <script lang="ts">
 	import IntegrationDisConnectButton from '$lib/components/IntegrationDisConnectButton.svelte';
 	import IntegrationConnectButton from '$lib/components/IntegrationConnectButton.svelte';
-	import { disconnect_user_integration_schema, type DisconnectUserIntegrationSchema } from '$lib/schemas';
 	import {
-		ThirdPartyIntegrationProvider,
-		type thirdPartyIntegrationToken,
-	} from '@prisma/client';
+		disconnect_user_integration_schema,
+		type DisconnectUserIntegrationSchema
+	} from '$lib/schemas';
+	import { ThirdPartyIntegrationProvider, type thirdPartyIntegrationToken } from '@prisma/client';
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';

@@ -2,10 +2,13 @@
 	import type { ThirdPartyIntegrationProvider } from '@prisma/client';
 	import { createEventDispatcher } from 'svelte';
 	import Button from './Button.svelte';
-	import type { DisconnectEvent, DisconnectEventDispatcher } from '$lib/components/IntegrationButtons/types';
+	import type {
+		DisconnectEvent,
+		DisconnectEventDispatcher
+	} from '$lib/components/IntegrationButtons/types';
 	export let provider: ThirdPartyIntegrationProvider;
 
-	let dispatch:DisconnectEventDispatcher = createEventDispatcher<DisconnectEvent>();
+	let dispatch: DisconnectEventDispatcher = createEventDispatcher<DisconnectEvent>();
 
 	function titleCase(provider: ThirdPartyIntegrationProvider) {
 		return provider[0].toUpperCase() + provider.slice(1).toLowerCase();
@@ -17,9 +20,8 @@
 		hovering = !hovering;
 	}
 
-
 	function dispatchProviderDisconnect(e: CustomEvent<any>): void {
-		dispatch('disconnect', provider );
+		dispatch('disconnect', provider);
 	}
 </script>
 

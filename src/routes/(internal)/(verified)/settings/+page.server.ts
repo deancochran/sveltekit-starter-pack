@@ -310,7 +310,7 @@ export const actions: Actions = {
 					}
 				});
 				integration = await disconnect_integration(integration);
-				
+
 				await db.thirdPartyIntegrationToken.delete({
 					where: {
 						id: integration.id
@@ -324,7 +324,7 @@ export const actions: Actions = {
 			setFlash(t, event);
 			return { form };
 		} catch (e) {
-			console.log(e)
+			console.log(e);
 			if (e instanceof Error) {
 				t = {
 					message: e.message,

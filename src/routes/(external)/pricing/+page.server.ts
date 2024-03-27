@@ -5,7 +5,6 @@ import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { setFlash, redirect } from 'sveltekit-flash-message/server';
 import { getActiveSubscription } from '$lib/utils/stripe/subscriptions';
 
-
 export const actions = {
 	checkout: async (event) => {
 		const { request, url } = event;
@@ -61,7 +60,7 @@ export const actions = {
 				data: {
 					stripe_id: new_customer.id
 				}
-			}); 
+			});
 		});
 
 		// this is going to trigger the `/stripe/webhook` endpoint
@@ -82,7 +81,7 @@ export const actions = {
 				},
 				trial_period_days: 30
 			},
-			customer: (customer.stripe_id as string),
+			customer: customer.stripe_id as string,
 			payment_method_collection: 'always',
 			success_url: `${url.origin}/settings`,
 			cancel_url: `${url.origin}`,

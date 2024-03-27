@@ -50,7 +50,7 @@ export async function refreshAccessToken(refresh_token: string): Promise<StravaO
 			refresh_token: refresh_token
 		})
 	});
-	if(!response.ok){
+	if (!response.ok) {
 		throw new Error(await response.text());
 	}
 	return await response.json();
@@ -67,7 +67,7 @@ export async function deauthorizeStravaIntegration(strava_access_token: string):
 	return response;
 }
 
-export async function authenticateStravaIntegration(integration: thirdPartyIntegrationToken) {	
+export async function authenticateStravaIntegration(integration: thirdPartyIntegrationToken) {
 	if (!isWithinExpirationDate(integration.expires_at)) {
 		console.log('user integration is not valid');
 		const token_obj: StravaOAuthRefresh = await refreshAccessToken(integration.refresh_token);

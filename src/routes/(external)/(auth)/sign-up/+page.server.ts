@@ -29,8 +29,6 @@ export const actions: Actions = {
 		const form = await superValidate(request, zod(signup_schema));
 		if (form.valid) {
 			try {
-
-
 				const hashedPassword = await argon.hash(form.data.password);
 				const user = await prisma.user.create({
 					data: {

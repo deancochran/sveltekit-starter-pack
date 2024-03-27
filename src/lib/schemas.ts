@@ -141,7 +141,7 @@ export const delete_user_schema = z.object({
 export type DeleteUserSchema = typeof delete_user_schema;
 
 const ProviderEnum = z.nativeEnum(ThirdPartyIntegrationProvider);
-type ProviderEnum = z.infer<typeof ProviderEnum>; 
+type ProviderEnum = z.infer<typeof ProviderEnum>;
 export const disconnect_user_integration_schema = z.object({
 	provider: ProviderEnum
 });

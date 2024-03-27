@@ -15,8 +15,10 @@ export async function userIsAllowedFreeTrial(user_id: string) {
 	return trial ? true : false;
 }
 
-export async function handleSubscriptionStatus(subscription: Stripe.Subscription): Promise<UserRole> {
-	const status = subscription.status
+export async function handleSubscriptionStatus(
+	subscription: Stripe.Subscription
+): Promise<UserRole> {
+	const status = subscription.status;
 	switch (status) {
 		case 'incomplete':
 			return UserRole.BASE;
@@ -66,17 +68,13 @@ export async function upsertSubscription(subscriptionId: string, stripe_user_id:
 			user_id: user.id,
 			cancel_at: subscription.cancel_at ? toDateTime(subscription.cancel_at) : null,
 			cancel_at_period_end: subscription.cancel_at_period_end,
-			canceled_at: subscription.canceled_at
-				? toDateTime(subscription.canceled_at)
-				: null,
+			canceled_at: subscription.canceled_at ? toDateTime(subscription.canceled_at) : null,
 			current_period_start: toDateTime(subscription.current_period_start),
 			current_period_end: toDateTime(subscription.current_period_end),
 			created_at: toDateTime(subscription.created),
 			ended_at: subscription.ended_at ? toDateTime(subscription.ended_at) : null,
 			start_date: toDateTime(subscription.start_date),
-			trial_start: subscription.trial_start
-				? toDateTime(subscription.trial_start)
-				: null,
+			trial_start: subscription.trial_start ? toDateTime(subscription.trial_start) : null,
 			trial_end: subscription.trial_end ? toDateTime(subscription.trial_end) : null,
 			metadata: subscription.metadata,
 			status: subscription.status
@@ -86,16 +84,12 @@ export async function upsertSubscription(subscriptionId: string, stripe_user_id:
 			user_id: user.id,
 			cancel_at: subscription.cancel_at ? toDateTime(subscription.cancel_at) : null,
 			cancel_at_period_end: subscription.cancel_at_period_end,
-			canceled_at: subscription.canceled_at
-				? toDateTime(subscription.canceled_at)
-				: null,
+			canceled_at: subscription.canceled_at ? toDateTime(subscription.canceled_at) : null,
 			current_period_start: toDateTime(subscription.current_period_start),
 			current_period_end: toDateTime(subscription.current_period_end),
 			created_at: toDateTime(subscription.created),
 			ended_at: subscription.ended_at ? toDateTime(subscription.ended_at) : null,
-			trial_start: subscription.trial_start
-				? toDateTime(subscription.trial_start)
-				: null,
+			trial_start: subscription.trial_start ? toDateTime(subscription.trial_start) : null,
 			trial_end: subscription.trial_end ? toDateTime(subscription.trial_end) : null,
 			metadata: subscription.metadata,
 			status: subscription.status
@@ -104,7 +98,7 @@ export async function upsertSubscription(subscriptionId: string, stripe_user_id:
 			user_id: user.id
 		}
 	});
-	const subscription_tier = await handleSubscriptionStatus( subscription);
+	const subscription_tier = await handleSubscriptionStatus(subscription);
 	const new_user = await prisma.user.update({
 		where: { id: user.id },
 		data: { role: subscription_tier }

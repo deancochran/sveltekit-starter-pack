@@ -2,7 +2,7 @@
 	import { PUBLIC_CANONICAL_URL, PUBLIC_STRAVA_CLIENT_ID } from '$env/static/public';
 	import type { ThirdPartyIntegrationProvider } from '@prisma/client';
 	export let provider: ThirdPartyIntegrationProvider;
-	
+
 	function titleCase(provider: ThirdPartyIntegrationProvider) {
 		return provider[0].toUpperCase() + provider.slice(1).toLowerCase();
 	}
@@ -13,11 +13,11 @@
 			default:
 				return '';
 		}
-
-		
 	}
-	$: title = titleCase(provider as  ThirdPartyIntegrationProvider);
-	$: href = getHref(provider as  ThirdPartyIntegrationProvider);
+	$: title = titleCase(provider as ThirdPartyIntegrationProvider);
+	$: href = getHref(provider as ThirdPartyIntegrationProvider);
 </script>
 
-<a {href} class="logo-item variant-ghost-primary" data-sveltekit-preload-data="hover">Connect to {title}</a>
+<a {href} class="logo-item variant-ghost-primary" data-sveltekit-preload-data="hover"
+	>Connect to {title}</a
+>
