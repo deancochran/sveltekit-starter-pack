@@ -1,5 +1,6 @@
-import { ThirdPartyIntegrationProvider } from '@prisma/client';
+import { ActivityType, ThirdPartyIntegrationProvider } from '@prisma/client';
 import { z } from 'zod';
+import { IntervalType } from './utils/trainingsessions/types';
 
 const one_upper_case_letter: RegExp = new RegExp('.*[A-Z].*');
 const one_lower_case_letter: RegExp = new RegExp('.*[a-z].*');
@@ -121,12 +122,13 @@ export const reset_pass_schema = z
 	});
 export type ResetPassSchema = typeof reset_pass_schema;
 
-export const update_ftp_schema = z.object({
+export const update_ftp_hr_schema = z.object({
+	max_hr: z.number(),
 	run_ftp: z.number(),
 	bike_ftp: z.number(),
 	swim_ftp: z.number()
 });
-export type UpdateFTPSchema = typeof update_ftp_schema;
+export type UpdateFTP_HRSchema = typeof update_ftp_hr_schema;
 
 export const cancel_user_subscription_schema = z.object({
 	password: z.string()
@@ -152,7 +154,7 @@ export const stripeProductSchema = z.object({
 	id: z.string(),
 	name: z.string(),
 	active: z.boolean(),
-	description: z.string(),
+	description: z.string().max(50, 'Must be at most 50 characters in length'),
 	metadata: z.record(z.string())
 });
 
@@ -161,6 +163,71 @@ export const stripeCustomerSchema = z.object({
 	email: z.string().email(),
 	metadata: z.record(z.string())
 });
+
+export const training_plan_schema = z
+	.object({
+		name: z.string(),
+		description: z.string().max(50, 'Must be at most 50 characters in length'),
+		start_date: z.date(),
+		end_date: z.date()
+	})
+	.superRefine(({ start_date, end_date }, ctx) => {
+		if (end_date < start_date) {
+			ctx.addIssue({
+				code: 'custom',
+				message: 'The End Date Cannot be Before the Start Date.',
+				path: ['end_date']
+			});
+		}
+	});
+export type TrainPlanSchema = typeof training_plan_schema;
+
+export const IntervalSchema = z.object({
+	interval_type: z.nativeEnum(IntervalType),
+	duration: z.number().min(1).int(),
+	distance: z.number().min(1).int(),
+});
+
+export type Interval = z.infer<typeof IntervalSchema>;
+
+export const RampIntervalSchema = IntervalSchema.extend({
+	interval_type: z.literal(IntervalType.RAMP),
+	start_intensity: z.number().min(0).max(1).nonnegative(),
+	end_intensity: z.number().min(0).max(1).nonnegative(),
+});
+export type RampInterval = z.infer<typeof RampIntervalSchema>;
+
+export const BlockIntervalSchema = IntervalSchema.extend({
+	interval_type: z.literal(IntervalType.BLOCK),
+	intensity: z.number().min(0).max(1).nonnegative(),
+});
+export type BlockInterval = z.infer<typeof BlockIntervalSchema>;
+
+export const WorkoutIntervalSchema = z.union([ RampIntervalSchema, BlockIntervalSchema ]);
+export type WorkoutInterval = z.infer<typeof WorkoutIntervalSchema>;
+
+export const training_session_schema = z
+	.object({
+		title: z.string(),
+		activity_type: z.nativeEnum(ActivityType),
+		description: z.string().max(50, 'Must be at most 50 characters in length'),
+		date: z.date(),
+		distance: z.number().gte(0),
+		duration: z.number().gte(0),
+		stress_score: z.number().gte(0),
+		plan: z.array(WorkoutIntervalSchema),
+		training_plan_id: z.number()
+
+	}).superRefine(({ date }, ctx) => {
+		if (date < new Date()) {
+			ctx.addIssue({
+				code: 'custom',
+				message: 'The Date Cannot be before today Date.',
+				path: ['date']
+			});
+		}
+	});
+export type TrainSessionSchema = typeof training_session_schema;
 
 type ProductConfig = Record<string, { features: string[]; call_to_action: string }>;
 
@@ -223,11 +290,11 @@ const priceProductSchema = z
 		};
 	});
 
-const priceSchema = z.object({
-	id: z.string(),
-	lookup_key: z.string(),
-	unit_amount: z.number().transform((amount) => amount / 100),
-	product: priceProductSchema
-});
+	const priceSchema = z.object({
+		id: z.string(),
+		lookup_key: z.string(),
+		unit_amount: z.number().transform((amount) => amount / 100),
+		product: priceProductSchema
+	});
 
 export const priceListSchema = z.array(priceSchema);

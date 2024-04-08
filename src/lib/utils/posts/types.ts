@@ -1,4 +1,4 @@
-export type Categories = 'Changelog';
+export type Categories = 'Changelog' | 'Guides' | 'Training' | 'Running';
 
 export type Post = {
 	categories: Categories[];

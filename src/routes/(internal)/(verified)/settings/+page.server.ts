@@ -9,7 +9,7 @@ import {
 	delete_user_schema,
 	disconnect_user_integration_schema,
 	send_new_user_email_code_schema,
-	update_ftp_schema,
+	update_ftp_hr_schema,
 	update_user_email_schema,
 	update_user_password_schema,
 	update_user_schema
@@ -39,7 +39,7 @@ export const load: PageServerLoad = async (event) => {
 	const deleteUserForm = await superValidate(zod(delete_user_schema));
 	const updateUserEmailPasswordForm = await superValidate(zod(update_user_password_schema));
 	const cancelUserSubscriptionForm = await superValidate(zod(cancel_user_subscription_schema));
-	const updateFTPForm = await superValidate(initialData, zod(update_ftp_schema));
+	const updateFTPForm = await superValidate(initialData, zod(update_ftp_hr_schema));
 	const integrationsForm = await superValidate(zod(disconnect_user_integration_schema));
 	const user_integrations = await prisma.thirdPartyIntegrationToken.findMany({
 		where: {
@@ -196,13 +196,13 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 	},
-	updateFTP: async (event) => {
+	updateFTPHR: async (event) => {
 		const { locals, request } = event;
-		const form = await superValidate(request, zod(update_ftp_schema));
+		const form = await superValidate(request, zod(update_ftp_hr_schema));
 
 		let t: ToastSettings;
 		try {
-			if (!form.valid) throw new Error('Must provide valid ftp values');
+			if (!form.valid) throw new Error('Must provide valid values');
 			await prisma.user.update({
 				where: {
 					id: locals.user!.id
@@ -212,14 +212,14 @@ export const actions: Actions = {
 				}
 			});
 			t = {
-				message: 'Updated FTP Settings',
+				message: 'Updated Settings',
 				background: 'variant-filled-success'
 			} as const;
 			setFlash(t, event);
 			return { form };
 		} catch (e) {
 			t = {
-				message: 'Failed to update FTP Settings',
+				message: 'Failed to update Settings',
 				background: 'variant-filled-error'
 			} as const;
 			setFlash(t, event);

@@ -22,20 +22,20 @@ model user {
   created_at       DateTime                     @default(now())
   stripe_id        String?                      @unique
   role             UserRole                     @default(BASE)
-  bike_ftp         Int                          @default(100)
-  run_ftp          Int                          @default(480)
-  swim_ftp         Int                          @default(240)
+  bike_ftp         Int                          @default(0)
+  run_ftp          Int                          @default(0)
+  swim_ftp         Int                          @default(0)
+  max_hr           Int                          @default(0)
   unit_type        UnitType                     @default(METRIC)
   activities       activities[]
-  calendar         calendar?
+  training_plans   trainingPlan[]
   email_tokens     emailVerificationToken[]
   keys             key[]
   password_tokens  passwordResetToken[]
   auth_sessions    session[]
-  subscription    subscription?
+  subscription     subscription?
   integration_logs thirdPartyIntegrationLogs[]
   integrations     thirdPartyIntegrationToken[]
-  training_plans   trainingPlan[]
 
   @@index([id])
 }
@@ -91,30 +91,30 @@ model emailVerificationToken {
 }
 
 model thirdPartyIntegrationToken {
-  id             Int                            @id @default(autoincrement())
+  id             Int                           @id @default(autoincrement())
   user_id        String
   provider       ThirdPartyIntegrationProvider
   expires_at     DateTime
-  created_at     DateTime                       @default(now())
-  updated_at     DateTime                       @updatedAt
+  created_at     DateTime                      @default(now())
+  updated_at     DateTime                      @updatedAt
   access_token   String
   refresh_token  String
-  integration_id String                         @unique
+  integration_id String                        @unique
   logs           thirdPartyIntegrationLogs[]
-  user           user                           @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "thirdPartyIntegrationToken_user_id_user_id_fk")
+  user           user                          @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "thirdPartyIntegrationToken_user_id_user_id_fk")
 }
 
 model thirdPartyIntegrationLogs {
-  id         Int                            @id @default(autoincrement())
+  id         Int                           @id @default(autoincrement())
   provider   ThirdPartyIntegrationProvider
-  created_at DateTime                       @default(now())
-  updated_at DateTime                       @updatedAt
+  created_at DateTime                      @default(now())
+  updated_at DateTime                      @updatedAt
   metadata   Json
   user_id    String
   token_id   Int
   activity   activities?
-  token      thirdPartyIntegrationToken     @relation(fields: [token_id], references: [id], onDelete: Cascade, map: "thirdPartyIntegrationLogs_token_id_thirdPartyIntegrationToken_i")
-  user       user                           @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "thirdPartyIntegrationLogs_user_id_user_id_fk")
+  token      thirdPartyIntegrationToken    @relation(fields: [token_id], references: [id], onDelete: Cascade, map: "thirdPartyIntegrationLogs_token_id_thirdPartyIntegrationToken_i")
+  user       user                          @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "thirdPartyIntegrationLogs_user_id_user_id_fk")
 }
 
 model activities {
@@ -127,48 +127,35 @@ model activities {
   stress_score           Float
   thirdparty_log_id      Int?                       @unique
   intensity_factor_score Float
-  event_id               Int?
-  event                  event?                     @relation(fields: [event_id], references: [id], map: "activities_event_id_event_id_fk")
   log                    thirdPartyIntegrationLogs? @relation(fields: [thirdparty_log_id], references: [id], onDelete: Cascade, map: "activities_thirdparty_log_id_thirdPartyIntegrationLogs_id_fk")
   user                   user                       @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "activities_user_id_user_id_fk")
 }
 
-model calendar {
-  id      Int     @id @default(autoincrement())
-  user_id String  @unique
-  user    user    @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "calendar_user_id_user_id_fk")
-  events  event[]
-}
-
-model event {
-  id               Int           @id @default(autoincrement())
-  event_type       ActivityType
-  date             DateTime      @default(now())
-  all_day          Boolean
-  start            DateTime?
-  end              DateTime?
-  title            String
-  description      String
-  calendar_id      Int
-  training_plan_id Int?
-  activities       activities[]
-  calendar         calendar      @relation(fields: [calendar_id], references: [id], onDelete: Cascade, map: "event_calendar_id_calendar_id_fk")
-  training_plan    trainingPlan? @relation(fields: [training_plan_id], references: [id], map: "event_training_plan_id_trainingPlan_id_fk")
-
-  @@index([date])
-}
-
 model trainingPlan {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  start_date  DateTime
-  end_date    DateTime
-  user_id     String
-  events      event[]
-  user        user     @relation(fields: [user_id], references: [id], map: "trainingPlan_userId_user_id_fk")
+  id                Int               @id @default(autoincrement())
+  name              String
+  description       String
+  start_date        DateTime
+  end_date          DateTime
+  user_id           String
+  training_sessions trainingSession[]
+  user              user              @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "trainingPlan_user_id_user_id_fk")
 
   @@index([start_date, end_date])
+}
+
+model trainingSession {
+  id               Int          @id @default(autoincrement())
+  title            String
+  activity_type    ActivityType
+  description      String
+  date             DateTime
+  distance         Int
+  duration         Int
+  stress_score     Float
+  plan             Json[]       @default([])
+  training_plan_id Int
+  training_plan    trainingPlan @relation(fields: [training_plan_id], references: [id], map: "trainingSession_training_plan_id_trainingPlan_id_fk")
 }
 
 enum ActivityType {

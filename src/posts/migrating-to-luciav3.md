@@ -9,8 +9,6 @@ published: true
 slug: migrating-to-luciav3
 ---
 
-## Contents
-
 Authentication is one of the most fundamental, and frankly underappreciated features for most web apps. Many applications use third party services or OAuth integrations to handle authentication for their application. However, this not only costs a premium, but it also sacrifices any custom requirements an organization may have with it's authentication process.
 
 **Cadence** uses Lucia Auth for authenticating it's users. [Lucia](https://lucia-auth.com/) provides open source tools for managing users, user sessions, and login credentials.

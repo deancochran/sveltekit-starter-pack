@@ -27,7 +27,7 @@ export function calc_sIF(NP: number, FTP: number) {
 }
 
 // TODO add yds to meters conversion
-export function calc_sTss(S: number, NP: number, FTP: number, INTENSITY_FACTOR: number) {
+export function calc_sTss(S: number, INTENSITY_FACTOR: number) {
 	// Convert paces to speeds (yards per minute or meters per minute)
 	// swim ftp give in best seconds/(100m/100yd) pace that you can hold over 1 hour
 	const elapsed_hrs = S / 60 / 60;

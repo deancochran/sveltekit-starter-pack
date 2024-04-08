@@ -76,7 +76,7 @@ export async function GET(event) {
 				);
 			const GAP = calcSwimPace(activity.distance!, activity.moving_time!);
 			const sIF = calc_sIF(GAP, integration.user.swim_ftp);
-			const tss = calc_sTss(activity.moving_time!, GAP, integration.user.swim_ftp, sIF);
+			const tss = calc_sTss(activity.moving_time!, sIF);
 			return json({ tss }, { status: 200 });
 		} else {
 			return json(

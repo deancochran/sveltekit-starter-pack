@@ -11,7 +11,7 @@
 		| 'btn-icon-md'
 		| 'btn-icon-lg'
 		| 'btn-icon-xl'
-		| undefined = undefined;
+		| string="";
 	export let color:
 		| 'variant-soft-primary'
 		| 'variant-soft-secondary'
@@ -19,7 +19,7 @@
 		| 'variant-filled-primary'
 		| 'variant-filled-secondary'
 		| 'variant-filled-tertiary'
-		| undefined = undefined;
+		| string="";
 
 	export let shadow: 'shadow-md' | undefined = undefined;
 	let classes = `${size} ${color} ${shadow} ${$$props.class}`;

@@ -28,7 +28,7 @@
 	{:then currentQuote}
 		{#key currentQuote}
 			<h1 in:fade class="font-serif font-semibold text-white z-10 text-4xl">
-				{currentQuote ? $page.status + ': ' + $page.error?.message : ''}
+				{currentQuote ? $page.error?.message : ''}
 			</h1>
 			<p in:fade class="z-10 font-serif text-white">{currentQuote ?? ''}</p>
 		{/key}

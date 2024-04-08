@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { update_ftp_schema, type UpdateFTPSchema } from '$lib/schemas';
+	import { update_ftp_hr_schema, type UpdateFTP_HRSchema } from '$lib/schemas';
 	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { focusTrap } from '@skeletonlabs/skeleton';
@@ -8,15 +8,16 @@
 	import SwimFtpInput from './inputs/customInputs/SwimFTPInput.svelte';
 	import BikeFtpInput from './inputs/customInputs/BikeFTPInput.svelte';
 	import RunFtpInput from './inputs/customInputs/RunFTPInput.svelte';
+	import MaxHrInput from './inputs/customInputs/MaxHrInput.svelte';
 	import { zod } from 'sveltekit-superforms/adapters';
-	export let form_data: SuperValidated<Infer<UpdateFTPSchema>>;
+	export let form_data: SuperValidated<Infer<UpdateFTP_HRSchema>>;
 
 	const { form, errors, constraints, enhance, delayed } = superForm(form_data, {
-		id: 'updateFTP',
+		id: 'updateFTPHR',
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: false,
-		validators: zod(update_ftp_schema),
+		validators: zod(update_ftp_hr_schema),
 		delayMs: 0,
 		timeoutMs: 8000
 	});
@@ -25,16 +26,26 @@
 
 <div class="card">
 	<header class="card-header flex justify-center">
-		<h1>FTP Settings</h1>
+		<h1>FTP and Heart Rate Settings</h1>
 	</header>
 	<section class="p-4">
 		<form
-			id="updateFTP"
+			id="updateFTPHR"
 			use:focusTrap={isFocused}
 			method="POST"
-			action="/settings/?/updateFTP"
+			action="/settings/?/updateFTPHR"
 			use:enhance
 		>
+			<MaxHrInput
+				name="max_hr"
+				label="Max HR"
+				max={220}
+				min={25}
+				step={1}
+				bind:value={$form.max_hr}
+				errors={$errors.max_hr}
+				constraints={$constraints.max_hr}
+			/>
 			<SwimFtpInput
 				name="swim_ftp"
 				label="Swim FTP"
@@ -74,7 +85,7 @@
 			<Button
 				shadow="shadow-md"
 				color="variant-filled-primary"
-				form="updateFTP"
+				form="updateFTPHR"
 				type="submit"
 				class="btn ">Update</Button
 			>

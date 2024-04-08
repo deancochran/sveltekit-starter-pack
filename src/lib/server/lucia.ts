@@ -20,7 +20,8 @@ export const auth = new Lucia(adapter, {
 			role: attributes.role,
 			bike_ftp: attributes.bike_ftp,
 			swim_ftp: attributes.swim_ftp,
-			run_ftp: attributes.run_ftp
+			run_ftp: attributes.run_ftp,
+			max_hr: attributes.max_hr
 		};
 	},
 	sessionExpiresIn: new TimeSpan(1, 'w'), // no more active/idle
@@ -46,9 +47,10 @@ interface DatabaseUserAttributes {
 	created_at: Date;
 	stripe_id: string | null;
 	role: typeof UserRole;
-	bike_ftp: number | undefined;
-	swim_ftp: number | undefined;
-	run_ftp: number | undefined;
+	bike_ftp: number;
+	swim_ftp: number;
+	run_ftp: number;
+	max_hr: number;
 }
 
 declare module 'lucia' {
