@@ -19,6 +19,7 @@
 	import { flip } from 'svelte/animate';
 	import { type ItemsStore, ItemsStoreService } from '$lib/utils/dragndrop/stores';
 	import { secondsToHHMMSS } from '$lib/utils/datetime';
+	import { convertDistance } from '$lib/utils/distance';
 
 	export let data: PageData;
 	let modal = getModalStore();
@@ -138,7 +139,7 @@
 
 			<div class="w-full flex flex-row flex-wrap justify-between gap-4">
 				<h3 class="h3">Duration: {secondsToHHMMSS($form.duration)}</h3>
-				<h3 class="h3">Distance: {$form.distance.toFixed(2)} km</h3>
+				<h3 class="h3">Distance: {convertDistance($form.distance, 'kilometers').toFixed(2)} km</h3>
 				<h3 class="h3">Stress Score: {$form.stress_score}</h3>
 			</div>
 			<hr class="w-full my-2" />

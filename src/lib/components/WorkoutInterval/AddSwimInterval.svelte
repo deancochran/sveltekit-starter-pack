@@ -28,7 +28,7 @@
 					sec_p_100m = user.swim_ftp + Math.round((1 - interval.intensity!) * user.swim_ftp);
 				}
 
-				return Math.round(interval.distance! * 1000 * (sec_p_100m / 100));
+				return Math.round(interval.distance! * (sec_p_100m / 100));
 			case IntervalType.RAMP:
 				let avg_intensity = (interval.start_intensity + interval.end_intensity) / 2;
 				if (avg_intensity! > 1) {
@@ -36,7 +36,7 @@
 				} else {
 					sec_p_100m = user.swim_ftp + Math.round((1 - avg_intensity) * user.swim_ftp);
 				}
-				return Math.round(interval.distance! * 1000 * (sec_p_100m / 100));
+				return Math.round(interval.distance! * (sec_p_100m / 100));
 			default:
 				return 0;
 		}
@@ -63,7 +63,6 @@
 			}}
 		/>
 		<DistanceInput
-			selectedUnit="m"
 			name="distance"
 			label="Distance"
 			bind:value={$plan_form.distance}

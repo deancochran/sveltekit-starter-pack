@@ -25,7 +25,7 @@
 				} else {
 					sec_p_km = user.run_ftp + Math.round((1 - interval.intensity!) * user.run_ftp);
 				}
-				return Math.round(interval.distance! * sec_p_km);
+				return Math.round((interval.distance! / 1000) * sec_p_km);
 			case IntervalType.RAMP:
 				let avg_intensity = (interval.start_intensity + interval.end_intensity) / 2;
 				if (avg_intensity! > 1) {
@@ -34,7 +34,7 @@
 					sec_p_km = user.run_ftp + Math.round((1 - avg_intensity) * user.run_ftp);
 				}
 				console.log(sec_p_km);
-				return Math.round(interval.distance! * sec_p_km);
+				return Math.round((interval.distance! / 1000) * sec_p_km);
 			default:
 				return 0;
 		}
@@ -61,7 +61,6 @@
 			}}
 		/>
 		<DistanceInput
-			selectedUnit="km"
 			name="distance"
 			label="Distance"
 			bind:value={$plan_form.distance}

@@ -209,7 +209,6 @@
 							<span class="text-sm">
 								{convertSecondsToTimeDisplay(item.data.duration)}
 							</span>
-							<span class="text-sm">{item.data.distance}</span>
 							{#if item.data.interval_type === IntervalType.BLOCK}
 								<span class="text-lg font-bold">@{item.data.intensity}%</span>
 							{:else}
