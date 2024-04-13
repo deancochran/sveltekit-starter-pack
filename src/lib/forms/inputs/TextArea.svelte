@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { InputConstraint } from 'sveltekit-superforms';
 
-	export let value: string|undefined = undefined;
+	export let value: string | undefined = undefined;
 	export let rows: number = 2;
 	export let label: string | undefined = undefined;
 	export let errors: string[] | undefined = undefined;
@@ -11,7 +11,6 @@
 <label class="label w-full">
 	{#if label}<span>{label}</span><br />{/if}
 	<textarea
-		
 		{rows}
 		bind:value
 		aria-invalid={errors ? 'true' : undefined}

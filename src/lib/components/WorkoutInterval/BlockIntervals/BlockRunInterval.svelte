@@ -8,10 +8,15 @@
 	export let interval: BlockInterval;
 	export let user: User;
 
-	export let speed: number = Math.ceil((user.run_ftp) / 5) * 5;
+	export let speed: number = Math.ceil(user.run_ftp / 5) * 5;
 	$: {
-		interval.intensity = (1-(speed / user.run_ftp)) + 1
+		interval.intensity = 1 - speed / user.run_ftp + 1;
 	}
 </script>
 
-<RunSpeedInput name="speed" label="Speed" bind:value={speed} on:input={(e) => dispatch('input', e)}/>
+<RunSpeedInput
+	name="speed"
+	label="Speed"
+	bind:value={speed}
+	on:input={(e) => dispatch('input', e)}
+/>

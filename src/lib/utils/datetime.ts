@@ -45,7 +45,7 @@ export function convertSecondsToTimeDisplay(seconds: number | undefined): {
 }
 
 export function secondsToHHMMSS(seconds: number): string {
-	if(!seconds) return '00:00:00';
+	if (!seconds) return '00:00:00';
 	// Calculate hours, minutes, and remaining seconds
 	const hours: number = Math.floor(seconds / 3600);
 	seconds %= 3600;

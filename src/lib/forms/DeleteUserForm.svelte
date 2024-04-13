@@ -60,11 +60,7 @@
 		{#if $delayed}
 			<LoadingIcon />
 		{:else}
-			<Button
-				shadow="shadow-md"
-				color="variant-filled-primary"
-				form="deleteUser"
-				type="submit"
+			<Button shadow="shadow-md" color="variant-filled-primary" form="deleteUser" type="submit"
 				>Delete Account</Button
 			>
 		{/if}

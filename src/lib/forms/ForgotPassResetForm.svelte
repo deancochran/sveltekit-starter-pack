@@ -54,11 +54,7 @@
 		</form>
 	</section>
 	<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">
-		<Button
-			shadow="shadow-md"
-			color="variant-filled-primary"
-			form="reset_forgot"
-			type="submit"
+		<Button shadow="shadow-md" color="variant-filled-primary" form="reset_forgot" type="submit"
 			>Submit</Button
 		>
 	</footer>

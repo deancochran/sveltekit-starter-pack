@@ -45,7 +45,7 @@
 	<form id="updatePlan" use:focusTrap={isFocused} method="POST" use:enhance>
 		<header class="card-header">
 			<TextInput
-			disabled={!editing}
+				disabled={!editing}
 				name="name"
 				label="Name"
 				bind:value={$form.name}

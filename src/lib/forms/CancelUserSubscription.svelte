@@ -64,8 +64,7 @@
 				shadow="shadow-md"
 				color="variant-filled-primary"
 				form="cancelSubscription"
-				type="submit"
-				>Cancel Subscription</Button
+				type="submit">Cancel Subscription</Button
 			>
 		{/if}
 	</footer>

@@ -28,7 +28,7 @@
 					sec_p_100m = user.swim_ftp + Math.round((1 - interval.intensity!) * user.swim_ftp);
 				}
 
-				return Math.round((interval.distance!*1000) * (sec_p_100m/100));
+				return Math.round(interval.distance! * 1000 * (sec_p_100m / 100));
 			case IntervalType.RAMP:
 				let avg_intensity = (interval.start_intensity + interval.end_intensity) / 2;
 				if (avg_intensity! > 1) {
@@ -36,7 +36,7 @@
 				} else {
 					sec_p_100m = user.swim_ftp + Math.round((1 - avg_intensity) * user.swim_ftp);
 				}
-				return Math.round((interval.distance!*1000) * (sec_p_100m/100));
+				return Math.round(interval.distance! * 1000 * (sec_p_100m / 100));
 			default:
 				return 0;
 		}
@@ -74,7 +74,7 @@
 		{#if $plan_form.interval_type === IntervalType.BLOCK}
 			<BlockSwimInterval bind:user bind:interval={$plan_form} on:input={onUpdate} />
 		{:else if $plan_form.interval_type === IntervalType.RAMP}
-			<RampSwimInterval bind:user bind:interval={$plan_form} on:input={onUpdate}  />
+			<RampSwimInterval bind:user bind:interval={$plan_form} on:input={onUpdate} />
 		{:else}
 			No valid interval type input
 		{/if}

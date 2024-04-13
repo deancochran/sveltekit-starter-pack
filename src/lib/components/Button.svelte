@@ -10,7 +10,7 @@
 		| 'btn-icon-md'
 		| 'btn-icon-lg'
 		| 'btn-icon-xl'
-		| undefined=undefined;
+		| undefined = undefined;
 	export let color:
 		| 'variant-soft-primary'
 		| 'variant-soft-secondary'
@@ -21,10 +21,10 @@
 		| 'variant-filled-error'
 		| 'variant-filled-warning'
 		| 'variant-filled-success'
-		| undefined=undefined;
+		| undefined = undefined;
 
 	export let shadow: 'shadow-md' | undefined = undefined;
-	let classes = `btn ${size??""} ${color??""} ${shadow??""} ${$$props.class}`;
+	let classes = `btn ${size ?? ''} ${color ?? ''} ${shadow ?? ''} ${$$props.class}`;
 	const dispatch = createEventDispatcher();
 </script>
 

@@ -11,7 +11,10 @@ import { setFlash } from 'sveltekit-flash-message/server';
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
 	const data = await parent();
-	const training_session_form = await superValidate(data.training_session,zod(training_session_schema));
+	const training_session_form = await superValidate(
+		data.training_session,
+		zod(training_session_schema)
+	);
 	const workout_interval_form = await superValidate(zod(workout_interval_schema));
 	return {
 		training_session_form,

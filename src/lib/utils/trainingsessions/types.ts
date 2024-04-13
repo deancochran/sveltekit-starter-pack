@@ -151,11 +151,11 @@ export function evaluatePlan(
 }
 
 export function evaluateInterval(
-	user: User|undefined,
+	user: User | undefined,
 	activity_type: ActivityType,
 	interval: WorkoutInterval
-):{ stress_score: number, distance: number, duration: number } {
-	if(!user) return { stress_score: 0, distance: 0, duration: 0 };
+): { stress_score: number; distance: number; duration: number } {
+	if (!user) return { stress_score: 0, distance: 0, duration: 0 };
 	switch (activity_type) {
 		case ActivityType.RUN:
 			return evaluateRunInterval(user, interval);
@@ -201,7 +201,7 @@ export function evaluateRunInterval(user: User, interval: WorkoutInterval) {
 			break;
 		}
 	}
-	return { stress_score, duration:totalDuration, distance:totalDistance };
+	return { stress_score, duration: totalDuration, distance: totalDistance };
 }
 
 export function evaluateBikeInterval(user: User, interval: WorkoutInterval) {
@@ -231,7 +231,7 @@ export function evaluateBikeInterval(user: User, interval: WorkoutInterval) {
 			break;
 		}
 	}
-	return { stress_score, duration:totalDuration, distance:totalDistance };
+	return { stress_score, duration: totalDuration, distance: totalDistance };
 }
 
 export function evaluateSwimInterval(user: User, interval: WorkoutInterval) {
@@ -267,5 +267,5 @@ export function evaluateSwimInterval(user: User, interval: WorkoutInterval) {
 			break;
 		}
 	}
-	return { stress_score, duration:totalDuration, distance:totalDistance };
+	return { stress_score, duration: totalDuration, distance: totalDistance };
 }

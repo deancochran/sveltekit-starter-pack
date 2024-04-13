@@ -16,7 +16,7 @@
 	export let plan_errors: Writable<any>;
 	export let plan_constraints: Writable<any>;
 
-		function calculateDuration(interval: WorkoutInterval) {
+	function calculateDuration(interval: WorkoutInterval) {
 		let sec_p_km: number;
 		switch (interval.interval_type) {
 			case IntervalType.BLOCK:
@@ -33,7 +33,7 @@
 				} else {
 					sec_p_km = user.run_ftp + Math.round((1 - avg_intensity) * user.run_ftp);
 				}
-				console.log(sec_p_km)
+				console.log(sec_p_km);
 				return Math.round(interval.distance! * sec_p_km);
 			default:
 				return 0;
@@ -42,7 +42,6 @@
 	const onUpdate = () => {
 		$plan_form.duration = calculateDuration($plan_form);
 	};
-	
 </script>
 
 <div class="flex w-full flex-row flex-wrap gap-2">

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-import type { InputConstraint } from 'sveltekit-superforms';
+	import type { InputConstraint } from 'sveltekit-superforms';
 	export let value: any = undefined;
 	export let enumType: any;
 	export let label: string | undefined = undefined;
@@ -11,20 +11,19 @@ import type { InputConstraint } from 'sveltekit-superforms';
 		value: val,
 		label: val
 	}));
-	const dispatch = createEventDispatcher()
+	const dispatch = createEventDispatcher();
 </script>
 
 <label class="label w-full">
 	{#if label}<span>{label}</span><br />{/if}
 
 	<select
-		on:change={(e)=>dispatch('change', e)}
+		on:change={(e) => dispatch('change', e)}
 		class="input"
 		bind:value
 		aria-invalid={errors ? 'true' : undefined}
 		{...constraints}
 		{...$$restProps}
-		
 	>
 		{#each enumOptions as option}
 			<option value={option.value}>

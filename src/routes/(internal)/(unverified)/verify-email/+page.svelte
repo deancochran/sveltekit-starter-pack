@@ -45,11 +45,7 @@
 	</form>
 
 	<form id="verify" method="post" action="?/verify" use:enhance>
-		<Button
-			shadow="shadow-md"
-			color="variant-filled-primary"
-			form="verify"
-			type="submit"
+		<Button shadow="shadow-md" color="variant-filled-primary" form="verify" type="submit"
 			>submit</Button
 		>
 	</form>

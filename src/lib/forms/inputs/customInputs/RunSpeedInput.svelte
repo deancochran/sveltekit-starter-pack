@@ -9,7 +9,7 @@
 		max: 480,
 		step: 5
 	};
-	
+
 	const dispatch = createEventDispatcher();
 
 	$: run_ftp_display = `${Math.floor(value / 60)

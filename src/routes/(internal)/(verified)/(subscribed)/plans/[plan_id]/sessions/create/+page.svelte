@@ -184,14 +184,13 @@
 							</section>
 
 							<footer class="card-footer p-1 gap-1 w-full flex items-end align-middle justify-end">
-								
 								<!-- Step 1: Make a Duplicate Button -->
 								<!-- Step 2: Update the indexes of the other intervals before inserting the new one -->
 								<!-- Step 3: Add the duplicate interval -->
 								<Button
 									type="button"
 									on:click={() => {
-										const new_item = { ...item, id: item.id + 1 }
+										const new_item = { ...item, id: item.id + 1 };
 										// Update the indexes of the other intervals before inserting the new one
 										$items = $items.map((i) => {
 											if (i.id > item.id) {
@@ -201,15 +200,14 @@
 											}
 										});
 										// Add the duplicate interval after the item and before the next item
-										$items = [...$items.slice(0, index+1), new_item, ...$items.slice(index+1)];
-
+										$items = [...$items.slice(0, index + 1), new_item, ...$items.slice(index + 1)];
 									}}
 									color="variant-soft-tertiary"
 									class=" rounded-md p-2"
 								>
 									<CopyIcon />
 								</Button>
-								
+
 								<!-- <Button
 									type="button"
 									on:click={() => {

@@ -12,8 +12,8 @@
 	export let end_speed: number = start_speed;
 
 	$: {
-		interval.start_intensity = (1 - (start_speed / user.run_ftp)) + 1;
-		interval.end_intensity = (1 - (end_speed / user.run_ftp)) + 1;
+		interval.start_intensity = 1 - start_speed / user.run_ftp + 1;
+		interval.end_intensity = 1 - end_speed / user.run_ftp + 1;
 	}
 </script>
 

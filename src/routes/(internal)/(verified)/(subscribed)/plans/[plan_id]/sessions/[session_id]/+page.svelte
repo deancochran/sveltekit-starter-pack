@@ -70,7 +70,9 @@
 	function handleSort(e: { detail: { items: { id: number; data: WorkoutInterval }[] } }) {
 		$items = e.detail.items;
 	}
-	let items: ItemsStore<WorkoutInterval> = ItemsStoreService<WorkoutInterval>($form.plan.map((obj,i) => ({ id: i, data: obj })));
+	let items: ItemsStore<WorkoutInterval> = ItemsStoreService<WorkoutInterval>(
+		$form.plan.map((obj, i) => ({ id: i, data: obj }))
+	);
 	items.subscribe(() => {
 		workout.set([...$items.map((i) => i.data)]);
 	});

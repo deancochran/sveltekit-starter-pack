@@ -48,11 +48,7 @@
 		{#if $delayed}
 			<LoadingIcon />
 		{:else}
-			<Button
-				shadow="shadow-md"
-				color="variant-filled-primary"
-				form="signin"
-				type="submit"
+			<Button shadow="shadow-md" color="variant-filled-primary" form="signin" type="submit"
 				>Sign In</Button
 			>
 		{/if}

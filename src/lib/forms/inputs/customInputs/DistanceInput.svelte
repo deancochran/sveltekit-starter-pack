@@ -6,8 +6,8 @@
 	import type { InputConstraint } from 'sveltekit-superforms';
 	export let selectedUnit: 'km' | 'm' = 'km';
 	const dispatch = createEventDispatcher();
-	$: valueInMetres = (value * 1000)??0;
-	$: valueInKm = (value)??0;
+	$: valueInMetres = value * 1000 ?? 0;
+	$: valueInKm = value ?? 0;
 
 	export let name: string;
 	export let value: number = 0;
@@ -16,8 +16,8 @@
 	export let constraints: InputConstraint | undefined = undefined;
 	let distance: number;
 	if (!value) distance = 0;
-	else{
-		if(selectedUnit === 'm') distance = value * 1000;
+	else {
+		if (selectedUnit === 'm') distance = value * 1000;
 		else distance = value;
 	}
 

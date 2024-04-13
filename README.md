@@ -177,5 +177,5 @@ Positive TSB means you are “on form” and have higher fitness than fatigue. T
 - on the dashboard, use the data.activites to calculate the total percentage of training done above threshold and below threshold
 - add a message to encourage training at a 80% below threshold and 20% above threshold ratio as per the 80/20 method
 - convert all distance measurements to meters in the database
-  - update all corresponding functions that calculate distance 
+  - update all corresponding functions that calculate distance
   - update the trainging session logic for creating a workout
