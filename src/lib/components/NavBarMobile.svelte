@@ -17,7 +17,7 @@
 >
 	<div class="flex flex-row w-full items-center align-middle justify-between p-4 gap-4 shadow-sm">
 		<h1 class="h1 font-serif bg-op font-bold text-surface text-4xl">cadence</h1>
-		{#if $page.data.user}
+		{#if $page.data?.user}
 			<ProfilePopup on:click={drawerClose} user={$page.data.user} />
 		{:else}
 			<Link

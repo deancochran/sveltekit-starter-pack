@@ -30,6 +30,7 @@
 	import { onMount } from 'svelte';
 	import SearchPostsModal from '$lib/modals/SearchPostsModal.svelte';
 	import Transition from '$lib/transitions/transition.svelte';
+	import AddInterval from '$lib/modals/AddInterval.svelte';
 	export let data: LayoutData;
 
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
@@ -69,7 +70,8 @@
 	const modalRegistry: Record<string, ModalComponent> = {
 		// Set a unique modal ID, then pass the component reference
 		DeleteUserForm: { ref: DeleteUserForm },
-		SearchPostsModal: { ref: SearchPostsModal }
+		SearchPostsModal: { ref: SearchPostsModal },
+		AddInterval: { ref: AddInterval }
 	};
 
 	const swUpdateModal: ModalSettings = {

@@ -172,7 +172,7 @@ export const training_plan_schema = z
 		end_date: z.date()
 	})
 	.superRefine(({ start_date, end_date }, ctx) => {
-		if (end_date < start_date) {
+		if (end_date.getUTCDate() < start_date.getUTCDate()) {
 			ctx.addIssue({
 				code: 'custom',
 				message: 'The End Date Cannot be Before the Start Date.',
@@ -184,45 +184,45 @@ export type TrainPlanSchema = typeof training_plan_schema;
 
 export const IntervalSchema = z.object({
 	interval_type: z.nativeEnum(IntervalType),
-	duration: z.number().min(1).int(),
-	distance: z.number().min(1).int(),
+	duration: z.number().min(0).default(0),
+	distance: z.number().min(0).default(0)
 });
 
 export type Interval = z.infer<typeof IntervalSchema>;
 
 export const RampIntervalSchema = IntervalSchema.extend({
 	interval_type: z.literal(IntervalType.RAMP),
-	start_intensity: z.number().min(0).max(1).nonnegative(),
-	end_intensity: z.number().min(0).max(1).nonnegative(),
+	start_intensity: z.number().min(0).nonnegative(),
+	end_intensity: z.number().min(0).nonnegative()
 });
 export type RampInterval = z.infer<typeof RampIntervalSchema>;
 
 export const BlockIntervalSchema = IntervalSchema.extend({
 	interval_type: z.literal(IntervalType.BLOCK),
-	intensity: z.number().min(0).max(1).nonnegative(),
+	intensity: z.number().min(0).nonnegative()
 });
 export type BlockInterval = z.infer<typeof BlockIntervalSchema>;
 
-export const WorkoutIntervalSchema = z.union([ RampIntervalSchema, BlockIntervalSchema ]);
-export type WorkoutInterval = z.infer<typeof WorkoutIntervalSchema>;
+export const workout_interval_schema = z.union([RampIntervalSchema, BlockIntervalSchema]);
+export type WorkoutInterval = z.infer<typeof workout_interval_schema>;
 
 export const training_session_schema = z
 	.object({
 		title: z.string(),
 		activity_type: z.nativeEnum(ActivityType),
-		description: z.string().max(50, 'Must be at most 50 characters in length'),
+		description: z.string().max(50, 'Must be at most 50 characters in length').optional(),
 		date: z.date(),
 		distance: z.number().gte(0),
 		duration: z.number().gte(0),
 		stress_score: z.number().gte(0),
-		plan: z.array(WorkoutIntervalSchema),
+		plan: z.array(workout_interval_schema),
 		training_plan_id: z.number()
-
-	}).superRefine(({ date }, ctx) => {
-		if (date < new Date()) {
+	})
+	.superRefine(({ date }, ctx) => {
+		if (date.getUTCDate() < new Date().getUTCDate()) {
 			ctx.addIssue({
 				code: 'custom',
-				message: 'The Date Cannot be before today Date.',
+				message: 'The Date can not be before today.',
 				path: ['date']
 			});
 		}
@@ -290,11 +290,11 @@ const priceProductSchema = z
 		};
 	});
 
-	const priceSchema = z.object({
-		id: z.string(),
-		lookup_key: z.string(),
-		unit_amount: z.number().transform((amount) => amount / 100),
-		product: priceProductSchema
-	});
+const priceSchema = z.object({
+	id: z.string(),
+	lookup_key: z.string(),
+	unit_amount: z.number().transform((amount) => amount / 100),
+	product: priceProductSchema
+});
 
 export const priceListSchema = z.array(priceSchema);

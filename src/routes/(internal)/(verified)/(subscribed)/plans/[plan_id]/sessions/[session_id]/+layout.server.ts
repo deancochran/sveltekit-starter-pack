@@ -1,31 +1,25 @@
 import type { ToastSettings } from '@skeletonlabs/skeleton';
-import { error } from '@sveltejs/kit';
-import type { LayoutServerLoad } from './$types';
 import { redirect } from 'sveltekit-flash-message/server';
+import type { LayoutServerLoad } from './$types';
 export const load: LayoutServerLoad = async (event) => {
 	const { parent, params } = event;
 	const data = await parent();
-
-	if (!Number(params.plan_id)) error(400);
-	const plan = await prisma.trainingPlan.findFirst({
+	const training_session = await prisma.trainingSession.findFirst({
 		where: {
-			id: Number(params.plan_id),
-			user_id: data.user?.id
-		},
-		include: {
-			training_sessions: true
+			id: Number(params.session_id),
+			training_plan_id: data.plan.id
 		}
 	});
-	if (!plan) {
+	if (!training_session) {
 		const t: ToastSettings = {
-			message: 'Failed to find plan',
+			message: 'Failed to find session',
 			background: 'variant-filled-error'
 		} as const;
-		redirect('/plans', t, event);
+		redirect(`/plans/${data.plan.id}/sessions`, t, event);
 	}
 
 	return {
 		...data,
-		plan
+		training_session
 	};
 };

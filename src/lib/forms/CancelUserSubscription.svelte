@@ -65,7 +65,7 @@
 				color="variant-filled-primary"
 				form="cancelSubscription"
 				type="submit"
-				class="btn">Cancel Subscription</Button
+				>Cancel Subscription</Button
 			>
 		{/if}
 	</footer>

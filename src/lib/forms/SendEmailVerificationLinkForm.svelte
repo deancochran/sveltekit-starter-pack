@@ -25,7 +25,7 @@
 			color="variant-filled-primary"
 			form="resend"
 			type="submit"
-			class="btn">Resend</Button
+			>Resend</Button
 		>
 	</footer>
 </div>

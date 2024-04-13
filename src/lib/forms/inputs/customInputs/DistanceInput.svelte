@@ -1,35 +1,55 @@
 <script lang="ts">
-	import type { InputConstraint } from 'sveltekit-superforms';
+	import { createEventDispatcher } from 'svelte';
 
-	export let value: number;
+	// VALUE IS ALWAYS IN KM, but can display Meters or KM
+
+	import type { InputConstraint } from 'sveltekit-superforms';
+	export let selectedUnit: 'km' | 'm' = 'km';
+	const dispatch = createEventDispatcher();
+	$: valueInMetres = (value * 1000)??0;
+	$: valueInKm = (value)??0;
+
+	export let name: string;
+	export let value: number = 0;
 	export let label: string | undefined = undefined;
 	export let errors: string[] | undefined = undefined;
 	export let constraints: InputConstraint | undefined = undefined;
+	let distance: number;
+	if (!value) distance = 0;
+	else{
+		if(selectedUnit === 'm') distance = value * 1000;
+		else distance = value;
+	}
+
+	$: {
+		value = selectedUnit === 'm' ? distance / 1000 : distance;
+	}
 </script>
 
-<p>{label}</p>
-<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-	<div class="input-group-shim">
-		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
-	</div>
+<label class="label w-full">
+	{#if label}<span
+			>{label}: {#if selectedUnit === 'm'}{valueInMetres}m{:else}{valueInKm}km{/if}</span
+		>{/if}
+
 	<input
-		class="input"
+		disabled={$$props.disabled}
+		{name}
+		class="input w-full"
 		type="number"
-        step="0.1"
-		bind:value
+		step={selectedUnit === 'm' ? '25' : '0.1'}
+		min="0"
+		bind:value={distance}
 		aria-invalid={errors ? 'true' : undefined}
+		on:input={(e) => {
+			dispatch('input', e);
+		}}
 		{...constraints}
 		{...$$restProps}
 	/>
-	<select>
-		<!-- <option>m</option> -->
-		<option>km</option>
-	</select>
-</div>
+</label>
 
 {#if errors}<span class="flex flex-inline space-x-2 text-error-500"
 		>{#each errors as err}
 			<p class="">{err}</p>
 		{/each}</span
 	>{/if}
-

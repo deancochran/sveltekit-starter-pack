@@ -31,3 +31,36 @@ export function getMostRecentSunday(): Date {
 	);
 	return mostRecentSunday;
 }
+
+export function convertSecondsToTimeDisplay(seconds: number | undefined): {
+	hours: number;
+	mins: number;
+	secs: number;
+} {
+	if (!seconds) seconds = 0;
+	const hours = Math.floor(seconds / 3600);
+	const mins = Math.floor((seconds % 3600) / 60);
+	const secs = seconds % 60;
+	return { hours, mins, secs };
+}
+
+export function secondsToHHMMSS(seconds: number): string {
+	if(!seconds) return '00:00:00';
+	// Calculate hours, minutes, and remaining seconds
+	const hours: number = Math.floor(seconds / 3600);
+	seconds %= 3600;
+	const minutes: number = Math.floor(seconds / 60);
+	seconds %= 60;
+
+	// Format the time
+	let timeStr: string = '';
+	if (hours > 0) {
+		timeStr += `${String(hours).padStart(2, '0')}:`;
+	}
+	if (hours > 0 || minutes > 0) {
+		timeStr += `${String(minutes).padStart(2, '0')}:`;
+	}
+	timeStr += `${String(seconds).padStart(2, '0')}`;
+
+	return timeStr;
+}

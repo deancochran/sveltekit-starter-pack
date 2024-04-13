@@ -23,6 +23,9 @@ A full-stack example of a Software as a Service (SaaS) web application built wit
     - [Lucia Authentication](#lucia-authentication)
     - [Database (Prisma)](#database-prisma)
     - [Database (Prisma)](#database-prisma-1)
+- [Fun Calculations](#fun-calculations)
+- [80/20 Rule:](#8020-rule)
+- [TODO for implementation...](#todo-for-implementation)
 
 ## Introduction
 
@@ -173,3 +176,6 @@ Positive TSB means you are “on form” and have higher fitness than fatigue. T
 - update the typing accordingly in the frontend 'StressDays' is in need of updating
 - on the dashboard, use the data.activites to calculate the total percentage of training done above threshold and below threshold
 - add a message to encourage training at a 80% below threshold and 20% above threshold ratio as per the 80/20 method
+- convert all distance measurements to meters in the database
+  - update all corresponding functions that calculate distance 
+  - update the trainging session logic for creating a workout

@@ -65,7 +65,7 @@
 				color="variant-filled-primary"
 				form="deleteUser"
 				type="submit"
-				class="btn">Delete Account</Button
+				>Delete Account</Button
 			>
 		{/if}
 	</footer>

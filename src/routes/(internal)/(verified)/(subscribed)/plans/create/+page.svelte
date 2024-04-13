@@ -12,12 +12,7 @@
 
 	export let data: PageData;
 	const { form, errors, constraints, enhance, delayed } = superForm(data.trainingPlanSchema, {
-		id: 'NewTrainingPlanForm',
-		applyAction: true,
-		invalidateAll: true,
-		resetForm: false,
 		validators: zod(training_plan_schema),
-		delayMs: 0,
 		timeoutMs: 8000
 	});
 	let isFocused: boolean = false;
@@ -28,13 +23,7 @@
 		<h1>New Training Plan</h1>
 	</header>
 	<section class="p-4">
-		<form
-			id="NewTrainingPlanForm"
-			use:focusTrap={isFocused}
-			method="POST"
-			action="?/create"
-			use:enhance
-		>
+		<form id="create" use:focusTrap={isFocused} method="POST" use:enhance action="?/create">
 			<TextInput
 				name="name"
 				label="Name"
@@ -69,13 +58,8 @@
 		{#if $delayed}
 			<LoadingIcon />
 		{:else}
-			<Button
-				formaction="?/create"
-				shadow="shadow-md"
-				color="variant-filled-primary"
-				form="NewTrainingPlanForm"
-				type="submit"
-				class="btn ">Create</Button
+			<Button shadow="shadow-md" color="variant-filled-primary" form="create" type="submit"
+				>Create</Button
 			>
 		{/if}
 	</footer>

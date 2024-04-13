@@ -4,7 +4,6 @@ import { getStravaActivities } from '$lib/utils/integrations/strava/server';
 import type { DetailedActivity } from '$lib/utils/integrations/strava/typescript-fetch-client/models';
 
 export const load: PageServerLoad = async ({ parent, fetch, locals }) => {
-	await parent();
 	const data = await parent();
 	const integration = await prisma.thirdPartyIntegrationToken.findFirstOrThrow({
 		where: {

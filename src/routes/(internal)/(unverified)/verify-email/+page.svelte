@@ -50,7 +50,7 @@
 			color="variant-filled-primary"
 			form="verify"
 			type="submit"
-			class="btn">submit</Button
+			>submit</Button
 		>
 	</form>
 

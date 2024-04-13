@@ -53,7 +53,7 @@
 				color="variant-filled-primary"
 				form="signin"
 				type="submit"
-				class="btn">Sign In</Button
+				>Sign In</Button
 			>
 		{/if}
 		<Link

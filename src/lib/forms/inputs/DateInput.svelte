@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { InputConstraint } from 'sveltekit-superforms';
 
-	export let value: Date;
+	export let value: Date = new Date();
 	export let label: string | undefined = undefined;
 	export let errors: string[] | undefined = undefined;
 	export let constraints: InputConstraint | undefined = undefined;

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 
-	export let type: 'button' | 'submit' | 'reset' | null | undefined = 'button';
 	export let size:
 		| 'btn-sm'
 		| 'btn-md'
@@ -11,7 +10,7 @@
 		| 'btn-icon-md'
 		| 'btn-icon-lg'
 		| 'btn-icon-xl'
-		| string="";
+		| undefined=undefined;
 	export let color:
 		| 'variant-soft-primary'
 		| 'variant-soft-secondary'
@@ -19,10 +18,13 @@
 		| 'variant-filled-primary'
 		| 'variant-filled-secondary'
 		| 'variant-filled-tertiary'
-		| string="";
+		| 'variant-filled-error'
+		| 'variant-filled-warning'
+		| 'variant-filled-success'
+		| undefined=undefined;
 
 	export let shadow: 'shadow-md' | undefined = undefined;
-	let classes = `${size} ${color} ${shadow} ${$$props.class}`;
+	let classes = `btn ${size??""} ${color??""} ${shadow??""} ${$$props.class}`;
 	const dispatch = createEventDispatcher();
 </script>
 
@@ -30,11 +32,10 @@
 	on:click={() => dispatch('click')}
 	on:mouseenter={() => dispatch('mouseenter')}
 	on:mouseleave={() => dispatch('mouseleave')}
-	{...$$props}
-	{type}
 	class:transition-colors={true}
 	class:duration-300={true}
-	class={classes}
+	{...$$props}
+	class="{$$props.class} {classes}"
 >
 	<slot /></button
 >

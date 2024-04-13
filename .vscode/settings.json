@@ -2,18 +2,25 @@
 	"cSpell.words": [
 		"alaphanumeric",
 		"cadence",
+		"ctss",
+		"dndzone",
+		"dragndrop",
 		"flexsearch",
 		"latlng",
 		"maplibre",
 		"mdsvex",
 		"Minio",
 		"rehype",
+		"rtss",
 		"signin",
 		"skeletonlabs",
 		"Strava",
+		"stss",
 		"superforms",
 		"Tableof",
-		"tailwindcss"
+		"tailwindcss",
+		"trainingsessions",
+		"uuidv"
 	],
 	"svg.preview.background": "dark-transparent"
 }

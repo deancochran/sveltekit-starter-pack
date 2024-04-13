@@ -59,7 +59,7 @@
 			color="variant-filled-primary"
 			form="reset_forgot"
 			type="submit"
-			class="btn">Submit</Button
+			>Submit</Button
 		>
 	</footer>
 </div>

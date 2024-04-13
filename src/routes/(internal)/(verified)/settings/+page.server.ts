@@ -26,7 +26,6 @@ import { disconnect_integration } from '$lib/utils/integrations/strava/utils';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
-	await parent();
 	const data = await parent();
 	const initialData = { ...data.user };
 	if (!data.user) redirect(302, handleSignInRedirect(event));
@@ -324,7 +323,6 @@ export const actions: Actions = {
 			setFlash(t, event);
 			return { form };
 		} catch (e) {
-			console.log(e);
 			if (e instanceof Error) {
 				t = {
 					message: e.message,

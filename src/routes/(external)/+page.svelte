@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import Link from '$lib/components/Link.svelte';
 	import type { PageData } from './$types';
 
@@ -8,8 +9,8 @@
 <div class="page-container flex items-center justify-center align-middle">
 	<div class="card p-4 flex-col gap-2 flex items-center justify-center align-middle">
 		<h1 class="h1 font-serif">
-			Welcome {#if data.user}
-				{data.user.username}
+			Welcome {#if $page.data?.user}
+				{$page.data?.user.username}
 			{:else}
 				Alien
 			{/if}

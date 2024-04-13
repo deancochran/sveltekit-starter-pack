@@ -25,10 +25,9 @@ model user {
   bike_ftp         Int                          @default(0)
   run_ftp          Int                          @default(0)
   swim_ftp         Int                          @default(0)
-  max_hr           Int                          @default(0)
   unit_type        UnitType                     @default(METRIC)
+  max_hr           Int                          @default(0)
   activities       activities[]
-  training_plans   trainingPlan[]
   email_tokens     emailVerificationToken[]
   keys             key[]
   password_tokens  passwordResetToken[]
@@ -36,6 +35,7 @@ model user {
   subscription     subscription?
   integration_logs thirdPartyIntegrationLogs[]
   integrations     thirdPartyIntegrationToken[]
+  training_plans   trainingPlan[]
 
   @@index([id])
 }
@@ -138,8 +138,8 @@ model trainingPlan {
   start_date        DateTime
   end_date          DateTime
   user_id           String
-  training_sessions trainingSession[]
   user              user              @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "trainingPlan_user_id_user_id_fk")
+  training_sessions trainingSession[]
 
   @@index([start_date, end_date])
 }
@@ -148,9 +148,9 @@ model trainingSession {
   id               Int          @id @default(autoincrement())
   title            String
   activity_type    ActivityType
-  description      String
+  description      String?
   date             DateTime
-  distance         Int
+  distance         Int?
   duration         Int
   stress_score     Float
   plan             Json[]       @default([])
@@ -166,8 +166,8 @@ enum ActivityType {
 
 enum UserRole {
   PRO
-  TRIAL
   BASE
+  TRIAL
 }
 
 enum ThirdPartyIntegrationProvider {

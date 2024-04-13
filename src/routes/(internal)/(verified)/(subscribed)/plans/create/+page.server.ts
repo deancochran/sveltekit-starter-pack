@@ -2,12 +2,14 @@ import { zod } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms/server';
 import { training_plan_schema } from '$lib/schemas';
+// import { handleSignInRedirect } from '$lib/utils/redirects/loginRedirect';
+// import type { trainingPlan } from '@prisma/client';
+import type { ToastSettings } from '@skeletonlabs/skeleton';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { handleSignInRedirect } from '$lib/utils/redirects/loginRedirect';
 import type { trainingPlan } from '@prisma/client';
-import type { ToastSettings } from '@skeletonlabs/skeleton';
-import { redirect as r } from '@sveltejs/kit';
-import { setFlash, redirect } from 'sveltekit-flash-message/server';
 import { fail } from 'sveltekit-superforms';
+import { redirect as r } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
@@ -37,7 +39,7 @@ export const actions: Actions = {
 			} as const;
 		} catch (e) {
 			t = {
-				message: 'Failed to delete account',
+				message: 'Failed to create plan',
 				background: 'variant-filled-error'
 			} as const;
 			setFlash(t, event);
