@@ -45,7 +45,7 @@ export function convertSecondsToTimeDisplay(seconds: number | undefined): {
 }
 
 export function secondsToHHMMSS(seconds: number): string {
-	if (!seconds) return '00:00:00';
+	if (!seconds) return '00:00:00hrs';
 	// Calculate hours, minutes, and remaining seconds
 	const hours: number = Math.floor(seconds / 3600);
 	seconds %= 3600;
@@ -53,14 +53,13 @@ export function secondsToHHMMSS(seconds: number): string {
 	seconds %= 60;
 
 	// Format the time
-	let timeStr: string = '';
-	if (hours > 0) {
-		timeStr += `${String(hours).padStart(2, '0')}:`;
+	const largestUnit = hours > 0 ? 'hrs' : minutes > 0 ? 'mins' : 'secs';
+	switch (largestUnit) {
+		case 'hrs':
+			return `${hours} ${largestUnit} ${minutes} mins, ${seconds} secs`;
+		case 'mins':
+			return `${minutes} ${largestUnit} ${seconds} secs`;
+		case 'secs':
+			return `${seconds} ${largestUnit}`;
 	}
-	if (hours > 0 || minutes > 0) {
-		timeStr += `${String(minutes).padStart(2, '0')}:`;
-	}
-	timeStr += `${String(seconds).padStart(2, '0')}`;
-
-	return timeStr;
 }

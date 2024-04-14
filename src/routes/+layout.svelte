@@ -85,7 +85,7 @@
 		}
 	};
 
-	async function dectectServiceWorkerUpdate() {
+	async function detectServiceWorkerUpdate() {
 		const registry = await navigator.serviceWorker.ready;
 		registry.addEventListener('updatefound', () => {
 			const sw = registry.installing;
@@ -108,7 +108,7 @@
 	}
 
 	onMount(() => {
-		dectectServiceWorkerUpdate();
+		detectServiceWorkerUpdate();
 	});
 </script>
 

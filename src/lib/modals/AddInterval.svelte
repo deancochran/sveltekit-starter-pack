@@ -1,44 +1,38 @@
 <script lang="ts">
 	import { getModalStore } from '@skeletonlabs/skeleton';
 	import { PlusSquare } from 'lucide-svelte';
-	import type { SvelteComponent } from 'svelte';
+	import { onMount, type SvelteComponent } from 'svelte';
 	import Button from '$lib/components/Button.svelte';
 	import { ActivityType } from '@prisma/client';
 	// import type { Infer, SuperValidated } from 'sveltekit-superforms';
-	import type { WorkoutInterval } from '$lib/schemas';
-	import type { Writable } from 'svelte/store';
+	import { workout_interval_schema, type training_session_schema } from '$lib/schemas';
 	import AddBikeInterval from '$lib/components/WorkoutInterval/AddBikeInterval.svelte';
 	import { page } from '$app/stores';
 	import AddRunInterval from '$lib/components/WorkoutInterval/AddRunInterval.svelte';
 	import AddSwimInterval from '$lib/components/WorkoutInterval/AddSwimInterval.svelte';
+	import { type Infer, type SuperForm } from 'sveltekit-superforms';
 
 	/** Exposes parent props to this component. */
 	export let parent: SvelteComponent;
 	const modal = getModalStore();
-	const {
-		form: plan_form,
-		errors: plan_errors,
-		constraints: plan_constraints,
-		validateForm: plan_validateForm,
-		reset: plan_reset,
-		activity_type
-	} = $modal[0].meta as {
-		form: Writable<WorkoutInterval>;
-		errors: any;
-		constraints: any;
-		validateForm: any;
-		reset: any;
+
+	const { form_obj, activity_type } = $modal[0].meta as {
+		form_obj: SuperForm<Infer<typeof workout_interval_schema>>;
 		activity_type: ActivityType;
 	};
+
+	const { form, errors, constraints, reset, validateForm } = form_obj;
 	// Base Classes
 	const cBase = 'card p-4 w-modal shadow-xl space-y-4';
 	const cHeader = 'text-2xl font-bold';
 	const cForm = 'border border-surface-500 p-4 space-y-4 rounded-container-token';
 
-	async function onFormSubmit(): Promise<void> {
-		const res = await plan_validateForm();
+	async function formSubmitHandler(
+		event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement }
+	) {
+		const res = await validateForm();
 		if (res.valid) {
-			if ($modal[0].response) $modal[0].response($plan_form);
+			if ($modal[0].response) $modal[0].response($form);
 			modal.close();
 		}
 		console.log(res);
@@ -50,38 +44,38 @@
 		<header class={cHeader}><h1>Add Interval</h1></header>
 		<form
 			id="NewSessionPlanForm"
-			on:submit|preventDefault={onFormSubmit}
+			on:submit|preventDefault={formSubmitHandler}
 			class="modal-form {cForm}"
 		>
 			{#key activity_type}
 				{#if activity_type === ActivityType.SWIM}
 					<AddSwimInterval
 						user={$page.data.user}
-						{plan_form}
-						{plan_errors}
-						{plan_constraints}
+						plan_form={form}
+						plan_errors={errors}
+						plan_constraints={constraints}
 						on:reset={() => {
-							plan_reset();
+							reset();
 						}}
 					/>
 				{:else if activity_type === ActivityType.RUN}
 					<AddRunInterval
 						user={$page.data.user}
-						{plan_form}
-						{plan_errors}
-						{plan_constraints}
+						plan_form={form}
+						plan_errors={errors}
+						plan_constraints={constraints}
 						on:reset={() => {
-							plan_reset();
+							reset();
 						}}
 					/>
 				{:else if activity_type === ActivityType.BIKE}
 					<AddBikeInterval
 						user={$page.data.user}
-						{plan_form}
-						{plan_errors}
-						{plan_constraints}
+						plan_form={form}
+						plan_errors={errors}
+						plan_constraints={constraints}
 						on:reset={() => {
-							plan_reset();
+							reset();
 						}}
 					/>
 				{:else}
@@ -96,7 +90,7 @@
 					color="variant-filled-primary"
 					class="btn {parent.buttonNeutral}"
 					on:click={() => {
-						plan_reset();
+						reset();
 						parent.onClose();
 					}}>{parent.buttonTextCancel}</Button
 				>

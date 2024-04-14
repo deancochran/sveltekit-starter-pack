@@ -1,33 +1,33 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import type { InputConstraint } from 'sveltekit-superforms';
 
 	export let name: string;
-	export let value: number = 0;
+	export let value: number;
 	export let label: string | undefined = undefined;
 	export let errors: string[] | undefined = undefined;
 	export let constraints: InputConstraint | undefined = undefined;
+	let distance: number;
+	if (value) distance = value / 1000;
 
-	const dispatch = createEventDispatcher();
+	$: {
+		value = distance * 1000 ?? 0;
+	}
 
-	$: valueInMetres = value ?? 0;
+	$: valueInKM = value / 1000 ?? 0;
 </script>
 
 <label class="label w-full">
-	{#if label}<span>{label}:{valueInMetres}m</span>{/if}
+	{#if label}<span>{label}:{valueInKM ?? 0}km</span>{/if}
 
 	<input
 		disabled={$$props.disabled}
 		{name}
 		class="input w-full"
 		type="number"
-		step={'25'}
 		min="0"
-		bind:value
+		step="0.1"
+		bind:value={distance}
 		aria-invalid={errors ? 'true' : undefined}
-		on:input={(e) => {
-			dispatch('input', e);
-		}}
 		{...constraints}
 		{...$$restProps}
 	/>

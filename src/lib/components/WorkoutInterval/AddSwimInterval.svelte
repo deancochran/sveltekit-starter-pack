@@ -2,7 +2,6 @@
 	import EnumSelectInput from '$lib/forms/inputs/EnumSelectInput.svelte';
 	import type { WorkoutInterval } from '$lib/schemas';
 	import { IntervalType } from '$lib/utils/trainingsessions/types';
-	import DurationInput from '$lib/forms/inputs/customInputs/DurationInput.svelte';
 
 	import type { Writable } from 'svelte/store';
 	import BlockSwimInterval from './BlockIntervals/BlockSwimInterval.svelte';
@@ -53,8 +52,6 @@
 			name="interval_type"
 			label="Interval Type"
 			bind:value={$plan_form.interval_type}
-			errors={$plan_errors.interval_type}
-			constraints={$plan_constraints.interval_type}
 			on:change={(e) => {
 				dispatch('reset');
 				$plan_form.interval_type = e.detail.currentTarget.value;

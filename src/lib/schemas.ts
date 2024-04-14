@@ -210,7 +210,7 @@ export const training_session_schema = z
 	.object({
 		title: z.string(),
 		activity_type: z.nativeEnum(ActivityType),
-		description: z.string().max(50, 'Must be at most 50 characters in length').optional(),
+		description: z.string().max(250, 'Must be at most 250 characters in length'),
 		date: z.date(),
 		distance: z.number().gte(0),
 		duration: z.number().gte(0),
@@ -227,7 +227,7 @@ export const training_session_schema = z
 			});
 		}
 	});
-export type TrainSessionSchema = typeof training_session_schema;
+export type TrainingSessionSchema = typeof training_session_schema;
 
 type ProductConfig = Record<string, { features: string[]; call_to_action: string }>;
 

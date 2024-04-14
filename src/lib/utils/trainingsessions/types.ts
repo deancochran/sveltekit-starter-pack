@@ -1,3 +1,8 @@
+import { calcRunPace, calc_rIF, calc_rTss } from '../tss/rtss';
+import { calc_cIF, calc_cTss } from '../tss/ctss';
+import { calcSwimPace, calc_sIF, calc_sTss } from '../tss/stss';
+import { ActivityType } from '@prisma/client';
+import type { User } from 'lucia';
 
 export enum IntervalType {
 	RAMP = 'ramp',
@@ -21,247 +26,126 @@ export type BlockInterval = Interval & {
 export type WorkoutInterval = RampInterval | BlockInterval;
 export type WorkoutSession = WorkoutInterval[];
 
-// export function evaluateRunPlan(user: User, intervals: WorkoutInterval[]) {
-// 	let stress_score = 0;
-// 	let totalDuration = 0;
-// 	let totalDistance = 0;
-// 	for (const interval of intervals) {
-// 		switch (interval.interval_type) {
-// 			case IntervalType.BLOCK: {
-// 				const kps =
-// 					interval.intensity > 1
-// 						? user.run_ftp - Math.round((interval.intensity - 1) * user.run_ftp) // running beyond ftp means faster pace
-// 						: Math.round(user.run_ftp * interval.intensity); // running under ftp means slower pace
-// 				const distance = kps * interval.duration;
-// 				const GAP = calcRunPace(distance, interval.duration);
-// 				const rIF = calc_rIF(GAP, user.run_ftp);
-// 				stress_score += calc_rTss(interval.duration, GAP, user.run_ftp, rIF);
-// 				totalDuration += interval.duration;
-// 				totalDistance += distance;
-// 				break;
-// 			}
-// 			case IntervalType.RAMP: {
-// 				const avg_intensity = (interval.start_intensity + interval.end_intensity) / 2;
-// 				const kps =
-// 					avg_intensity > 1
-// 						? user.run_ftp - Math.round((avg_intensity - 1) * user.run_ftp) // running beyond ftp means faster pace
-// 						: Math.round(user.run_ftp * avg_intensity); // running under ftp means slower pace
-// 				const distance = kps * interval.duration;
-// 				const GAP = calcRunPace(distance, interval.duration);
-// 				const rIF = calc_rIF(GAP, user.run_ftp);
-// 				stress_score += calc_rTss(interval.duration, GAP, user.run_ftp, rIF);
-// 				totalDuration += interval.duration;
-// 				totalDistance += distance;
-// 				break;
-// 			}
-// 		}
-// 	}
-// 	return { stress_score, totalDuration, totalDistance };
-// }
+function evaluateRunPlan(user: User, intervals: WorkoutInterval[]) {
+	let stress_score = 0;
+	for (const interval of intervals) {
+		if (interval.duration) {
+			switch (interval.interval_type) {
+				case IntervalType.BLOCK: {
+					const GAP = calcRunPace(interval.distance, interval.duration);
+					const rIF = calc_rIF(GAP, user.run_ftp);
+					stress_score += calc_rTss(interval.duration, GAP, user.run_ftp, rIF);
+					break;
+				}
+				case IntervalType.RAMP: {
+					const GAP = calcRunPace(interval.distance, interval.duration);
+					const rIF = calc_rIF(GAP, user.run_ftp);
+					stress_score += calc_rTss(interval.duration, GAP, user.run_ftp, rIF);
+					break;
+				}
+			}
+		}
+	}
+	return stress_score < 1 ? 0 : stress_score;
+}
 
-// //
-// export function evaluateBikePlan(user: User, intervals: WorkoutInterval[]) {
-// 	let stress_score = 0;
-// 	let totalDuration = 0;
-// 	// eslint-disable-next-line prefer-const
-// 	let totalDistance = 0;
-// 	for (const interval of intervals) {
-// 		switch (interval.interval_type) {
-// 			case IntervalType.BLOCK: {
-// 				const NP = interval.intensity * user.bike_ftp;
-// 				const cIF = calc_cIF(NP, user.bike_ftp);
-// 				stress_score += calc_cTss(interval.duration, NP, user.bike_ftp, cIF);
-// 				totalDuration += interval.duration;
-// 				// totalDistance += distance;
-// 				break;
-// 			}
+function evaluateBikePlan(user: User, intervals: WorkoutInterval[]) {
+	let stress_score = 0;
+	for (const interval of intervals) {
+		if (interval.duration) {
+			switch (interval.interval_type) {
+				case IntervalType.BLOCK: {
+					const NP = interval.intensity * user.bike_ftp;
+					const cIF = calc_cIF(NP, user.bike_ftp);
+					stress_score += calc_cTss(interval.duration, NP, user.bike_ftp, cIF);
+					break;
+				}
+				case IntervalType.RAMP: {
+					const avg_intensity = (interval.start_intensity + interval.end_intensity) / 2;
+					const NP = avg_intensity * user.bike_ftp;
+					const cIF = calc_cIF(NP, user.bike_ftp);
+					stress_score += calc_cTss(interval.duration, NP, user.bike_ftp, cIF);
+					break;
+				}
+			}
+		}
+	}
+	return stress_score < 1 ? 0 : stress_score;
+}
 
-// 			// TODO update this to be more accurate and scientific
-// 			case IntervalType.RAMP: {
-// 				const avg_intensity = (interval.start_intensity + interval.end_intensity) / 2;
-// 				const NP = avg_intensity * user.bike_ftp;
-// 				const cIF = calc_cIF(NP, user.bike_ftp);
-// 				stress_score += calc_cTss(interval.duration, NP, user.bike_ftp, cIF);
-// 				totalDuration += interval.duration;
-// 				// totalDistance += distance;
-// 				break;
-// 			}
-// 		}
-// 	}
-// 	return { stress_score, totalDuration, totalDistance };
-// }
+function evaluateSwimPlan(user: User, intervals: WorkoutInterval[]) {
+	let stress_score = 0;
 
-// export function evaluateSwimPlan(user: User, intervals: WorkoutInterval[]) {
-// 	let stress_score = 0;
-// 	let totalDuration = 0;
-// 	let totalDistance = 0;
-// 	for (const interval of intervals) {
-// 		switch (interval.interval_type) {
-// 			case IntervalType.BLOCK: {
-// 				const mps =
-// 					interval.intensity > 1
-// 						? user.swim_ftp - Math.round((interval.intensity - 1) * user.swim_ftp) // running beyond ftp means faster pace
-// 						: Math.round(user.swim_ftp * interval.intensity); // running under ftp means slower pace
-// 				const distance = mps * interval.duration;
-// 				const GAP = calcSwimPace(distance, interval.duration);
-// 				const sIF = calc_sIF(GAP, user.swim_ftp);
-// 				stress_score += calc_sTss(interval.duration, sIF);
-// 				totalDuration += interval.duration;
-// 				totalDistance += distance;
-// 				break;
-// 			}
-// 			case IntervalType.RAMP: {
-// 				const avg_intensity = (interval.start_intensity + interval.end_intensity) / 2;
-// 				const mps =
-// 					avg_intensity > 1
-// 						? user.swim_ftp - Math.round((avg_intensity - 1) * user.swim_ftp) // running beyond ftp means faster pace
-// 						: Math.round(user.swim_ftp * avg_intensity); // running under ftp means slower pace
-// 				const distance = mps * interval.duration;
-// 				const GAP = calcSwimPace(distance, interval.duration);
-// 				const sIF = calc_sIF(GAP, user.swim_ftp);
-// 				stress_score += calc_sTss(interval.duration, sIF);
-// 				totalDuration += interval.duration;
-// 				totalDistance += distance;
-// 				break;
-// 			}
-// 		}
-// 	}
-// 	return { stress_score, totalDuration, totalDistance };
-// }
+	for (const [index, interval] of intervals.entries()) {
+		if (interval.duration) {
+			switch (interval.interval_type) {
+				case IntervalType.BLOCK: {
+					const GAP = calcSwimPace(interval.distance, interval.duration);
+					const sIF = calc_sIF(GAP, user.swim_ftp);
+					const stressScore = calc_sTss(interval.duration, sIF);
+					stress_score += stressScore;
+					console.log('index', index, stressScore);
 
-// export function evaluatePlan(
-// 	user: User,
-// 	activity_type: ActivityType,
-// 	intervals: WorkoutInterval[]
-// ) {
-// 	switch (activity_type) {
-// 		case ActivityType.RUN:
-// 			return evaluateRunPlan(user, intervals);
-// 		case ActivityType.BIKE:
-// 			return evaluateBikePlan(user, intervals);
-// 		case ActivityType.SWIM:
-// 			return evaluateSwimPlan(user, intervals);
-// 		default:
-// 			return { stress_score: 0, totalDuration: 0, totalDistance: 0 };
-// 	}
-// }
+					break;
+				}
+				case IntervalType.RAMP: {
+					const avg_intensity = (interval.start_intensity + interval.end_intensity) / 2;
+					const mps =
+						avg_intensity > 1
+							? user.swim_ftp - Math.round((avg_intensity - 1) * user.swim_ftp) // running beyond ftp means faster pace
+							: Math.round(user.swim_ftp * avg_intensity); // running under ftp means slower pace
+					const distance = mps * interval.duration;
+					const GAP = calcSwimPace(distance, interval.duration);
+					const sIF = calc_sIF(GAP, user.swim_ftp);
+					stress_score += calc_sTss(interval.duration, sIF);
 
-// export function evaluateInterval(
-// 	user: User | undefined,
-// 	activity_type: ActivityType,
-// 	interval: WorkoutInterval
-// ): { stress_score: number; distance: number; duration: number } {
-// 	if (!user) return { stress_score: 0, distance: 0, duration: 0 };
-// 	switch (activity_type) {
-// 		case ActivityType.RUN:
-// 			return evaluateRunInterval(user, interval);
-// 		case ActivityType.BIKE:
-// 			return evaluateBikeInterval(user, interval);
-// 		case ActivityType.SWIM:
-// 			return evaluateSwimInterval(user, interval);
-// 		default:
-// 			return { stress_score: 0, distance: 0, duration: 0 };
-// 	}
-// }
+					break;
+				}
+			}
+		}
+	}
 
-// export function evaluateRunInterval(user: User, interval: WorkoutInterval) {
-// 	let stress_score = 0;
-// 	let totalDuration = 0;
-// 	let totalDistance = 0;
-// 	switch (interval.interval_type) {
-// 		case IntervalType.BLOCK: {
-// 			const kps =
-// 				interval.intensity > 1
-// 					? user.run_ftp - Math.round((interval.intensity - 1) * user.run_ftp) // running beyond ftp means faster pace
-// 					: Math.round(user.run_ftp * interval.intensity); // running under ftp means slower pace
-// 			const distance = kps * interval.duration;
-// 			const GAP = calcRunPace(distance, interval.duration);
-// 			const rIF = calc_rIF(GAP, user.run_ftp);
-// 			stress_score += calc_rTss(interval.duration, GAP, user.run_ftp, rIF);
-// 			totalDuration += interval.duration;
-// 			totalDistance += distance;
-// 			break;
-// 		}
-// 		case IntervalType.RAMP: {
-// 			const avg_intensity = (interval.start_intensity + interval.end_intensity) / 2;
-// 			const kps =
-// 				avg_intensity > 1
-// 					? user.run_ftp - Math.round((avg_intensity - 1) * user.run_ftp) // running beyond ftp means faster pace
-// 					: Math.round(user.run_ftp * avg_intensity); // running under ftp means slower pace
-// 			const distance = kps * interval.duration;
-// 			const GAP = calcRunPace(distance, interval.duration);
-// 			const rIF = calc_rIF(GAP, user.run_ftp);
-// 			stress_score += calc_rTss(interval.duration, GAP, user.run_ftp, rIF);
-// 			totalDuration += interval.duration;
-// 			totalDistance += distance;
-// 			break;
-// 		}
-// 	}
-// 	return { stress_score, duration: totalDuration, distance: totalDistance };
-// }
+	return stress_score < 1 ? 0 : stress_score;
+}
 
-// export function evaluateBikeInterval(user: User, interval: WorkoutInterval) {
-// 	let stress_score = 0;
-// 	let totalDuration = 0;
-// 	// eslint-disable-next-line prefer-const
-// 	let totalDistance = 0;
+export function evaluatePlanTss(
+	user: User | undefined,
+	activity_type: ActivityType,
+	intervals: WorkoutInterval[]
+) {
+	if (!user) return 0;
+	console.log('evaluatePlanTss');
+	switch (activity_type) {
+		case ActivityType.RUN:
+			return evaluateRunPlan(user, intervals);
+		case ActivityType.BIKE:
+			return evaluateBikePlan(user, intervals);
+		case ActivityType.SWIM:
+			return evaluateSwimPlan(user, intervals);
+		default:
+			return 0;
+	}
+}
 
-// 	switch (interval.interval_type) {
-// 		case IntervalType.BLOCK: {
-// 			const NP = interval.intensity * user.bike_ftp;
-// 			const cIF = calc_cIF(NP, user.bike_ftp);
-// 			stress_score += calc_cTss(interval.duration, NP, user.bike_ftp, cIF);
-// 			totalDuration += interval.duration;
-// 			// totalDistance += distance;
-// 			break;
-// 		}
+export function calculateAvgWatts(user: User | undefined, plan: WorkoutInterval[]): number {
+	//if no user return 0
+	if (!user) {
+		return 0;
+	}
+	if (plan.length === 0) {
+		return 0;
+	}
 
-// 		// TODO update this to be more accurate and scientific
-// 		case IntervalType.RAMP: {
-// 			const avg_intensity = (interval.start_intensity + interval.end_intensity) / 2;
-// 			const NP = avg_intensity * user.bike_ftp;
-// 			const cIF = calc_cIF(NP, user.bike_ftp);
-// 			stress_score += calc_cTss(interval.duration, NP, user.bike_ftp, cIF);
-// 			totalDuration += interval.duration;
-// 			// totalDistance += distance;
-// 			break;
-// 		}
-// 	}
-// 	return { stress_score, duration: totalDuration, distance: totalDistance };
-// }
-
-// export function evaluateSwimInterval(user: User, interval: WorkoutInterval) {
-// 	let stress_score = 0;
-// 	let totalDuration = 0;
-// 	let totalDistance = 0;
-// 	switch (interval.interval_type) {
-// 		case IntervalType.BLOCK: {
-// 			const mps =
-// 				interval.intensity > 1
-// 					? user.swim_ftp - Math.round((interval.intensity - 1) * user.swim_ftp) // running beyond ftp means faster pace
-// 					: Math.round(user.swim_ftp * interval.intensity); // running under ftp means slower pace
-// 			const distance = mps * interval.duration;
-// 			const GAP = calcSwimPace(distance, interval.duration);
-// 			const sIF = calc_sIF(GAP, user.swim_ftp);
-// 			stress_score += calc_sTss(interval.duration, sIF);
-// 			totalDuration += interval.duration;
-// 			totalDistance += distance;
-// 			break;
-// 		}
-// 		case IntervalType.RAMP: {
-// 			const avg_intensity = (interval.start_intensity + interval.end_intensity) / 2;
-// 			const mps =
-// 				avg_intensity > 1
-// 					? user.swim_ftp - Math.round((avg_intensity - 1) * user.swim_ftp) // running beyond ftp means faster pace
-// 					: Math.round(user.swim_ftp * avg_intensity); // running under ftp means slower pace
-// 			const distance = mps * interval.duration;
-// 			const GAP = calcSwimPace(distance, interval.duration);
-// 			const sIF = calc_sIF(GAP, user.swim_ftp);
-// 			stress_score += calc_sTss(interval.duration, sIF);
-// 			totalDuration += interval.duration;
-// 			totalDistance += distance;
-// 			break;
-// 		}
-// 	}
-// 	return { stress_score, duration: totalDuration, distance: totalDistance };
-// }
+	let totalWatts = 0;
+	plan.forEach((i) => {
+		if (user) {
+			if (i.interval_type === IntervalType.RAMP) {
+				const avg_intensity = (i.start_intensity + i.end_intensity) / 2;
+				totalWatts += avg_intensity * user.bike_ftp;
+			} else {
+				totalWatts += i.intensity * user.bike_ftp;
+			}
+		}
+	});
+	return totalWatts / plan.length;
+}

@@ -14,7 +14,12 @@
 	import { WorkoutIntervalService } from '$lib/utils/trainingsessions/stores';
 	import { CopyIcon, PlusSquare, TrashIcon } from 'lucide-svelte';
 	import { get } from 'svelte/store';
-	import { IntervalType, type WorkoutInterval } from '$lib/utils/trainingsessions/types';
+	import {
+		IntervalType,
+		evaluatePlanTss,
+		type WorkoutInterval,
+		calculateAvgWatts
+	} from '$lib/utils/trainingsessions/types';
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import { type ItemsStore, ItemsStoreService } from '$lib/utils/dragndrop/stores';
@@ -46,6 +51,8 @@
 
 		$form.duration = totalDuration_;
 		$form.distance = totalDistance_;
+		$form.stress_score = evaluatePlanTss(data.user, $form.activity_type, intervals);
+		$form.plan = intervals;
 	});
 
 	function handleSort(e: { detail: { items: { id: number; data: WorkoutInterval }[] } }) {
@@ -69,7 +76,6 @@
 		resetForm: true
 	});
 	$plan_form.interval_type = IntervalType.BLOCK;
-	$: selectedUnit = $form.activity_type === ActivityType.SWIM ? 'm' : ('km' as 'km' | 'm');
 
 	// AddInterval Modal
 	function triggerAddIntervalModal() {
@@ -98,6 +104,7 @@
 <div class="card">
 	<form id="create" use:focusTrap={isFocused} method="POST" action="?/create" use:enhance>
 		<header class="card-header flex flex-col">
+			<h1 class="w-full py-2 text-center">New Training Session</h1>
 			<div class="flex w-full flex-row gap-4 justify-between">
 				<DateInput
 					name="date"
@@ -126,8 +133,6 @@
 				errors={$errors.title}
 				constraints={$constraints.title}
 			/>
-		</header>
-		<section class="p-4">
 			<TextArea
 				name="description"
 				label="Description"
@@ -136,14 +141,25 @@
 				constraints={$constraints.description}
 				class="resize-none"
 			/>
-
+		</header>
+		<hr class="w-full" />
+		<section class="flex p-4 flex-col gap-4">
 			<div class="w-full flex flex-row flex-wrap justify-between gap-4">
 				<h3 class="h3">Duration: {secondsToHHMMSS($form.duration)}</h3>
-				<h3 class="h3">Distance: {convertDistance($form.distance, 'kilometers').toFixed(2)} km</h3>
-				<h3 class="h3">Stress Score: {$form.stress_score}</h3>
+
+				{#if $form.activity_type === ActivityType.BIKE}
+					<h3 class="h3">
+						Avg Watts: {calculateAvgWatts(data.user, $form.plan).toFixed(0)} km
+					</h3>
+				{:else}
+					<h3 class="h3">
+						Distance: {convertDistance($form.distance, 'kilometers').toFixed(2)} km
+					</h3>
+				{/if}
+				<h3 class="h3">Stress Score: {$form.stress_score.toFixed(2)}</h3>
 			</div>
-			<hr class="w-full my-2" />
-			<div class="w-full flex flex-row flex-wrap items-center align-middle justify-between">
+			<hr class="w-full" />
+			<div class="w-full flex flex-row gap-4 flex-wrap items-center align-middle justify-between">
 				<h3 class="h3">Intervals</h3>
 				<Button
 					color="variant-soft-tertiary"
@@ -151,22 +167,24 @@
 					on:click={triggerAddIntervalModal}
 					class="btn"
 				>
-					<span>Add </span>
+					<span>Add Interval </span>
 					<PlusSquare />
 				</Button>
 			</div>
 
-			{#if $items.length > 0}
-				<section
-					use:dndzone={{ items: $items, dragDisabled: false }}
-					on:consider={handleSort}
-					on:finalize={handleSort}
-					class=" w-full flex flex-row p-4 shadow-inner bg-surface-backdrop-token rounded-md gap-2 overflow-x-auto items-end justify-start snap-mandatory snap-normal snap-x"
-				>
+			<section
+				use:dndzone={{ items: $items, dragDisabled: false }}
+				on:consider={handleSort}
+				on:finalize={handleSort}
+				class=" w-full flex flex-row p-2 shadow-inner bg-surface-backdrop-token rounded-md gap-2 overflow-x-auto items-end justify-start snap-mandatory snap-normal snap-x"
+			>
+				{#if $items.length === 0}
+					<p class="w-full text-center">No Intervals</p>
+				{:else}
 					{#each $items as item, index (item.id)}
 						<div
 							animate:flip={{ duration: 100 }}
-							class="card variant-filled-surface flex flex-col justify-between w-full h-full snap-center min-w-[20vw] bg-red-400"
+							class="card variant-filled-surface flex flex-col justify-between w-full h-full snap-center"
 						>
 							<section class="p-2">
 								<!-- Interval Display -->
@@ -185,14 +203,11 @@
 							</section>
 
 							<footer class="card-footer p-1 gap-1 w-full flex items-end align-middle justify-end">
-								<!-- Step 1: Make a Duplicate Button -->
-								<!-- Step 2: Update the indexes of the other intervals before inserting the new one -->
-								<!-- Step 3: Add the duplicate interval -->
 								<Button
 									type="button"
 									on:click={() => {
 										const new_item = { ...item, id: item.id + 1 };
-										// Update the indexes of the other intervals before inserting the new one
+
 										$items = $items.map((i) => {
 											if (i.id > item.id) {
 												return { ...i, id: i.id + 1 };
@@ -200,7 +215,7 @@
 												return i;
 											}
 										});
-										// Add the duplicate interval after the item and before the next item
+
 										$items = [...$items.slice(0, index + 1), new_item, ...$items.slice(index + 1)];
 									}}
 									color="variant-soft-tertiary"
@@ -209,17 +224,6 @@
 									<CopyIcon />
 								</Button>
 
-								<!-- <Button
-									type="button"
-									on:click={() => {
-										const new_item = { ...item, id: $items.length + 1 };
-										$items = [...$items, new_item];
-									}}
-									color="variant-soft-tertiary"
-									class=" rounded-md p-2"
-								>
-									<CopyIcon />
-								</Button> -->
 								<Button
 									type="button"
 									on:click={() => {
@@ -233,8 +237,8 @@
 							</footer>
 						</div>
 					{/each}
-				</section>
-			{/if}
+				{/if}
+			</section>
 		</section>
 		<footer
 			class="w-full card-footer flex flex-row flex-wrap items-end align-middle justify-end gap-2"

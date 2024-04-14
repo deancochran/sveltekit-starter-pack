@@ -24,9 +24,10 @@ export const actions: Actions = {
 		form.data.training_plan_id = Number(params.plan_id);
 		if (!locals.user) r(302, handleSignInRedirect(event));
 		let t: ToastSettings;
+		console.log(form.data);
 		if (form.data.plan.length === 0) {
 			t = {
-				message: 'No Plan Found',
+				message: 'No Intervals Were Found',
 				background: 'variant-filled-warning'
 			} as const;
 			redirect(`/plans/${params.plan_id}/sessions/create`, t, event);
