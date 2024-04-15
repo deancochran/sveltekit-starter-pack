@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getModalStore } from '@skeletonlabs/skeleton';
 	import { PlusSquare } from 'lucide-svelte';
-	import { onMount, type SvelteComponent } from 'svelte';
+	import { onDestroy, onMount, type SvelteComponent } from 'svelte';
 	import Button from '$lib/components/Button.svelte';
 	import { ActivityType } from '@prisma/client';
 	// import type { Infer, SuperValidated } from 'sveltekit-superforms';
@@ -16,12 +16,15 @@
 	export let parent: SvelteComponent;
 	const modal = getModalStore();
 
-	const { form_obj, activity_type } = $modal[0].meta as {
-		form_obj: SuperForm<Infer<typeof workout_interval_schema>>;
+	const { form, errors, constraints, reset, validateForm, activity_type } = $modal[0].meta as {
 		activity_type: ActivityType;
+		form: SuperForm<Infer<typeof workout_interval_schema>>['form'];
+		errors: SuperForm<Infer<typeof workout_interval_schema>>['errors'];
+		constraints: SuperForm<Infer<typeof workout_interval_schema>>['constraints'];
+		reset: SuperForm<Infer<typeof workout_interval_schema>>['reset'];
+		validateForm: SuperForm<Infer<typeof workout_interval_schema>>['validateForm'];
 	};
 
-	const { form, errors, constraints, reset, validateForm } = form_obj;
 	// Base Classes
 	const cBase = 'card p-4 w-modal shadow-xl space-y-4';
 	const cHeader = 'text-2xl font-bold';
@@ -35,8 +38,12 @@
 			if ($modal[0].response) $modal[0].response($form);
 			modal.close();
 		}
-		console.log(res);
 	}
+
+	// onDestroy(() => {
+	// 	if ($modal[0].response) $modal[0].response(null);
+	// 	modal.close();
+	// });
 </script>
 
 {#if $modal[0] && $page.data.user}

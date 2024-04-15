@@ -48,9 +48,6 @@
 		if (!editing) {
 			reset();
 			$items = $form.plan.map((obj, i) => ({ id: i, data: obj }));
-			console.log('form', $form.plan);
-			console.log('workout', $workout);
-			console.log('items', $items);
 		}
 	}
 
@@ -87,11 +84,11 @@
 			type: 'component',
 			component: 'AddInterval',
 			meta: {
-				form_obj: superForm(interval, {
+				activity_type: $form.activity_type,
+				...superForm(interval, {
 					id: 'NewSessionPlanForm',
 					validators: zod(workout_interval_schema)
-				}),
-				activity_type: $form.activity_type
+				})
 			},
 			response: (data) => {
 				if (data) {

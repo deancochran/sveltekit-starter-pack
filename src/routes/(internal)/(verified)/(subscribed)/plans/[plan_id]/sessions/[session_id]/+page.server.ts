@@ -1,4 +1,8 @@
-import { training_session_schema, workout_interval_schema } from '$lib/schemas';
+import {
+	training_session_schema,
+	workout_interval_schema,
+	type TrainingSessionSchema
+} from '$lib/schemas';
 import { fail, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
@@ -12,7 +16,7 @@ export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
 	const data = await parent();
 	const training_session_form = await superValidate(
-		data.training_session,
+		data.training_session as Partial<TrainingSessionSchema>,
 		zod(training_session_schema)
 	);
 	const workout_interval_form = await superValidate(zod(workout_interval_schema));
@@ -67,12 +71,8 @@ export const actions: Actions = {
 					id: Number(params.session_id)
 				}
 			});
-			t = {
-				message: 'Successfully Deleted Training Session',
-				background: 'variant-filled-success'
-			} as const;
-			redirect('/plans/' + params.plan_id + '/sessions', t, event);
 		} catch (e) {
+			console.log(e);
 			t = {
 				message: 'Failed to delete session',
 				background: 'variant-filled-error'
@@ -80,5 +80,10 @@ export const actions: Actions = {
 			setFlash(t, event);
 			return fail(400);
 		}
+		t = {
+			message: 'Successfully Deleted Training Session',
+			background: 'variant-filled-success'
+		} as const;
+		redirect('/plans/' + params.plan_id + '/sessions', t, event);
 	}
 };

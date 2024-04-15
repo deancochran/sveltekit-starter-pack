@@ -33,7 +33,6 @@
 				} else {
 					sec_p_km = user.run_ftp + Math.round((1 - avg_intensity) * user.run_ftp);
 				}
-				console.log(sec_p_km);
 				return Math.round((interval.distance! / 1000) * sec_p_km);
 			default:
 				return 0;

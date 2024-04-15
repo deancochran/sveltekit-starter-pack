@@ -76,7 +76,7 @@ function evaluateBikePlan(user: User, intervals: WorkoutInterval[]) {
 function evaluateSwimPlan(user: User, intervals: WorkoutInterval[]) {
 	let stress_score = 0;
 
-	for (const [index, interval] of intervals.entries()) {
+	for (const interval of intervals) {
 		if (interval.duration) {
 			switch (interval.interval_type) {
 				case IntervalType.BLOCK: {
@@ -84,7 +84,6 @@ function evaluateSwimPlan(user: User, intervals: WorkoutInterval[]) {
 					const sIF = calc_sIF(GAP, user.swim_ftp);
 					const stressScore = calc_sTss(interval.duration, sIF);
 					stress_score += stressScore;
-					console.log('index', index, stressScore);
 
 					break;
 				}
@@ -114,7 +113,6 @@ export function evaluatePlanTss(
 	intervals: WorkoutInterval[]
 ) {
 	if (!user) return 0;
-	console.log('evaluatePlanTss');
 	switch (activity_type) {
 		case ActivityType.RUN:
 			return evaluateRunPlan(user, intervals);
