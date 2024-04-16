@@ -9,16 +9,17 @@
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
+	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
 
 	export let integrations: thirdPartyIntegrationToken[];
 	export let form_data: SuperValidated<Infer<DisconnectUserIntegrationSchema>>;
-	$: integration_providers = Object.values(
+	const integration_providers = Object.values(
 		ThirdPartyIntegrationProvider
 	) as ThirdPartyIntegrationProvider[];
-	$: user_integration_providers = integrations.map(
+	let user_integration_providers = integrations.map(
 		(integration) => integration.provider as ThirdPartyIntegrationProvider
 	);
-	$: unconnected_providers = integration_providers.filter(
+	let unconnected_providers = integration_providers.filter(
 		(integration) => !user_integration_providers.includes(integration)
 	);
 	const { form, errors, constraints, enhance, delayed } = superForm(form_data, {
@@ -38,6 +39,7 @@
 		<h1>Integrations</h1>
 	</header>
 	<section class="p-4 space-y-4">
+
 		<form
 			use:focusTrap={isFocused}
 			id="disconnect"
@@ -48,16 +50,16 @@
 		>
 			<input type="hidden" name="provider" bind:value={selectedProvider} />
 			{#each integration_providers as provider}
-				{#key provider}
-					{#if unconnected_providers.includes(provider)}
-						<IntegrationConnectButton {provider} />
-					{:else}
-						<IntegrationDisconnectButton
-							on:disconnect={(e) => (selectedProvider = e.detail)}
-							{provider}
-						/>
-					{/if}
-				{/key}
+				{#if unconnected_providers.includes(provider)}
+					<IntegrationConnectButton {provider} />
+				{:else if $delayed && selectedProvider === provider}
+					<LoadingIcon />
+				{:else}
+					<IntegrationDisconnectButton
+						on:disconnect={(e) => (selectedProvider = e.detail)}
+						{provider}
+					/>
+				{/if}
 			{/each}
 		</form>
 	</section>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PUBLIC_CANONICAL_URL, PUBLIC_STRAVA_CLIENT_ID } from '$env/static/public';
+	import { PUBLIC_CANONICAL_URL, PUBLIC_STRAVA_CLIENT_ID, PUBLIC_WAHOO_CLIENT_ID } from '$env/static/public';
 	import type { ThirdPartyIntegrationProvider } from '@prisma/client';
 	export let provider: ThirdPartyIntegrationProvider;
 
@@ -9,7 +9,9 @@
 	function getHref(provider: ThirdPartyIntegrationProvider) {
 		switch (provider) {
 			case 'STRAVA':
-				return `http://www.strava.com/oauth/authorize?client_id=${PUBLIC_STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${PUBLIC_CANONICAL_URL}/api/integrations/strava/authorize&approval_prompt=force&scope=read,activity:read`;
+				return `https://www.strava.com/oauth/authorize?client_id=${PUBLIC_STRAVA_CLIENT_ID}&redirect_uri=${PUBLIC_CANONICAL_URL}/api/integrations/strava/authorize&response_type=code&approval_prompt=force&scope=read,activity:read`;
+			case "WAHOO":
+				return `https://api.wahooligan.com/oauth/authorize?client_id=${PUBLIC_WAHOO_CLIENT_ID}&redirect_uri=${PUBLIC_CANONICAL_URL}/api/integrations/wahoo/authorize&response_type=code&scope=user_read,workouts_read,workouts_write`;
 			default:
 				return '';
 		}

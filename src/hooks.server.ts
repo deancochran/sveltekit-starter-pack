@@ -1,4 +1,4 @@
-import { dev } from '$app/environment';
+import { checkConsentCookie, setConsentCookie } from '$lib/cookies';
 import { auth } from '$lib/server/lucia';
 import type { Handle } from '@sveltejs/kit';
 
@@ -7,16 +7,19 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (!session_id) {
 		event.locals.user = undefined;
 		event.locals.session = undefined;
+		event.locals.consent_cookie = checkConsentCookie(event);
 	} else {
 		const { session, user } = await auth.validateSession(session_id);
+		// Assuming they have accepted to the terms and conditions of the app, then they would've accepted the privacy policy
 		if (session && session.fresh) {
+			setConsentCookie(event);
 			const sessionCookie = auth.createSessionCookie(session.id);
-			// sveltekit types deviates from the de-facto standard
-			// you can use 'as any' too
-			event.cookies.set(sessionCookie.name, sessionCookie.value, {
-				path: '/',
-				...sessionCookie.attributes
-			});
+			if (event.locals.consent_cookie) {
+				event.cookies.set(sessionCookie.name, sessionCookie.value, {
+					path: '/',
+					...sessionCookie.attributes
+				});
+			}
 		}
 		if (!session) {
 			const sessionCookie = auth.createBlankSessionCookie();
@@ -27,21 +30,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 		event.locals.user = user ?? undefined;
 		event.locals.session = session ?? undefined;
+		event.locals.consent_cookie = checkConsentCookie(event);
 	}
-
-	let theme = '';
-
 	const cookieTheme = event.cookies.get('theme');
-
-	if (cookieTheme) {
-		theme = cookieTheme;
-	} else {
-		event.cookies.set('theme', 'skeleton', { path: '/' });
-		theme = 'skeleton';
-	}
-	console.log(
-		`${dev ? '💻 DEV: ' : '🚀 PROD: '} ${'⏰ ' + new Date().toLocaleTimeString()} ${'📍' + event.route.id}`
-	);
+	const theme = cookieTheme ?? 'skeleton';
 
 	return await resolve(event, {
 		transformPageChunk: ({ html }) => html.replace('data-theme=""', `data-theme="${theme}"`)

@@ -172,6 +172,7 @@ enum UserRole {
 
 enum ThirdPartyIntegrationProvider {
   STRAVA
+  WAHOO
 }
 
 enum UnitType {

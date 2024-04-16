@@ -70,6 +70,7 @@ export const actions: Actions = {
 					path: '.',
 					...sessionCookie.attributes
 				});
+			
 
 				t = {
 					message: `Your Password has been Updated`,
@@ -87,13 +88,13 @@ export const actions: Actions = {
 					background: 'variant-filled-warning'
 				} as const;
 			}
-			redirect('/', t, event.cookies);
+			redirect('/', t, event);
 		} else {
 			const t: ToastSettings = {
 				message: 'Invalid Form',
 				background: 'variant-filled-warning'
 			} as const;
-			setFlash(t, event.cookies);
+			setFlash(t, event);
 			return { form };
 		}
 	}

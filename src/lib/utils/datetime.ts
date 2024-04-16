@@ -11,6 +11,12 @@ export function addDays(date: Date, days: number): Date {
 	return newDate;
 }
 
+export function addHours(date: Date, hours: number): Date {
+	const newDate = new Date(date.getTime());
+	newDate.setHours(newDate.getHours() + hours);
+	return newDate;
+}
+
 type DateStyle = Intl.DateTimeFormatOptions['dateStyle'];
 
 export function formatDate(date: string, dateStyle: DateStyle = 'medium', locales = 'en') {

@@ -20,3 +20,5 @@ node_modules
 .pnpm-lock*
 /prisma/seed.ts
 pnpm-lock.yaml
+/cert
+/cert/*

@@ -14,7 +14,7 @@
 		type ModalSettings,
 		getModalStore
 	} from '@skeletonlabs/skeleton';
-	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
+	import { computePosition, autoUpdate, offset, shift, flip as f, arrow } from '@floating-ui/dom';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import { getFlash } from 'sveltekit-flash-message';
 	import { page } from '$app/stores';
@@ -31,9 +31,11 @@
 	import SearchPostsModal from '$lib/modals/SearchPostsModal.svelte';
 	import Transition from '$lib/transitions/transition.svelte';
 	import AddInterval from '$lib/modals/AddInterval.svelte';
+	import { flip } from 'svelte/animate';
+	import { slide } from 'svelte/transition';
 	export let data: LayoutData;
 
-	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
+	storePopup.set({ computePosition, autoUpdate, offset, shift, f, arrow });
 	initializeStores();
 
 	// init Maplibre Stores
@@ -175,9 +177,12 @@
 		</AppBar>
 	</svelte:fragment>
 
-	<div class="flex items-center justify-center p-4 align-middle">
+	<div class="flex items-center justify-center p-4 align-middle shadow-inner">
 		<Transition bind:key={data.pathname}>
 			<slot />
 		</Transition>
 	</div>
+	<svelte:fragment slot="footer">		
+		<div out:slide={{ duration: 100 }} class="w-full h-[4vh] bg-surface-800 shadow-2xl">Consent to Cookies</div>
+	</svelte:fragment>
 </AppShell>

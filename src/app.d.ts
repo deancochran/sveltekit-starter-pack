@@ -8,6 +8,7 @@ declare global {
 		interface Locals {
 			user?: import('lucia').User;
 			session?: import('lucia').Session;
+			consent_cookie?: boolean;
 		}
 		interface Error {
 			code: string;
@@ -17,6 +18,7 @@ declare global {
 			session?: Session;
 			session?: import('lucia').Session;
 			user?: import('lucia').User;
+			consent_cookie?: boolean;
 			pathname?: string;
 			title?: string;
 			description?: string;
