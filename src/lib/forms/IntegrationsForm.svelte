@@ -10,17 +10,13 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
+	import { invalidateAll } from '$app/navigation';
 
 	export let integrations: thirdPartyIntegrationToken[];
 	export let form_data: SuperValidated<Infer<DisconnectUserIntegrationSchema>>;
-	const integration_providers = Object.values(
-		ThirdPartyIntegrationProvider
-	) as ThirdPartyIntegrationProvider[];
-	let user_integration_providers = integrations.map(
+
+	$: user_integration_providers = integrations.map(
 		(integration) => integration.provider as ThirdPartyIntegrationProvider
-	);
-	let unconnected_providers = integration_providers.filter(
-		(integration) => !user_integration_providers.includes(integration)
 	);
 	const { form, errors, constraints, enhance, delayed } = superForm(form_data, {
 		applyAction: true,
@@ -28,7 +24,12 @@
 		resetForm: true,
 		validators: zod(disconnect_user_integration_schema),
 		delayMs: 0,
-		timeoutMs: 8000
+		timeoutMs: 8000,
+		onResult: async ({ result }) => {
+			if (result.type == 'success') {
+				await invalidateAll();
+			}
+		}
 	});
 	let isFocused: boolean = false;
 	let selectedProvider: ThirdPartyIntegrationProvider;
@@ -39,7 +40,6 @@
 		<h1>Integrations</h1>
 	</header>
 	<section class="p-4 space-y-4">
-
 		<form
 			use:focusTrap={isFocused}
 			id="disconnect"
@@ -49,18 +49,29 @@
 			use:enhance
 		>
 			<input type="hidden" name="provider" bind:value={selectedProvider} />
-			{#each integration_providers as provider}
-				{#if unconnected_providers.includes(provider)}
-					<IntegrationConnectButton {provider} />
-				{:else if $delayed && selectedProvider === provider}
-					<LoadingIcon />
-				{:else}
-					<IntegrationDisconnectButton
-						on:disconnect={(e) => (selectedProvider = e.detail)}
-						{provider}
-					/>
-				{/if}
-			{/each}
+
+			<!-- STRAVA -->
+			{#if !user_integration_providers.includes("STRAVA")}
+				<IntegrationConnectButton provider={"STRAVA"} />
+			{:else if $delayed && selectedProvider === "STRAVA"}
+				<LoadingIcon />
+			{:else}
+				<IntegrationDisconnectButton
+					on:disconnect={(e) => (selectedProvider = e.detail)}
+					provider={"STRAVA"}
+				/>
+			{/if}
+			<!-- WAHOO -->
+			{#if !user_integration_providers.includes("WAHOO")}
+				<IntegrationConnectButton provider={"WAHOO"} />
+			{:else if $delayed && selectedProvider === "WAHOO"}
+				<LoadingIcon />
+			{:else}
+				<IntegrationDisconnectButton
+					on:disconnect={(e) => (selectedProvider = e.detail)}
+					provider={"WAHOO"}
+				/>
+			{/if}
 		</form>
 	</section>
 </div>

@@ -15,6 +15,7 @@ import { sendEmailVerificationLink } from '$lib/utils/emails';
 import { generateId, type User } from 'lucia';
 import * as argon from 'argon2';
 import { zod } from 'sveltekit-superforms/adapters';
+import { setConsentCookie } from '$lib/cookies';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
@@ -38,7 +39,7 @@ export const actions: Actions = {
 						hashed_password: hashedPassword
 					}
 				});
-
+				setConsentCookie(event);
 				const session = await auth.createSession(user.id, {});
 				const sessionCookie = auth.createSessionCookie(session.id);
 				event.cookies.set(sessionCookie.name, sessionCookie.value, {

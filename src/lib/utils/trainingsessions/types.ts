@@ -5,8 +5,7 @@ import { ActivityType } from '@prisma/client';
 import type { User } from 'lucia';
 
 export enum IntervalType {
-	RAMP = 'ramp',
-	BLOCK = 'block'
+	RAMP = 'ramp'
 }
 
 export type Interval = {
@@ -19,11 +18,8 @@ export type RampInterval = Interval & {
 	start_intensity: number;
 	end_intensity: number;
 };
-export type BlockInterval = Interval & {
-	interval_type: IntervalType.BLOCK;
-	intensity: number;
-};
-export type WorkoutInterval = RampInterval | BlockInterval;
+
+export type WorkoutInterval = RampInterval;
 export type WorkoutSession = WorkoutInterval[];
 
 function evaluateRunPlan(user: User, intervals: WorkoutInterval[]) {
@@ -31,12 +27,6 @@ function evaluateRunPlan(user: User, intervals: WorkoutInterval[]) {
 	for (const interval of intervals) {
 		if (interval.duration) {
 			switch (interval.interval_type) {
-				case IntervalType.BLOCK: {
-					const GAP = calcRunPace(interval.distance, interval.duration);
-					const rIF = calc_rIF(GAP, user.run_ftp);
-					stress_score += calc_rTss(interval.duration, GAP, user.run_ftp, rIF);
-					break;
-				}
 				case IntervalType.RAMP: {
 					const GAP = calcRunPace(interval.distance, interval.duration);
 					const rIF = calc_rIF(GAP, user.run_ftp);
@@ -54,12 +44,6 @@ function evaluateBikePlan(user: User, intervals: WorkoutInterval[]) {
 	for (const interval of intervals) {
 		if (interval.duration) {
 			switch (interval.interval_type) {
-				case IntervalType.BLOCK: {
-					const NP = interval.intensity * user.bike_ftp;
-					const cIF = calc_cIF(NP, user.bike_ftp);
-					stress_score += calc_cTss(interval.duration, NP, user.bike_ftp, cIF);
-					break;
-				}
 				case IntervalType.RAMP: {
 					const avg_intensity = (interval.start_intensity + interval.end_intensity) / 2;
 					const NP = avg_intensity * user.bike_ftp;
@@ -79,14 +63,6 @@ function evaluateSwimPlan(user: User, intervals: WorkoutInterval[]) {
 	for (const interval of intervals) {
 		if (interval.duration) {
 			switch (interval.interval_type) {
-				case IntervalType.BLOCK: {
-					const GAP = calcSwimPace(interval.distance, interval.duration);
-					const sIF = calc_sIF(GAP, user.swim_ftp);
-					const stressScore = calc_sTss(interval.duration, sIF);
-					stress_score += stressScore;
-
-					break;
-				}
 				case IntervalType.RAMP: {
 					const avg_intensity = (interval.start_intensity + interval.end_intensity) / 2;
 					const mps =
@@ -137,12 +113,8 @@ export function calculateAvgWatts(user: User | undefined, plan: WorkoutInterval[
 	let totalWatts = 0;
 	plan.forEach((i) => {
 		if (user) {
-			if (i.interval_type === IntervalType.RAMP) {
-				const avg_intensity = (i.start_intensity + i.end_intensity) / 2;
-				totalWatts += avg_intensity * user.bike_ftp;
-			} else {
-				totalWatts += i.intensity * user.bike_ftp;
-			}
+			const avg_intensity = (i.start_intensity + i.end_intensity) / 2;
+			totalWatts += avg_intensity * user.bike_ftp;
 		}
 	});
 	return totalWatts / plan.length;

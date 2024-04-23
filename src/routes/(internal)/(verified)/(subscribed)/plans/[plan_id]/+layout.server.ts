@@ -13,7 +13,11 @@ export const load: LayoutServerLoad = async (event) => {
 			user_id: data.user?.id
 		},
 		include: {
-			training_sessions: true
+			training_sessions: {
+				include: {
+					third_party_training_sessions: true
+				}
+			}
 		}
 	});
 	if (!plan) {

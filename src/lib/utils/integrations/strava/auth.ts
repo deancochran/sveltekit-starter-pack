@@ -69,7 +69,6 @@ export async function deauthorizeStravaIntegration(strava_access_token: string):
 
 export async function authenticateStravaIntegration(integration: thirdPartyIntegrationToken) {
 	if (!isWithinExpirationDate(integration.expires_at)) {
-		console.log('user integration is not valid');
 		const token_obj: StravaOAuthRefresh = await refreshAccessToken(integration.refresh_token);
 		integration = await prisma.thirdPartyIntegrationToken.update({
 			where: {

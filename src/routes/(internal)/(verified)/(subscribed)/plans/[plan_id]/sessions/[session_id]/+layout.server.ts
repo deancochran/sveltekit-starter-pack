@@ -8,6 +8,9 @@ export const load: LayoutServerLoad = async (event) => {
 		where: {
 			id: Number(params.session_id),
 			training_plan_id: data.plan.id
+		},
+		include: {
+			third_party_training_sessions: true
 		}
 	});
 	if (!training_session) {

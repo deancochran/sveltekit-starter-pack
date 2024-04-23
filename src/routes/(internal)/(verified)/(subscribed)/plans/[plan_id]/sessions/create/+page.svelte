@@ -75,7 +75,7 @@
 		dataType: 'json',
 		resetForm: true
 	});
-	$plan_form.interval_type = IntervalType.BLOCK;
+	$plan_form.interval_type = IntervalType.RAMP;
 
 	// AddInterval Modal
 	function triggerAddIntervalModal() {
@@ -149,7 +149,7 @@
 
 				{#if $form.activity_type === ActivityType.BIKE}
 					<h3 class="h3">
-						Avg Watts: {calculateAvgWatts(data.user, $form.plan).toFixed(0)} km
+						Avg Watts: {calculateAvgWatts(data.user, $form.plan).toFixed(0)} w
 					</h3>
 				{:else}
 					<h3 class="h3">
@@ -189,14 +189,14 @@
 							<section class="p-2">
 								<!-- Interval Display -->
 								<div class="flex flex-row gap-1">
-									{#if item.data.interval_type === IntervalType.BLOCK}
-										<span class="text-sm">@{item.data.intensity.toFixed(2)}% FTP</span>
-									{:else}
+									{#if item.data.interval_type === IntervalType.RAMP}
 										<span class="text-sm"
 											>@{item.data.start_intensity.toFixed(2)} to {item.data.end_intensity.toFixed(
 												2
 											)}% FTP</span
 										>
+									{:else}
+											<p>Undefined IntervalType</p>
 									{/if}
 									<span class="text-sm">in {secondsToHHMMSS(item.data.duration)}</span>
 								</div>

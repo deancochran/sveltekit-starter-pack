@@ -3,7 +3,6 @@
 	import type { WorkoutInterval } from '$lib/schemas';
 	import { IntervalType } from '$lib/utils/trainingsessions/types';
 	import type { Writable } from 'svelte/store';
-	import BlockBikeInterval from './BlockIntervals/BlockBikeInterval.svelte';
 	import RampBikeInterval from './RampIntervals/RampBikeInterval.svelte';
 	import type { User } from 'lucia';
 	import { createEventDispatcher } from 'svelte';
@@ -34,9 +33,7 @@
 		<DurationInput name="duration" label="Duration" bind:value={$plan_form.duration} />
 	</div>
 	{#key $plan_form.interval_type}
-		{#if $plan_form.interval_type === IntervalType.BLOCK}
-			<BlockBikeInterval bind:user bind:interval={$plan_form} />
-		{:else if $plan_form.interval_type === IntervalType.RAMP}
+		{#if $plan_form.interval_type === IntervalType.RAMP}
 			<RampBikeInterval bind:user bind:interval={$plan_form} />
 		{:else}
 			No valid interval type input

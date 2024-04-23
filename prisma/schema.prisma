@@ -145,17 +145,29 @@ model trainingPlan {
 }
 
 model trainingSession {
-  id               Int          @id @default(autoincrement())
-  title            String
-  activity_type    ActivityType
-  description      String?
-  date             DateTime
-  distance         Int?
-  duration         Int
-  stress_score     Float
-  plan             Json[]       @default([])
-  training_plan_id Int
-  training_plan    trainingPlan @relation(fields: [training_plan_id], references: [id], map: "trainingSession_training_plan_id_trainingPlan_id_fk")
+  id                            Int                                    @id @default(autoincrement())
+  uuid                          String                                 @default(uuid())
+  title                         String
+  activity_type                 ActivityType
+  description                   String?
+  date                          DateTime
+  distance                      Int
+  duration                      Int
+  stress_score                  Float
+  plan                          Json[]                                 @default([])
+  training_plan_id              Int
+  training_plan                 trainingPlan                           @relation(fields: [training_plan_id], references: [id], map: "trainingSession_training_plan_id_trainingPlan_id_fk")
+  third_party_training_sessions thirdPartyIntegrationTrainingSession[]
+}
+
+model thirdPartyIntegrationTrainingSession {
+  id                           Int                           @id @default(autoincrement())
+  provider                     ThirdPartyIntegrationProvider
+  training_session_id          Int
+  provider_training_session_id Int
+  meta                         Json?
+
+  training_session trainingSession @relation(fields: [training_session_id], onDelete: Cascade, references: [id])
 }
 
 enum ActivityType {

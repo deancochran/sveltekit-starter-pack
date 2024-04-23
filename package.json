@@ -3,8 +3,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "vite dev",
-		"localhost": "npm run dev --host 0.0.0.0",
+		"dev": "vite dev --host",
 		"build": "vite build",
 		"preview": "vite preview",
 		"test": "npm run test:integration && npm run test:unit",
@@ -17,7 +16,8 @@
 		"prisma-generate": "npx prisma generate",
 		"prisma-format": "npx prisma format",
 		"prisma-studio": "npx prisma studio",
-		"stripe-webhook": "stripe listen --forward-to localhost:5173/stripe/webhook"
+		"stripe-webhook": "stripe listen --forward-to https://localhost:5173/stripe/webhook",
+		"ngrok": "ngrok http 5173"
 	},
 	"devDependencies": {
 		"@mermaid-js/mermaid-cli": "^10.8.0",

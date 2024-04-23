@@ -40,16 +40,10 @@
 	<section class="p-2">
 		<!-- Interval Display -->
 		<div class="flex flex-col gap-1">
-			{#if item.data.interval_type === IntervalType.BLOCK}
-				<span class="text-sm whitespace-nowrap line-clamp-1"
-					>{getIntervalIntensityDisplay(item.data, activity_type)}</span
-				>
-			{:else}
-				<span class="text-sm whitespace-nowrap line-clamp-1"
+			<span class="text-sm whitespace-nowrap line-clamp-1"
 					>@{item.data.start_intensity.toFixed(2)} to {item.data.end_intensity.toFixed(2)}% FTP</span
 				>
-			{/if}
-			<span class="text-sm">in {secondsToHHMMSS(item.data.duration)}</span>
+			<span class="text-sm">for {secondsToHHMMSS(item.data.duration)}</span>
 		</div>
 	</section>
 

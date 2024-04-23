@@ -1,6 +1,7 @@
 import { ThirdPartyIntegrationProvider, type thirdPartyIntegrationToken } from '@prisma/client';
 import type { DetailedActivity, StreamSet } from './typescript-fetch-client/models';
 import { authenticateStravaIntegration, deauthorizeStravaIntegration } from './auth';
+import { WahooAPI } from '../wahoo/api';
 
 type userHasStravaIntegrationResponse = {
 	exists: boolean;
@@ -122,33 +123,24 @@ export async function disconnect_integration(integration: thirdPartyIntegrationT
 	// Step: 1 Use a switch case statement to identify the provider type
 	// Step: 2 fetch with the correct endpoint of the provider type
 	// Step 3: Return the response
-	let res: Response|undefined;
 	const provider: ThirdPartyIntegrationProvider =
 		integration.provider as ThirdPartyIntegrationProvider;
 	switch (provider) {
 		case ThirdPartyIntegrationProvider.STRAVA: {
 			integration = await authenticateStravaIntegration(integration);
-			res = await deauthorizeStravaIntegration(integration.access_token);
+			await deauthorizeStravaIntegration(integration.access_token);
 			break;
 		}
 		case ThirdPartyIntegrationProvider.WAHOO: {
-			integration = await authenticateStravaIntegration(integration);
-			res = await deauthorizeStravaIntegration(integration.access_token);
-			// TODO authenticate with wahoo
-			// TODO deauthorize with wahoo
+			const wahoo_user = new WahooAPI(integration);
+			await wahoo_user.unauthorizeIntegration();
 			break;
 		}
 		default: {
-			res = undefined
 			break;
 		}
 
 	}
-	if (!res) {
-		throw new Error('No Provided found');
-	}
-	if (!res.ok) {
-		throw new Error('Error Disconnecting Integration');
-	}
+
 	return integration;
 }

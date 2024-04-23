@@ -323,17 +323,10 @@ export const actions: Actions = {
 			setFlash(t, event);
 			return { form };
 		} catch (e) {
-			if (e instanceof Error) {
-				t = {
-					message: e.message,
-					background: 'variant-filled-error'
-				} as const;
-			} else {
-				t = {
-					message: 'Failed to disconnect Integration',
-					background: 'variant-filled-error'
-				} as const;
-			}
+			t = {
+				message: 'Failed to disconnect Integration',
+				background: 'variant-filled-error'
+			} as const;
 			setFlash(t, event);
 			return fail(400, { form });
 		}

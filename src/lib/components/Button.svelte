@@ -35,6 +35,7 @@
 	class:transition-colors={true}
 	class:duration-300={true}
 	{...$$props}
+	{...$$restProps}
 	class="{$$props.class} {classes}"
 >
 	<slot /></button

@@ -10,10 +10,17 @@
 	import DateInput from '$lib/forms/inputs/DateInput.svelte';
 	import EnumSelectInput from '$lib/forms/inputs/EnumSelectInput.svelte';
 	import IntervalCard from '$lib/components/WorkoutInterval/IntervalCard.svelte';
-	import { ActivityType } from '@prisma/client';
 	import {
+		ActivityType,
+		ThirdPartyIntegrationProvider,
+		type thirdPartyIntegrationTrainingSession,
+		type trainingSession
+	} from '@prisma/client';
+	import {
+		create_wahoo_workout_schema,
 		training_session_schema,
 		workout_interval_schema,
+		type CreateWahooWorkoutSchema,
 		type WorkoutInterval
 	} from '$lib/schemas';
 	import { type ItemsStore, ItemsStoreService } from '$lib/utils/dragndrop/stores';
@@ -25,6 +32,7 @@
 	import { get } from 'svelte/store';
 	import { secondsToHHMMSS } from '$lib/utils/datetime';
 	import { convertDistance } from '$lib/utils/distance';
+	import { getWahooWorkoutIdFromTrainingSessionType } from '$lib/utils/integrations/wahoo/utils';
 
 	export let data: PageData;
 
@@ -97,6 +105,29 @@
 			}
 		});
 	}
+
+	async function triggerCreateWahooWorkoutModal() {
+		
+		const init_data: Infer<CreateWahooWorkoutSchema> = {
+			name: data.training_session.title,
+			workout_type_id: getWahooWorkoutIdFromTrainingSessionType(
+				data.training_session.activity_type
+			),
+			starts: data.training_session.date,
+			minutes: data.training_session.duration ?? 0,
+			workout_token: String(data.training_session.id),
+		};
+		const CreateWahooWorkForm = await superValidate(init_data, zod(create_wahoo_workout_schema));
+
+		modal.trigger({
+			type: 'component',
+			component: 'CreateWahooWorkout',
+			meta: {
+				CreateWahooWorkForm,
+				training_session: data.training_session
+			}
+		});
+	}
 </script>
 
 <div class="card">
@@ -125,6 +156,15 @@
 					errors={$errors.activity_type}
 					constraints={$constraints.activity_type}
 				/>
+				{#if $form.activity_type !== ActivityType.SWIM}
+					<Button
+						shadow="shadow-md"
+						color="variant-filled-tertiary"
+						type="button"
+						on:click={triggerCreateWahooWorkoutModal}
+						class="btn ">Create Wahoo Workout</Button
+					>
+				{/if}
 			</div>
 			<TextInput
 				name="title"
@@ -151,7 +191,7 @@
 
 				{#if $form.activity_type === ActivityType.BIKE}
 					<h3 class="h3">
-						Avg Watts: {calculateAvgWatts(data.user, $form.plan).toFixed(0)} km
+						Avg Watts: {calculateAvgWatts(data.user, $form.plan).toFixed(0)} w
 					</h3>
 				{:else}
 					<h3 class="h3">

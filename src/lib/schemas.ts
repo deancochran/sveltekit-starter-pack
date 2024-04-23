@@ -1,6 +1,8 @@
 import { ActivityType, ThirdPartyIntegrationProvider } from '@prisma/client';
 import { z } from 'zod';
 import { IntervalType } from './utils/trainingsessions/types';
+import { WahooWorkoutTypeID } from './utils/integrations/wahoo/types';
+import { addDays } from './utils/datetime';
 
 const one_upper_case_letter: RegExp = new RegExp('.*[A-Z].*');
 const one_lower_case_letter: RegExp = new RegExp('.*[a-z].*');
@@ -172,7 +174,7 @@ export const training_plan_schema = z
 		end_date: z.date()
 	})
 	.superRefine(({ start_date, end_date }, ctx) => {
-		if (end_date.getUTCDate() < start_date.getUTCDate()) {
+		if (end_date < start_date) {
 			ctx.addIssue({
 				code: 'custom',
 				message: 'The End Date Cannot be Before the Start Date.',
@@ -197,13 +199,9 @@ export const RampIntervalSchema = IntervalSchema.extend({
 });
 export type RampInterval = z.infer<typeof RampIntervalSchema>;
 
-export const BlockIntervalSchema = IntervalSchema.extend({
-	interval_type: z.literal(IntervalType.BLOCK),
-	intensity: z.number().min(0).nonnegative()
-});
-export type BlockInterval = z.infer<typeof BlockIntervalSchema>;
+// export const workout_interval_schema = z.union([RampIntervalSchema, BlockIntervalSchema]);
+export const workout_interval_schema = RampIntervalSchema;
 
-export const workout_interval_schema = z.union([RampIntervalSchema, BlockIntervalSchema]);
 export type WorkoutInterval = z.infer<typeof workout_interval_schema>;
 
 export const training_session_schema = z
@@ -212,14 +210,18 @@ export const training_session_schema = z
 		activity_type: z.nativeEnum(ActivityType),
 		description: z.string().max(250, 'Must be at most 250 characters in length'),
 		date: z.date(),
-		distance: z.number().gte(0),
-		duration: z.number().gte(0),
+		distance: z.number().default(0),
+		duration: z.number().default(0),
 		stress_score: z.number().gte(0),
 		plan: z.array(workout_interval_schema),
 		training_plan_id: z.number()
 	})
 	.superRefine(({ date }, ctx) => {
-		if (date.getUTCDate() < new Date().getUTCDate()) {
+		// if the date is before today, add an issue. Otherwise, do nothing
+		// today must be the 00:00:00 of the current day
+		const today = new Date().setHours(0, 0, 0, 0);
+		const dateToCheck = new Date(date).setHours(0, 0, 0, 0);
+		if (dateToCheck < today) {
 			ctx.addIssue({
 				code: 'custom',
 				message: 'The Date can not be before today.',
@@ -228,6 +230,35 @@ export const training_session_schema = z
 		}
 	});
 export type TrainingSessionSchema = typeof training_session_schema;
+
+export const create_wahoo_workout_schema = z
+	.object({
+		name: z.string(),
+		workout_type_id: z.nativeEnum(WahooWorkoutTypeID),
+		starts: z.date(),
+		minutes: z.number(),
+		workout_token: z.string(),
+		plan_id: z.number().optional(),
+		workout_summary_id: z.any().optional()
+	})
+	.superRefine(({ starts }, ctx) => {
+		const today = new Date().setUTCHours(0, 0, 0, 0);
+		const dateToCheck = starts.setUTCHours(0, 0, 0, 0);
+		if (!(dateToCheck >= today)) {
+			ctx.addIssue({
+				code: 'custom',
+				message: 'The Date can not be before today.',
+				path: ['starts']
+			});
+		} else if (starts > addDays(new Date(), 6)) {
+			ctx.addIssue({
+				code: 'custom',
+				message: 'The workout can not be scheduled in wahoo by more than 6 days in advance.',
+				path: ['starts']
+			});
+		}
+	});
+export type CreateWahooWorkoutSchema = typeof create_wahoo_workout_schema;
 
 type ProductConfig = Record<string, { features: string[]; call_to_action: string }>;
 

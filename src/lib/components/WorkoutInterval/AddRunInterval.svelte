@@ -1,7 +1,6 @@
 <script lang="ts">
 	import EnumSelectInput from '$lib/forms/inputs/EnumSelectInput.svelte';
 	import { IntervalType } from '$lib/utils/trainingsessions/types';
-	import BlockRunInterval from './BlockIntervals/BlockRunInterval.svelte';
 	import RampRunInterval from './RampIntervals/RampRunInterval.svelte';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import DistanceInput from '$lib/forms/inputs/customInputs/DistanceInput.svelte';
@@ -19,13 +18,6 @@
 	function calculateDuration(interval: WorkoutInterval) {
 		let sec_p_km: number;
 		switch (interval.interval_type) {
-			case IntervalType.BLOCK:
-				if (interval.intensity! > 1) {
-					sec_p_km = user.run_ftp - Math.round((interval.intensity! - 1) * user.run_ftp);
-				} else {
-					sec_p_km = user.run_ftp + Math.round((1 - interval.intensity!) * user.run_ftp);
-				}
-				return Math.round((interval.distance! / 1000) * sec_p_km);
 			case IntervalType.RAMP:
 				let avg_intensity = (interval.start_intensity + interval.end_intensity) / 2;
 				if (avg_intensity! > 1) {
@@ -67,9 +59,7 @@
 		/>
 	</div>
 	{#key $plan_form.interval_type}
-		{#if $plan_form.interval_type === IntervalType.BLOCK}
-			<BlockRunInterval bind:user bind:interval={$plan_form} on:input={onUpdate} />
-		{:else if $plan_form.interval_type === IntervalType.RAMP}
+		{#if $plan_form.interval_type === IntervalType.RAMP}
 			<RampRunInterval bind:user bind:interval={$plan_form} on:input={onUpdate} />
 		{:else}
 			No valid interval type input

@@ -14,7 +14,7 @@
 		type ModalSettings,
 		getModalStore
 	} from '@skeletonlabs/skeleton';
-	import { computePosition, autoUpdate, offset, shift, flip as f, arrow } from '@floating-ui/dom';
+	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import { getFlash } from 'sveltekit-flash-message';
 	import { page } from '$app/stores';
@@ -31,11 +31,19 @@
 	import SearchPostsModal from '$lib/modals/SearchPostsModal.svelte';
 	import Transition from '$lib/transitions/transition.svelte';
 	import AddInterval from '$lib/modals/AddInterval.svelte';
-	import { flip } from 'svelte/animate';
+
 	import { slide } from 'svelte/transition';
+	import Button from '$lib/components/Button.svelte';
+	import CookiePolicy from '$lib/modals/CookiePolicy.svelte';
+
+	import { enhance } from '$app/forms';
+	import type { SubmitFunction } from '@sveltejs/kit';
+	import { invalidateAll } from '$app/navigation';
+	import CreateWahooWorkout from '$lib/modals/CreateWahooWorkout.svelte';
+
 	export let data: LayoutData;
 
-	storePopup.set({ computePosition, autoUpdate, offset, shift, f, arrow });
+	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 	initializeStores();
 
 	// init Maplibre Stores
@@ -73,7 +81,9 @@
 		// Set a unique modal ID, then pass the component reference
 		DeleteUserForm: { ref: DeleteUserForm },
 		SearchPostsModal: { ref: SearchPostsModal },
-		AddInterval: { ref: AddInterval }
+		AddInterval: { ref: AddInterval },
+		CookiePolicy: { ref: CookiePolicy },
+		CreateWahooWorkout: { ref: CreateWahooWorkout }
 	};
 
 	const swUpdateModal: ModalSettings = {
@@ -112,6 +122,16 @@
 	onMount(() => {
 		detectServiceWorkerUpdate();
 	});
+
+	function triggerCookiePolicy(): void {
+		modalStore.trigger({
+			type: 'component',
+			component: 'CookiePolicy'
+		});
+	}
+	const handleConsent: SubmitFunction = (e) => {
+		invalidateAll();
+	};
 </script>
 
 <svelte:window
@@ -128,8 +148,8 @@
 />
 
 <Seo />
-<Toast />
-<Modal components={modalRegistry} />
+<Modal zIndex="z-[998]" components={modalRegistry} />
+<Toast zIndex="z-[999]" />
 <Drawer>
 	<NavBarMobile on:close={closeDrawer} />
 </Drawer>
@@ -182,7 +202,25 @@
 			<slot />
 		</Transition>
 	</div>
-	<svelte:fragment slot="footer">		
-		<div out:slide={{ duration: 100 }} class="w-full h-[4vh] bg-surface-800 shadow-2xl">Consent to Cookies</div>
+
+	<svelte:fragment slot="footer">
+		{#if !data.consent_cookie}
+			<form
+				use:enhance={handleConsent}
+				method="POST"
+				action="/?/setCookiePolicy"
+				out:slide={{ duration: 100 }}
+				class="w-full p-2 bg-surface-200 dark:bg-surface-800 shadow-2xl flex items-center align-middle justify-between"
+			>
+				<span
+					>Please Accept our <button
+						type="button"
+						class="btn m-0 p-0 text-primary-500"
+						on:click={triggerCookiePolicy}>Cookie Policy</button
+					>
+				</span>
+				<Button type="submit" class="btn variant-filled-primary py-2">Accept</Button>
+			</form>
+		{/if}
 	</svelte:fragment>
 </AppShell>

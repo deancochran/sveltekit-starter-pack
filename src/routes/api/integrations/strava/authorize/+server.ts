@@ -26,13 +26,14 @@ export async function GET(event) {
 		}
 		try {
 			const token_obj: StravaOAuth = await getTokenFromAuthCode(code);
+			const timestampInMilliseconds = token_obj.expires_at * 1000;
 			await prisma.thirdPartyIntegrationToken.upsert({
 				where: {
 					integration_id: String(token_obj.athlete.id)
 				},
 				update: {
 					integration_id: String(token_obj.athlete.id),
-					expires_at: new Date(token_obj.expires_at),
+					expires_at: new Date(timestampInMilliseconds),
 					access_token: token_obj.access_token,
 					refresh_token: token_obj.refresh_token
 				},
@@ -40,7 +41,7 @@ export async function GET(event) {
 					user_id: locals.user!.id,
 					integration_id: String(token_obj.athlete.id),
 					provider: ThirdPartyIntegrationProvider.STRAVA,
-					expires_at: new Date(token_obj.expires_at),
+					expires_at: new Date(timestampInMilliseconds),
 					access_token: token_obj.access_token,
 					refresh_token: token_obj.refresh_token
 				}
