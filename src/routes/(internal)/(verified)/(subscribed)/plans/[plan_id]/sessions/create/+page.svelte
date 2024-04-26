@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { training_session_schema, workout_interval_schema } from '$lib/schemas';
+	import { training_session_schema } from '$lib/schemas';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { focusTrap, getModalStore } from '@skeletonlabs/skeleton';
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
@@ -15,7 +15,6 @@
 	import { CopyIcon, PlusSquare, TrashIcon } from 'lucide-svelte';
 	import { get } from 'svelte/store';
 	import {
-		IntervalType,
 		evaluatePlanTss,
 		type WorkoutInterval,
 		calculateAvgWatts

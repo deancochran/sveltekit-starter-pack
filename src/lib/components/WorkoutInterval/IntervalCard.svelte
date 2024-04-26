@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { secondsToHHMMSS } from '$lib/utils/datetime';
-	import { IntervalType, type WorkoutInterval } from '$lib/utils/trainingsessions/types';
+	import { type WorkoutInterval } from '$lib/utils/trainingsessions/types';
 	import { ActivityType } from '@prisma/client';
 	import Button from '../Button.svelte';
 
@@ -41,7 +41,7 @@
 		<!-- Interval Display -->
 		<div class="flex flex-col gap-1">
 			<span class="text-sm whitespace-nowrap line-clamp-1"
-					>@{item.data.start_intensity.toFixed(2)} to {item.data.end_intensity.toFixed(2)}% FTP</span
+					>@{item.data.intensity.toFixed(2)}% FTP</span
 				>
 			<span class="text-sm">for {secondsToHHMMSS(item.data.duration)}</span>
 		</div>

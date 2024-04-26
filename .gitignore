@@ -22,3 +22,9 @@ node_modules
 pnpm-lock.yaml
 /cert
 /cert/*
+.venv
+.vscode
+
+# do not load the bike dataset
+ml/**/*.xml
+ml/**/*.zwo

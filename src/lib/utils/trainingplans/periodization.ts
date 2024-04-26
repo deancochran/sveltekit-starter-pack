@@ -1,6 +1,3 @@
-import type { User } from 'lucia';
-import type { trainingPlan } from '@prisma/client';
-
 // TODO replace intensity rate with an equation to calculate a dynamic rate base on the clients needs
 export enum TrainingIntensityDistribution {
 	pyramidal = 'pyramidal',
@@ -173,103 +170,6 @@ export const daysInPhases = (startDate: Date, endDate: Date): DaysInPhases => {
 	};
 };
 
-/**
- * Retrieves events between the given start and end dates for the authenticated user.
- *
- * @param {User} auth_user - The authenticated user object
- * @param {Date} startDate - The start date for filtering events
- * @param {Date} endDate - The end date for filtering events
- * @return {Promise<event[]>} An array of events between the start and end dates
- */
-// export const getEventsBetween = async (
-// 	auth_user: User,
-// 	startDate: Date,
-// 	endDate: Date
-// ): Promise<event[]> => {
-// 	const user = await prisma.user.findUnique({
-// 		where: {
-// 			id: auth_user.id
-// 		},
-// 		include: {
-// 			calendar: {
-// 				include: {
-// 					training_plans: {
-// 						include: {
-// 							training_sessions:{
-// 								where: {
-// 									date: {
-// 										gte: startDate,
-// 										lte: endDate
-// 									}
-// 								}
-// 							}
-// 						}
-// 					}
-// 				}
-// 			}
-// 		}
-// 	});
-// 	return user?.calendar?.events ?? [];
-// };
-
-export type PeriodizationEventGenerationOptions = {
-	user: User;
-	plan: trainingPlan;
-	structure: 'linear' | 'block' | 'peak' | 'undulating';
-};
-
-// export type TrainingDayIntensities = {
-// 	lowIntensity: number;
-// 	midIntensity: number;
-// 	highIntensity: number;
-// };
-// /**
-//  * Distributes the available training days based on intensity rates.
-//  *
-//  * @param {number} availableTrainingDays - The total number of available training days.
-//  * @return {TrainingDayIntensities} - An object containing the number of training days for low, medium, and high intensity.
-//  */
-// export function distributeTrainingDayIntensities(availableTrainingDays: number) {
-// 	// Adjust to ensure the total days sum up to availableTrainingDays
-// 	let lowIntensityDays = Math.round(availableTrainingDays * low_intensity_rate);
-// 	let midIntensityDays = Math.round(availableTrainingDays * mid_intensity_rate);
-// 	let highIntensityDays = Math.round(availableTrainingDays * high_intensity_rate);
-// 	let adjustment =
-// 		availableTrainingDays - (lowIntensityDays + midIntensityDays + highIntensityDays);
-// 	// Prioritize adjustment based on intensity rates
-// 	// Greedily adjust the day counts based on the intensity rates
-// 	// This technique is called "greedy algorithm" because it chooses the option that
-// 	// seems best at the moment, without considering the overall result
-// 	// It ensures that the total number of days is equal to the availableTrainingDays,
-// 	// and that the intensity distribution is as close as possible to the defined intensity rates
-// 	// Priority is given to low intensity, mid intensity, and then finally high intensity
-// 	while (adjustment !== 0) {
-// 		if (adjustment > 0) {
-// 			if (lowIntensityDays < availableTrainingDays * low_intensity_rate) {
-// 				lowIntensityDays++;
-// 			} else if (midIntensityDays < availableTrainingDays * mid_intensity_rate) {
-// 				midIntensityDays++;
-// 			} else {
-// 				highIntensityDays++;
-// 			}
-// 			adjustment--;
-// 		} else {
-// 			if (highIntensityDays > availableTrainingDays * high_intensity_rate) {
-// 				highIntensityDays--;
-// 			} else if (midIntensityDays > availableTrainingDays * mid_intensity_rate) {
-// 				midIntensityDays--;
-// 			} else {
-// 				lowIntensityDays--;
-// 			}
-// 			adjustment++;
-// 		}
-// 	}
-// 	return {
-// 		lowIntensity: lowIntensityDays,
-// 		midIntensity: midIntensityDays,
-// 		highIntensity: highIntensityDays
-// 	};
-// }
 
 /**
  * Generates FTP zones based on the FTP value.
@@ -304,3 +204,5 @@ export const hrZones = (maxHR: number): HRZones => {
 		zone5: { min: maxHR * zone4_max_hr, max: maxHR * zone5_max_hr }
 	};
 };
+
+

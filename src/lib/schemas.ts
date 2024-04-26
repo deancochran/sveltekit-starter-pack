@@ -1,6 +1,5 @@
 import { ActivityType, ThirdPartyIntegrationProvider } from '@prisma/client';
 import { z } from 'zod';
-import { IntervalType } from './utils/trainingsessions/types';
 import { WahooWorkoutTypeID } from './utils/integrations/wahoo/types';
 import { addDays } from './utils/datetime';
 
@@ -185,24 +184,11 @@ export const training_plan_schema = z
 export type TrainPlanSchema = typeof training_plan_schema;
 
 export const IntervalSchema = z.object({
-	interval_type: z.nativeEnum(IntervalType),
 	duration: z.number().min(0).default(0),
-	distance: z.number().min(0).default(0)
+	intensity: z.number().min(0).nonnegative(),
 });
-
 export type Interval = z.infer<typeof IntervalSchema>;
-
-export const RampIntervalSchema = IntervalSchema.extend({
-	interval_type: z.literal(IntervalType.RAMP),
-	start_intensity: z.number().min(0).nonnegative(),
-	end_intensity: z.number().min(0).nonnegative()
-});
-export type RampInterval = z.infer<typeof RampIntervalSchema>;
-
-// export const workout_interval_schema = z.union([RampIntervalSchema, BlockIntervalSchema]);
-export const workout_interval_schema = RampIntervalSchema;
-
-export type WorkoutInterval = z.infer<typeof workout_interval_schema>;
+export type WorkoutInterval = z.infer<typeof IntervalSchema>;
 
 export const training_session_schema = z
 	.object({
@@ -213,7 +199,7 @@ export const training_session_schema = z
 		distance: z.number().default(0),
 		duration: z.number().default(0),
 		stress_score: z.number().gte(0),
-		plan: z.array(workout_interval_schema),
+		plan: z.array(IntervalSchema),
 		training_plan_id: z.number()
 	})
 	.superRefine(({ date }, ctx) => {
