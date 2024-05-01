@@ -26,5 +26,5 @@ pnpm-lock.yaml
 .vscode
 
 # do not load the bike dataset
-ml/**/*.xml
-ml/**/*.zwo
+ml
+ml/**/*
