@@ -27,4 +27,4 @@ pnpm-lock.yaml
 
 # do not load the bike dataset
 ml
-ml/**/*
+ml/data
