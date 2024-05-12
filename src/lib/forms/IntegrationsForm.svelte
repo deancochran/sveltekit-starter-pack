@@ -51,25 +51,25 @@
 			<input type="hidden" name="provider" bind:value={selectedProvider} />
 
 			<!-- STRAVA -->
-			{#if !user_integration_providers.includes("STRAVA")}
-				<IntegrationConnectButton provider={"STRAVA"} />
-			{:else if $delayed && selectedProvider === "STRAVA"}
+			{#if !user_integration_providers.includes('STRAVA')}
+				<IntegrationConnectButton provider={'STRAVA'} />
+			{:else if $delayed && selectedProvider === 'STRAVA'}
 				<LoadingIcon />
 			{:else}
 				<IntegrationDisconnectButton
 					on:disconnect={(e) => (selectedProvider = e.detail)}
-					provider={"STRAVA"}
+					provider={'STRAVA'}
 				/>
 			{/if}
 			<!-- WAHOO -->
-			{#if !user_integration_providers.includes("WAHOO")}
-				<IntegrationConnectButton provider={"WAHOO"} />
-			{:else if $delayed && selectedProvider === "WAHOO"}
+			{#if !user_integration_providers.includes('WAHOO')}
+				<IntegrationConnectButton provider={'WAHOO'} />
+			{:else if $delayed && selectedProvider === 'WAHOO'}
 				<LoadingIcon />
 			{:else}
 				<IntegrationDisconnectButton
 					on:disconnect={(e) => (selectedProvider = e.detail)}
-					provider={"WAHOO"}
+					provider={'WAHOO'}
 				/>
 			{/if}
 		</form>

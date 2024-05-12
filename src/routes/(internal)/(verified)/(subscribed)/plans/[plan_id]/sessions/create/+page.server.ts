@@ -1,4 +1,4 @@
-import { training_session_schema, workout_interval_schema } from '$lib/schemas';
+import { training_session_schema, IntervalSchema } from '$lib/schemas';
 import { handleSignInRedirect } from '$lib/utils/redirects/loginRedirect';
 import type { trainingSession } from '@prisma/client';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
@@ -11,8 +11,10 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
 	const data = await parent();
-	const trainingSessionSchema = await superValidate(zod(training_session_schema));
-	const workoutIntervalSchema = await superValidate(zod(workout_interval_schema));
+	const trainingSessionSchema = await superValidate( {
+		title: new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date()) + ' ' + 'Workout'
+	},zod(training_session_schema));
+	const workoutIntervalSchema = await superValidate(zod(IntervalSchema));
 
 	return { trainingSessionSchema, workoutIntervalSchema, ...data };
 };

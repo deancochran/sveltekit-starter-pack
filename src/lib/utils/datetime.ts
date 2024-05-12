@@ -51,21 +51,24 @@ export function convertSecondsToTimeDisplay(seconds: number | undefined): {
 }
 
 export function secondsToHHMMSS(seconds: number): string {
-	if (!seconds) return '00:00:00hrs';
+	if (!seconds) return '0s';
 	// Calculate hours, minutes, and remaining seconds
-	const hours: number = Math.floor(seconds / 3600);
+	const hours = Math.floor(seconds / 3600);
 	seconds %= 3600;
 	const minutes: number = Math.floor(seconds / 60);
 	seconds %= 60;
 
-	// Format the time
-	const largestUnit = hours > 0 ? 'hrs' : minutes > 0 ? 'mins' : 'secs';
+	// Pad with leading zeros if less than 10
+	const paddedHours = hours.toString().padStart(2, '0');
+	const paddedMinutes = minutes.toString().padStart(2, '0');
+	const paddedSeconds = seconds.toFixed(0).toString().padStart(2, '0');
+	const largestUnit = hours > 0 ? 'hr' : minutes > 0 ? 'min' : 's';
 	switch (largestUnit) {
-		case 'hrs':
-			return `${hours} ${largestUnit} ${minutes} mins, ${seconds} secs`;
-		case 'mins':
-			return `${minutes} ${largestUnit} ${seconds} secs`;
-		case 'secs':
-			return `${seconds} ${largestUnit}`;
+		case 'hr':
+			return `${paddedHours}:${paddedMinutes}:${paddedSeconds}${largestUnit}`;
+		case 'min':
+			return `${paddedMinutes}:${paddedSeconds}${largestUnit}`;
+		case 's':
+			return `${paddedSeconds}${largestUnit}`;
 	}
 }

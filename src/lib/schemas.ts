@@ -185,36 +185,22 @@ export type TrainPlanSchema = typeof training_plan_schema;
 
 export const IntervalSchema = z.object({
 	duration: z.number().min(0).default(0),
-	intensity: z.number().min(0).nonnegative(),
+	intensity: z.number().min(0).nonnegative()
 });
 export type Interval = z.infer<typeof IntervalSchema>;
 export type WorkoutInterval = z.infer<typeof IntervalSchema>;
 
-export const training_session_schema = z
-	.object({
-		title: z.string(),
-		activity_type: z.nativeEnum(ActivityType),
-		description: z.string().max(250, 'Must be at most 250 characters in length'),
-		date: z.date(),
-		distance: z.number().default(0),
-		duration: z.number().default(0),
-		stress_score: z.number().gte(0),
-		plan: z.array(IntervalSchema),
-		training_plan_id: z.number()
-	})
-	.superRefine(({ date }, ctx) => {
-		// if the date is before today, add an issue. Otherwise, do nothing
-		// today must be the 00:00:00 of the current day
-		const today = new Date().setHours(0, 0, 0, 0);
-		const dateToCheck = new Date(date).setHours(0, 0, 0, 0);
-		if (dateToCheck < today) {
-			ctx.addIssue({
-				code: 'custom',
-				message: 'The Date can not be before today.',
-				path: ['date']
-			});
-		}
-	});
+export const training_session_schema = z.object({
+	title: z.string(),
+	activity_type: z.nativeEnum(ActivityType),
+	description: z.string().max(250, 'Must be at most 250 characters in length'),
+	date: z.date(),
+	distance: z.number().default(0),
+	duration: z.number().default(0),
+	stress_score: z.number().gte(0),
+	plan: z.array(IntervalSchema),
+	training_plan_id: z.number()
+});
 export type TrainingSessionSchema = typeof training_session_schema;
 
 export const create_wahoo_workout_schema = z

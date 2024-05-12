@@ -43,7 +43,7 @@ export function convertTrainingSessionToWahooPlan(
 	const workout_intervals = training_session.plan as WorkoutSession;
 	for (let i = 0; i < workout_intervals.length; i++) {
 		const interval = workout_intervals[i];
-		const avg_intensity = (interval.start_intensity + interval.end_intensity) / 2;
+		const avg_intensity = interval.intensity;
 		const wahoo_interval: WAHOO_PLAN_INTERVALS = {
 			name: `${avg_intensity}% FTP` + ` for ${secondsToHHMMSS(interval.duration)}`,
 			exit_trigger_type: WAHOO_PLAN_TRIGGER_TYPE.TIME,

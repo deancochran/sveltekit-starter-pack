@@ -7,7 +7,6 @@
 	import IntegrationsForm from '$lib/forms/IntegrationsForm.svelte';
 
 	export let data;
-
 </script>
 
 <div class="page-container">
@@ -15,7 +14,6 @@
 		<div class="card p-4 flex-col gap-2 flex items-center justify-center align-middle">
 			<h1 class="h1 font-serif">Settings Page</h1>
 		</div>
-		
 
 		<IntegrationsForm integrations={data.user_integrations} form_data={data.integrationsForm} />
 		<UpdateFtpForm form_data={data.updateFTPForm} />

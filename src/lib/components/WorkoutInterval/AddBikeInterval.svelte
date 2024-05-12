@@ -7,7 +7,6 @@
 	import DurationInput from '$lib/forms/inputs/customInputs/DurationInput.svelte';
 	import BikeInterval from '$lib/components/WorkoutInterval/Intervals/BikeInterval.svelte';
 
-
 	const dispatch = createEventDispatcher();
 
 	export let user: User;
@@ -20,6 +19,5 @@
 	<div class="flex w-full flex-row gap-2">
 		<DurationInput name="duration" label="Duration" bind:value={$plan_form.duration} />
 	</div>
-	<BikeInterval bind:user bind:interval={$plan_form} on:input={()=>dispatch('input')}/>
-
+	<BikeInterval bind:user bind:interval={$plan_form} on:input={() => dispatch('input')} />
 </div>

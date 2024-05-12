@@ -5,25 +5,33 @@
 	import Button from '$lib/components/Button.svelte';
 	import { ActivityType } from '@prisma/client';
 	// import type { Infer, SuperValidated } from 'sveltekit-superforms';
-	import { workout_interval_schema, type training_session_schema } from '$lib/schemas';
+	import { IntervalSchema, type training_session_schema } from '$lib/schemas';
 	import AddBikeInterval from '$lib/components/WorkoutInterval/AddBikeInterval.svelte';
 	import { page } from '$app/stores';
 	import AddRunInterval from '$lib/components/WorkoutInterval/AddRunInterval.svelte';
 	import AddSwimInterval from '$lib/components/WorkoutInterval/AddSwimInterval.svelte';
-	import { type Infer, type SuperForm } from 'sveltekit-superforms';
+	import { superForm, type Infer, type SuperForm, type SuperValidated } from 'sveltekit-superforms';
+	import type { WorkoutInterval } from '$lib/utils/trainingsessions/types';
+	import type { ItemsStore } from '$lib/utils/dragndrop/stores';
+	import { zod } from 'sveltekit-superforms/adapters';
 
 	/** Exposes parent props to this component. */
 	export let parent: SvelteComponent;
 	const modal = getModalStore();
-
-	const { form, errors, constraints, reset, validateForm, activity_type } = $modal[0].meta as {
+	
+	const { items, activity_type, workoutIntervalForm } = $modal[0].meta as {
+		items: ItemsStore<WorkoutInterval>;
 		activity_type: ActivityType;
-		form: SuperForm<Infer<typeof workout_interval_schema>>['form'];
-		errors: SuperForm<Infer<typeof workout_interval_schema>>['errors'];
-		constraints: SuperForm<Infer<typeof workout_interval_schema>>['constraints'];
-		reset: SuperForm<Infer<typeof workout_interval_schema>>['reset'];
-		validateForm: SuperForm<Infer<typeof workout_interval_schema>>['validateForm'];
+		workoutIntervalForm: SuperValidated<Infer<typeof IntervalSchema>>;
+
 	};
+	const { form, errors, constraints, validateForm, enhance, delayed, reset } = superForm(workoutIntervalForm, {
+		id: 'NewSessionPlanForm',
+		resetForm: true,
+		validators: zod(IntervalSchema),
+		applyAction: false,
+		dataType: 'json'
+	});
 
 	// Base Classes
 	const cBase = 'card p-4 w-modal shadow-xl space-y-4';
@@ -40,10 +48,6 @@
 		}
 	}
 
-	// onDestroy(() => {
-	// 	if ($modal[0].response) $modal[0].response(null);
-	// 	modal.close();
-	// });
 </script>
 
 {#if $modal[0] && $page.data.user}

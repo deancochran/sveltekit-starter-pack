@@ -7,7 +7,7 @@ export const load: LayoutServerLoad = async (event) => {
 	const data = await parent();
 	if (data.session) {
 		if (!data.user?.email_verified) {
-			redirect('/verify-email',event);
+			redirect('/verify-email', event);
 		} else {
 			redirect('/', event);
 		}
@@ -19,6 +19,6 @@ export const load: LayoutServerLoad = async (event) => {
 			background: 'variant-filled-warning'
 		} as const;
 		redirect('/', t, event);
-	} 
+	}
 	return data;
 };

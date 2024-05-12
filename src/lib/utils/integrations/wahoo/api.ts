@@ -96,7 +96,10 @@ export class WahooAPI {
 			body: JSON.stringify(body)
 		});
 	}
-	async updatePlan(wahoo_plan_id: number|string, body: WahooV1PlanRequestBody): Promise<WahooV1PlanResponse> {
+	async updatePlan(
+		wahoo_plan_id: number | string,
+		body: WahooV1PlanRequestBody
+	): Promise<WahooV1PlanResponse> {
 		return await this.validatedFetch(`/v1/plans/${wahoo_plan_id}`, {
 			method: 'PUT',
 			headers: {
@@ -105,7 +108,7 @@ export class WahooAPI {
 			body: JSON.stringify({ ...body, external_id: undefined })
 		});
 	}
-	async deletePlan(wahoo_plan_id: number|string,): Promise<WahooV1PlanResponse> {
+	async deletePlan(wahoo_plan_id: number | string): Promise<WahooV1PlanResponse> {
 		return await this.validatedFetch(`/v1/plans/${wahoo_plan_id}`, { method: 'DELETE' });
 	}
 }

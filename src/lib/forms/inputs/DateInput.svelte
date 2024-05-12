@@ -12,13 +12,14 @@
 		{#if label}<span>{label}</span><br />{/if}
 
 		<input
-			class="input"
+
 			type="date"
 			value={value.toISOString().split('T')[0]}
 			on:input={(e) => (value = new Date(e.currentTarget.value))}
 			aria-invalid={errors ? 'true' : undefined}
 			{...constraints}
 			{...$$restProps}
+			class="input {$$props.class}"
 		/>
 	</label>
 	{#if errors}<span class="flex flex-inline space-x-2 text-error-500"

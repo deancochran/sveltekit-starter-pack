@@ -217,7 +217,7 @@ async function createActivityFromHook(
 				);
 			const GAP = calcSwimPace(activity.distance!, activity.moving_time!);
 			const sIF = calc_sIF(GAP, log.user.swim_ftp);
-			const tss = calc_sTss(activity.moving_time!, sIF);
+			const tss = calc_sTss(activity.moving_time!, GAP, log.user.swim_ftp, sIF);
 			return await prisma.activities.create({
 				data: {
 					type: ActivityType.SWIM,

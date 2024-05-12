@@ -74,6 +74,7 @@ export const actions: Actions = {
 			} as const;
 			redirect('/plans', t, event);
 		} catch (e) {
+			console.log(e);
 			t = {
 				message: 'Failed to delete plan',
 				background: 'variant-filled-error'

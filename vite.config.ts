@@ -18,6 +18,6 @@ export default defineConfig({
 			key: fs.readFileSync(`${__dirname}/cert/key.pem`),
 			cert: fs.readFileSync(`${__dirname}/cert/cert.pem`)
 		},
-		proxy:{}
+		proxy: {}
 	}
 });

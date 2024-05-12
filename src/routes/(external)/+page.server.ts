@@ -14,6 +14,6 @@ export const actions: Actions = {
 	setCookiePolicy: async (event) => {
 		setConsentCookie(event);
 		event.locals.consent_cookie = checkConsentCookie(event);
-		return event.locals
+		return event.locals;
 	}
 };

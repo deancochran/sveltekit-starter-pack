@@ -15,7 +15,7 @@
 			<PlusSquare />
 		</a>
 	</header>
-	<!-- <hr /> -->
+	<!-- <hrs/> -->
 	<!-- Plan List -->
 	<section class="blog-list space-y-8">
 		{#each data.plans as plan}

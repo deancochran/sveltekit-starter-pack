@@ -41,8 +41,8 @@
 		<!-- Interval Display -->
 		<div class="flex flex-col gap-1">
 			<span class="text-sm whitespace-nowrap line-clamp-1"
-					>@{item.data.intensity.toFixed(2)}% FTP</span
-				>
+				>@{item.data.intensity?.toFixed(2)}% FTP</span
+			>
 			<span class="text-sm">for {secondsToHHMMSS(item.data.duration)}</span>
 		</div>
 	</section>

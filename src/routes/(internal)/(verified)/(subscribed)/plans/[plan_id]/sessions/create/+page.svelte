@@ -1,32 +1,57 @@
 <script lang="ts">
-	import { training_session_schema } from '$lib/schemas';
-	import { superForm } from 'sveltekit-superforms/client';
-	import { focusTrap, getModalStore } from '@skeletonlabs/skeleton';
+	import { IntervalSchema, training_session_schema } from '$lib/schemas';
+	import { superForm, superValidate } from 'sveltekit-superforms/client';
+	import { focusTrap, getModalStore, popup } from '@skeletonlabs/skeleton';
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
 	import Button from '$lib/components/Button.svelte';
-	import { zod } from 'sveltekit-superforms/adapters';
+	import { zod, type Infer } from 'sveltekit-superforms/adapters';
 	import TextInput from '$lib/forms/inputs/TextInput.svelte';
 	import TextArea from '$lib/forms/inputs/TextArea.svelte';
 	import DateInput from '$lib/forms/inputs/DateInput.svelte';
 	import type { PageData } from './$types';
 	import EnumSelectInput from '$lib/forms/inputs/EnumSelectInput.svelte';
 	import { ActivityType } from '@prisma/client';
-	import { WorkoutIntervalService } from '$lib/utils/trainingsessions/stores';
-	import { CopyIcon, PlusSquare, TrashIcon } from 'lucide-svelte';
-	import { get } from 'svelte/store';
-	import {
-		evaluatePlanTss,
-		type WorkoutInterval,
-		calculateAvgWatts
-	} from '$lib/utils/trainingsessions/types';
+	import { CopyIcon, PlusSquare, TrashIcon, Undo2 } from 'lucide-svelte';
+	import { calculateDistance, evaluatePlanTss, getIntensityDisplay, getIntervalDisplay, type WorkoutInterval } from '$lib/utils/trainingsessions/types';
 	import { dndzone } from 'svelte-dnd-action';
-	import { flip } from 'svelte/animate';
 	import { type ItemsStore, ItemsStoreService } from '$lib/utils/dragndrop/stores';
+	import { getIntensityColor } from '$lib/components/WorkoutIntervals/types';
 	import { secondsToHHMMSS } from '$lib/utils/datetime';
-	import { convertDistance } from '$lib/utils/distance';
+	import { flip } from 'svelte/animate';
+	import { page } from '$app/stores';
+	import type { User } from 'lucia';
 
+
+	// Get page data
 	export let data: PageData;
+
+
+	// Init modal
 	let modal = getModalStore();
+	// AddInterval Modal
+	async function triggerAddIntervalModal() {
+		const workoutIntervalForm = await superValidate(zod(IntervalSchema));
+		modal.trigger({
+			type: 'component',
+			component: 'AddInterval',
+			meta: {
+				workoutIntervalForm,
+				items,
+				activity_type: $form.activity_type
+			},
+			response: (r: WorkoutInterval) => {
+				if (r) {
+					// $items = [...$items, { id: $items.length + 1, data: r }];
+					const new_item = { id: $items.length + 1, data: r };
+					items.update((curr) => [...curr, new_item]);
+				}
+			}
+		});
+	}
+
+
+	// Init form
+	let isFocused: boolean = false;
 	const { form, errors, constraints, enhance, delayed } = superForm(data.trainingSessionSchema, {
 		id: 'create',
 		resetForm: true,
@@ -36,98 +61,55 @@
 		dataType: 'json'
 	});
 
-	let isFocused: boolean = false;
 
-	const workout = WorkoutIntervalService([]);
-	workout.subscribe(() => {
-		const intervals = get(workout);
-		let totalDuration_ = 0;
-		let totalDistance_ = 0;
-		intervals.forEach((i) => {
-			totalDuration_ += i.duration ?? 0;
-			totalDistance_ += i.distance ?? 0;
-		});
-
-		$form.duration = totalDuration_;
-		$form.distance = totalDistance_;
-		$form.stress_score = evaluatePlanTss(data.user, $form.activity_type, intervals);
-		$form.plan = intervals;
-	});
-
+	// Init drag and drop sort
 	function handleSort(e: { detail: { items: { id: number; data: WorkoutInterval }[] } }) {
 		$items = e.detail.items;
 	}
 	let items: ItemsStore<WorkoutInterval> = ItemsStoreService<WorkoutInterval>([]);
 
-	items.subscribe(() => {
-		workout.set([...$items.map((i) => i.data)]);
+	items.subscribe((curr) => {
+		$form.duration = curr.reduce((a, b) => a + b.data.duration, 0);
+		const intervals = [...curr.map((i) => i.data)];
+		$form.stress_score = evaluatePlanTss(data.user, $form.activity_type, intervals).stress_score;
+		$form.plan = intervals;
 	});
-	const {
-		form: plan_form,
-		errors: plan_errors,
-		constraints: plan_constraints,
-		validateForm: plan_validateForm,
-		reset: plan_reset
-	} = superForm(data.workoutIntervalSchema, {
-		id: 'NewSessionPlanForm',
-		validators: zod(workout_interval_schema),
-		dataType: 'json',
-		resetForm: true
-	});
-	$plan_form.interval_type = IntervalType.RAMP;
 
-	// AddInterval Modal
-	function triggerAddIntervalModal() {
-		modal.trigger({
-			type: 'component',
-			component: 'AddInterval',
-			meta: {
-				form: plan_form,
-				errors: plan_errors,
-				constraints: plan_constraints,
-				validateForm: plan_validateForm,
-				reset: plan_reset,
-				activity_type: $form.activity_type
-			},
-			response: (r) => {
-				if (r) {
-					$items = [...$items, { id: $items.length + 1, data: $plan_form }];
-				}
-			}
-		});
-	}
-	$form.title =
-		new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date()) + ' ' + 'Workout';
+	
+	
+	$: max_intensity = $items.reduce((a, b) => Math.max(a, b.data.intensity), 0);
+
+	
 </script>
 
 <div class="card">
 	<form id="create" use:focusTrap={isFocused} method="POST" action="?/create" use:enhance>
 		<header class="card-header flex flex-col">
 			<h1 class="w-full py-2 text-center">New Training Session</h1>
-			<div class="flex w-full flex-row gap-4 justify-between">
-				<DateInput
+			<DateInput
 					name="date"
 					label="Date"
+					disabled={false}
 					bind:value={$form.date}
 					errors={$errors.date}
 					constraints={$constraints.date}
 				/>
 				<EnumSelectInput
-					enumType={ActivityType}
-					name="activity_type"
-					label="Activity Type"
-					on:change={async (e) => {
-						$items = [];
-						$workout = [];
-					}}
-					bind:value={$form.activity_type}
-					errors={$errors.activity_type}
-					constraints={$constraints.activity_type}
-				/>
-			</div>
+				enumType={ActivityType}
+				name="activity_type"
+				label="Activity Type"
+				on:change={async (e) => {
+					$items = [];
+				}}
+				bind:value={$form.activity_type}
+				disabled={false}
+				errors={$errors.activity_type}
+				constraints={$constraints.activity_type}
+			/>
 			<TextInput
 				name="title"
 				label="Title"
+				disabled={false}
 				bind:value={$form.title}
 				errors={$errors.title}
 				constraints={$constraints.title}
@@ -135,109 +117,113 @@
 			<TextArea
 				name="description"
 				label="Description"
+				disabled={false}
 				bind:value={$form.description}
 				errors={$errors.description}
 				constraints={$constraints.description}
 				class="resize-none"
 			/>
 		</header>
-		<hr class="w-full" />
-		<section class="flex p-4 flex-col gap-4">
-			<div class="w-full flex flex-row flex-wrap justify-between gap-4">
-				<h3 class="h3">Duration: {secondsToHHMMSS($form.duration)}</h3>
 
-				{#if $form.activity_type === ActivityType.BIKE}
-					<h3 class="h3">
-						Avg Watts: {calculateAvgWatts(data.user, $form.plan).toFixed(0)} w
-					</h3>
-				{:else}
-					<h3 class="h3">
-						Distance: {convertDistance($form.distance, 'kilometers').toFixed(2)} km
-					</h3>
-				{/if}
-				<h3 class="h3">Stress Score: {$form.stress_score.toFixed(2)}</h3>
-			</div>
-			<hr class="w-full" />
-			<div class="w-full flex flex-row gap-4 flex-wrap items-center align-middle justify-between">
-				<h3 class="h3">Intervals</h3>
-				<Button
-					color="variant-soft-tertiary"
-					type="button"
-					on:click={triggerAddIntervalModal}
-					class="btn"
+		<section class="p-4">
+			<div class="flex flex-col overflow-hidden rounded-md p-2 bg-surface-backdrop-token">
+				<div class="flex flex-row items-center justify-between">
+					<div class="flex flex-row justify-center align-middle gap-2">
+						<h3 class="text-sm">Duration: {secondsToHHMMSS($form.duration)}</h3>
+						{#if $form.activity_type != ActivityType.BIKE}
+							<h3 class="text-sm">Distance: {calculateDistance($form, $page.data.user)}</h3>
+						{/if}
+						<!-- IF THE ACTIVITTY IS A RUN OR SWIM, DISPLAY THE DISTANCE -->
+						<h3 class="text-sm">Stress Score: {$form.stress_score}</h3>
+					</div>
+
+					<div class="flex flex-row justify-center align-middle gap-2">
+						<Button
+							color="variant-ghost-surface"
+							type="button"
+							on:click={triggerAddIntervalModal}
+							class="btn p-1 rounded-sm w-fit flex flex-row gap-1"
+						>
+							<span class="text-sm">Add Interval </span>
+							<PlusSquare class="w-4 h-4 !m-0 text-surface" />
+						</Button>
+						<Button
+							color="variant-ghost-surface"
+							type="button"
+							on:click={() => {
+								items.update((curr) => []);
+							}}
+							class="btn p-1 rounded-sm w-fit flex flex-row gap-1"
+						>
+							<span class="text-sm">Clear</span>
+							<Undo2 class="w-4 h-4 !m-0 text-surface" />
+						</Button>
+					</div>
+				</div>
+
+				<section
+					use:dndzone={{ items: $items, dragDisabled: false }}
+					on:consider={handleSort}
+					on:finalize={handleSort}
+					class="w-full h-[100px] p-1 flex flex-row gap-px items-end justify-start snap-x hide-scrollbar overscroll-y-none"
 				>
-					<span>Add Interval </span>
-					<PlusSquare />
-				</Button>
-			</div>
-
-			<section
-				use:dndzone={{ items: $items, dragDisabled: false }}
-				on:consider={handleSort}
-				on:finalize={handleSort}
-				class=" w-full flex flex-row p-2 shadow-inner bg-surface-backdrop-token rounded-md gap-2 overflow-x-auto items-end justify-start snap-mandatory snap-normal snap-x"
-			>
-				{#if $items.length === 0}
-					<p class="w-full text-center">No Intervals</p>
-				{:else}
 					{#each $items as item, index (item.id)}
 						<div
-							animate:flip={{ duration: 100 }}
-							class="card variant-filled-surface flex flex-col justify-between w-full h-full snap-center"
+							animate:flip={{ duration: 50 }}
+							style="width: {Math.ceil(
+								(item.data.duration / $form.duration) * 100
+							)}%; height: {Math.ceil((item.data.intensity / max_intensity) * 100)}%"
+							class="w-fit p-2 snap-x rounded-sm {getIntensityColor(
+								item.data.intensity
+							)} overscroll-y-none"
+							use:popup={{
+								event: 'click',
+								target: 'intervalPopup-' + index,
+								placement: 'bottom'
+							}}
 						>
-							<section class="p-2">
-								<!-- Interval Display -->
-								<div class="flex flex-row gap-1">
-									{#if item.data.interval_type === IntervalType.RAMP}
-										<span class="text-sm"
-											>@{item.data.start_intensity.toFixed(2)} to {item.data.end_intensity.toFixed(
-												2
-											)}% FTP</span
-										>
-									{:else}
-											<p>Undefined IntervalType</p>
-									{/if}
-									<span class="text-sm">in {secondsToHHMMSS(item.data.duration)}</span>
+							<div
+								class="bg-surface-backdrop-token p-1 rounded-sm w-fit overscroll-y-none"
+								data-popup="intervalPopup-{index}"
+							>
+								<div class="flex flex-row items-center align-middle justify-center gap-1">
+									<span class="text-sm text-nowrap"
+										>{getIntervalDisplay(item.data, $form.activity_type, $page.data.user)}</span
+									>
+									<Button
+										id="duplicate"
+										type="button"
+										on:click={() => {
+											const new_item = { ...item, id: $items.length + 1 };
+											items.update((curr) => [...curr, new_item]);
+										}}
+										color="variant-ghost-surface"
+										class="rounded-md p-px"
+									>
+										<CopyIcon class="w-6 h-6 p-1 text-surface-400" />
+									</Button>
+
+									<Button
+										id="delete"
+										type="button"
+										on:click={() => {
+											items.update((curr) =>
+												curr
+													.filter((i) => i.id !== item.id)
+													.map((i, index) => ({ ...i, id: index }))
+											);
+										}}
+										color="variant-ghost-surface"
+										class=" rounded-md p-px"
+									>
+										<TrashIcon class="w-6 h-6 p-1 text-surface-400" />
+									</Button>
 								</div>
-							</section>
-
-							<footer class="card-footer p-1 gap-1 w-full flex items-end align-middle justify-end">
-								<Button
-									type="button"
-									on:click={() => {
-										const new_item = { ...item, id: item.id + 1 };
-
-										$items = $items.map((i) => {
-											if (i.id > item.id) {
-												return { ...i, id: i.id + 1 };
-											} else {
-												return i;
-											}
-										});
-
-										$items = [...$items.slice(0, index + 1), new_item, ...$items.slice(index + 1)];
-									}}
-									color="variant-soft-tertiary"
-									class=" rounded-md p-2"
-								>
-									<CopyIcon />
-								</Button>
-
-								<Button
-									type="button"
-									on:click={() => {
-										$items = $items.filter((i) => i.id !== item.id);
-									}}
-									color="variant-soft-tertiary"
-									class=" rounded-md p-2"
-								>
-									<TrashIcon />
-								</Button>
-							</footer>
+							</div>
 						</div>
 					{/each}
-				{/if}
-			</section>
+				</section>
+			</div>
 		</section>
 		<footer
 			class="w-full card-footer flex flex-row flex-wrap items-end align-middle justify-end gap-2"

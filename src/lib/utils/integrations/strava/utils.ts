@@ -139,7 +139,6 @@ export async function disconnect_integration(integration: thirdPartyIntegrationT
 		default: {
 			break;
 		}
-
 	}
 
 	return integration;

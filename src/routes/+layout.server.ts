@@ -8,7 +8,7 @@ flashCookieOptions.secure = !dev;
 
 export const load: LayoutServerLoad = loadFlash((event) => {
 	const { locals, url } = event;
-	
+
 	return {
 		user: locals.user,
 		session: locals.session,

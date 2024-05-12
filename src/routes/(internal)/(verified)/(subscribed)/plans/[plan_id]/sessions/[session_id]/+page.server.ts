@@ -1,7 +1,7 @@
 import {
 	create_wahoo_workout_schema,
 	training_session_schema,
-	workout_interval_schema,
+	IntervalSchema,
 	type TrainingSessionSchema
 } from '$lib/schemas';
 import { fail, superValidate } from 'sveltekit-superforms';
@@ -24,7 +24,7 @@ export const load: PageServerLoad = async (event) => {
 		data.training_session as Partial<TrainingSessionSchema>,
 		zod(training_session_schema)
 	);
-	const workout_interval_form = await superValidate(zod(workout_interval_schema));
+	const workout_interval_form = await superValidate(zod(IntervalSchema));
 	return {
 		training_session_form,
 		workout_interval_form,
@@ -153,7 +153,6 @@ export const actions: Actions = {
 				}
 			}
 		} catch (e) {
-			console.log(e);
 			t = {
 				message: 'Failed to delete session',
 				background: 'variant-filled-error'
@@ -210,12 +209,10 @@ export const actions: Actions = {
 						}
 					});
 
-					const ww = await wahoo_user.createWorkout({ workout: form.data });
-					console.log('ww', ww);
+					await wahoo_user.createWorkout({ workout: form.data });
 				});
 			} else {
-				const ww = await wahoo_user.createWorkout({ workout: form.data });
-				console.log('ww', ww);
+				await wahoo_user.createWorkout({ workout: form.data });
 			}
 		} catch (error) {
 			t = {

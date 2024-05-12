@@ -70,7 +70,6 @@ export const actions: Actions = {
 					path: '.',
 					...sessionCookie.attributes
 				});
-			
 
 				t = {
 					message: `Your Password has been Updated`,

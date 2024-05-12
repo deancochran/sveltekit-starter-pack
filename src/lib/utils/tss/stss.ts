@@ -27,10 +27,25 @@ export function calc_sIF(NP: number, FTP: number) {
 }
 
 // TODO add yds to meters conversion
-export function calc_sTss(S: number, INTENSITY_FACTOR: number) {
-	// Convert paces to speeds (yards per minute or meters per minute)
-	// swim ftp give in best seconds/(100m/100yd) pace that you can hold over 1 hour
-	const elapsed_hrs = S / 60 / 60;
-	// Calculate Swim TSS
-	return Math.pow(INTENSITY_FACTOR, 3) * elapsed_hrs * 100;
+export function calc_sTss(S: number, NGP: number, FTP: number, INTENSITY_FACTOR: number) {
+	// // Constants
+	const MAX_HOUR_FTP_POWER_OUTPUT: number = FTP * 3600;
+	// // Calculate rTSS
+	const EFFORT_POWER_OUTPUT: number = S * (NGP * INTENSITY_FACTOR);
+	const sTSS: number = (EFFORT_POWER_OUTPUT / MAX_HOUR_FTP_POWER_OUTPUT) * 100;
+	return sTSS;
+}
+
+export function intensity_to_swim_speed(intensity: number, swim_ftp:number|undefined): [display:string, value:number] {
+	if (swim_ftp === undefined) {
+		return ['00:00/100m', 0];
+	}
+	let sec_p_100m: number
+
+	if (intensity > 1) {
+		sec_p_100m = swim_ftp - Math.round((intensity - 1) * swim_ftp);
+	} else {
+		sec_p_100m = swim_ftp + Math.round((1 - intensity) * swim_ftp);
+	}
+	return [`${Math.floor(sec_p_100m / 60).toString().padStart(2, '0')}:${(sec_p_100m % 60).toFixed(0).padStart(2, '0')}/100m`, sec_p_100m];
 }

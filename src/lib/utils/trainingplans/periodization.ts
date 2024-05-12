@@ -170,7 +170,6 @@ export const daysInPhases = (startDate: Date, endDate: Date): DaysInPhases => {
 	};
 };
 
-
 /**
  * Generates FTP zones based on the FTP value.
  *
@@ -204,5 +203,3 @@ export const hrZones = (maxHR: number): HRZones => {
 		zone5: { min: maxHR * zone4_max_hr, max: maxHR * zone5_max_hr }
 	};
 };
-
-

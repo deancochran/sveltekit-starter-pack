@@ -183,13 +183,15 @@ Positive TSB means you are “on form” and have higher fitness than fatigue. T
   - update the trainging session logic for creating a workout
 
 # notes to self
-april 18th - I am working or a wahoo api client class that can be used for server-side functions ONLY. I import secret keys for the wahoo api so I'm building it as a model for other future api classes too as a template. (I could build something that i could inherit with. But I think the development effort is to high. I will begin working on a smaller more functional class to upload workouts, plans, and maybe other info to wahoo. I will start by attempting to upload a workout and being able to render that workout on my element roam bike computer, or wahoo kickr v6). 
+
+april 18th - I am working or a wahoo api client class that can be used for server-side functions ONLY. I import secret keys for the wahoo api so I'm building it as a model for other future api classes too as a template. (I could build something that i could inherit with. But I think the development effort is to high. I will begin working on a smaller more functional class to upload workouts, plans, and maybe other info to wahoo. I will start by attempting to upload a workout and being able to render that workout on my element roam bike computer, or wahoo kickr v6).
 
 I hated programming. Till i learned how to learn, Till i gave in.
 
-
 # For development
+
 Run dev and expose localhost
+
 - pnpm run dev --host
 
 Ensure you have a valid mkcert https certificate stored in the /cert directory ('this directory is not pushed so you need to make it')
@@ -200,14 +202,15 @@ npx prisma migrate dev will run your migrations
 npx prisma generate will generate the client
 
 - pnpm run ngrok (exposes the localhost at a proxied address)
-  
+
 Take the proxied address and update your thridparty api configurations
+
 - strava needs the domain and auth callback url
-  - Use postman to register your strava api webhook with the ngrok url 
+  - Use postman to register your strava api webhook with the ngrok url
 - wahoo needs the callback url and the webhook location
 - .env needs to be updated for the new ngok url
 
-- test the webhook endpoints using postman on an external network device 
+- test the webhook endpoints using postman on an external network device
   - I recommend sending a postman request from another laptop using a hotspot from your phone's cellular data for ease of developer experience
 
 pnpm run prisma-studio should open the database view on port 5555

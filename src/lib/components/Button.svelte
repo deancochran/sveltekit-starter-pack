@@ -21,6 +21,10 @@
 		| 'variant-filled-error'
 		| 'variant-filled-warning'
 		| 'variant-filled-success'
+		| 'variant-ghost-surface'
+		| 'variant-ghost-success'
+		| 'variant-ghost-error'
+		| 'variant-ghost-warning'
 		| undefined = undefined;
 
 	export let shadow: 'shadow-md' | undefined = undefined;

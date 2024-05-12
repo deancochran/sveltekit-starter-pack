@@ -19,11 +19,12 @@
 
 	<select
 		on:change={(e) => dispatch('change', e)}
-		class="input"
+		
 		bind:value
 		aria-invalid={errors ? 'true' : undefined}
 		{...constraints}
 		{...$$restProps}
+		class="input {$$props.class}"
 	>
 		{#each enumOptions as option}
 			<option value={option.value}>

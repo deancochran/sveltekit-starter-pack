@@ -1,44 +1,70 @@
 <script lang="ts">
-	import { superForm, superValidate, type SuperForm } from 'sveltekit-superforms';
+	import { superForm, superValidate } from 'sveltekit-superforms';
 	import type { PageData } from './$types';
 	import { zod, type Infer } from 'sveltekit-superforms/adapters';
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
 	import Button from '$lib/components/Button.svelte';
-	import { focusTrap, getModalStore } from '@skeletonlabs/skeleton';
+	import { focusTrap, getModalStore, popup } from '@skeletonlabs/skeleton';
 	import TextInput from '$lib/forms/inputs/TextInput.svelte';
 	import TextArea from '$lib/forms/inputs/TextArea.svelte';
 	import DateInput from '$lib/forms/inputs/DateInput.svelte';
 	import EnumSelectInput from '$lib/forms/inputs/EnumSelectInput.svelte';
 	import IntervalCard from '$lib/components/WorkoutInterval/IntervalCard.svelte';
+	import { ActivityType } from '@prisma/client';
 	import {
-		ActivityType,
-		ThirdPartyIntegrationProvider,
-		type thirdPartyIntegrationTrainingSession,
-		type trainingSession
-	} from '@prisma/client';
-	import {
+		IntervalSchema,
 		create_wahoo_workout_schema,
 		training_session_schema,
-		workout_interval_schema,
 		type CreateWahooWorkoutSchema,
 		type WorkoutInterval
 	} from '$lib/schemas';
 	import { type ItemsStore, ItemsStoreService } from '$lib/utils/dragndrop/stores';
 	import { WorkoutIntervalService } from '$lib/utils/trainingsessions/stores';
-	import { calculateAvgWatts, evaluatePlanTss } from '$lib/utils/trainingsessions/types';
-	import { PlusSquare } from 'lucide-svelte';
+	import {
+		calculateAvgWatts,
+		calculateDistance,
+		evaluatePlanTss,
+		getIntervalDisplay
+	} from '$lib/utils/trainingsessions/types';
+	import { CopyIcon, PlusSquare, TrashIcon, Undo2 } from 'lucide-svelte';
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import { get } from 'svelte/store';
 	import { secondsToHHMMSS } from '$lib/utils/datetime';
-	import { convertDistance } from '$lib/utils/distance';
 	import { getWahooWorkoutIdFromTrainingSessionType } from '$lib/utils/integrations/wahoo/utils';
+	import WorkoutIntervals from '$lib/components/WorkoutIntervals/WorkoutIntervals.svelte';
+	import ZoneDistribution from '$lib/components/WorkoutIntervals/ZoneDistribution.svelte';
+	import { page } from '$app/stores';
+	import { getIntensityColor } from '$lib/components/WorkoutIntervals/types';
 
+	// Get page data
 	export let data: PageData;
 
-	let editing = false;
-	let isFocused: boolean = false;
+	// Init modal
+	let modal = getModalStore();
+	// AddInterval Modal
+	async function triggerAddIntervalModal() {
+		const workoutIntervalForm = await superValidate(zod(IntervalSchema));
+		modal.trigger({
+			type: 'component',
+			component: 'AddInterval',
+			meta: {
+				workoutIntervalForm,
+				items,
+				activity_type: $form.activity_type
+			},
+			response: (r: WorkoutInterval) => {
+				if (r) {
+					// $items = [...$items, { id: $items.length + 1, data: r }];
+					const new_item = { id: $items.length + 1, data: r };
+					items.update((curr) => [...curr, new_item]);
+				}
+			}
+		});
+	}
 
+	// Init form
+	let isFocused: boolean = false;
 	const { form, errors, constraints, enhance, delayed, reset } = superForm(
 		data.training_session_form,
 		{
@@ -47,10 +73,18 @@
 			validators: zod(training_session_schema),
 			delayMs: 0,
 			timeoutMs: 8000,
-			dataType: 'json'
+			dataType: 'json',
+			onResult: (e) => {
+				if (e.result.type === 'success') {
+					toggleEditing();
+				}
+			}
 		}
 	);
-	function toggleEditing(e: CustomEvent<any>): void {
+
+	// Init edit mode
+	$: editing = false;
+	function toggleEditing(): void {
 		editing = !editing;
 		isFocused = !isFocused;
 		if (!editing) {
@@ -59,55 +93,25 @@
 		}
 	}
 
-	const workout = WorkoutIntervalService($form.plan ?? []);
-	workout.subscribe(() => {
-		const intervals = get(workout);
-		let totalDuration_ = 0;
-		let totalDistance_ = 0;
-		intervals.forEach((i) => {
-			totalDuration_ += i.duration;
-			totalDistance_ += i.distance ?? 0;
-		});
-		$form.duration = totalDuration_;
-		$form.distance = totalDistance_;
-		$form.stress_score = evaluatePlanTss(data.user, $form.activity_type, intervals);
-		$form.plan = intervals;
-	});
-
+	// Init drag and drop sort items
 	function handleSort(e: { detail: { items: { id: number; data: WorkoutInterval }[] } }) {
 		$items = e.detail.items;
 	}
 	let items: ItemsStore<WorkoutInterval> = ItemsStoreService<WorkoutInterval>(
 		$form.plan.map((obj, i) => ({ id: i, data: obj }))
 	);
-	items.subscribe(() => {
-		workout.set([...$items.map((i) => i.data)]);
+
+	items.subscribe((curr) => {
+		$form.duration = curr.reduce((a, b) => a + b.data.duration, 0);
+		const intervals = [...curr.map((i) => i.data)];
+		$form.stress_score = evaluatePlanTss(data.user, $form.activity_type, intervals).stress_score;
+		$form.plan = intervals;
 	});
 
-	let modal = getModalStore();
-	// AddInterval Modal
-	async function triggerAddIntervalModal() {
-		const interval = await superValidate(zod(workout_interval_schema));
-		modal.trigger({
-			type: 'component',
-			component: 'AddInterval',
-			meta: {
-				activity_type: $form.activity_type,
-				...superForm(interval, {
-					id: 'NewSessionPlanForm',
-					validators: zod(workout_interval_schema)
-				})
-			},
-			response: (data) => {
-				if (data) {
-					$items = [...$items, { id: $items.length + 1, data }];
-				}
-			}
-		});
-	}
+	$: max_intensity = $items.reduce((a, b) => Math.max(a, b.data.intensity), 0);
 
+	// Init modal
 	async function triggerCreateWahooWorkoutModal() {
-		
 		const init_data: Infer<CreateWahooWorkoutSchema> = {
 			name: data.training_session.title,
 			workout_type_id: getWahooWorkoutIdFromTrainingSessionType(
@@ -115,7 +119,7 @@
 			),
 			starts: data.training_session.date,
 			minutes: data.training_session.duration ?? 0,
-			workout_token: String(data.training_session.id),
+			workout_token: String(data.training_session.id)
 		};
 		const CreateWahooWorkForm = await superValidate(init_data, zod(create_wahoo_workout_schema));
 
@@ -128,44 +132,44 @@
 			}
 		});
 	}
+	console.log(data);
 </script>
 
 <div class="card">
-	<form id="update" use:focusTrap={isFocused} method="POST" action="?/update" use:enhance>
+	<form id="update" use:focusTrap={isFocused} method="POST" use:enhance>
 		<header class="card-header flex flex-col">
 			<h1 class="w-full py-2 text-center">Update Training Session</h1>
-			<div class="flex w-full flex-row gap-4 justify-between">
-				<DateInput
-					name="date"
-					label="Date"
-					disabled={!editing}
-					bind:value={$form.date}
-					errors={$errors.date}
-					constraints={$constraints.date}
-				/>
-				<EnumSelectInput
-					enumType={ActivityType}
-					name="activity_type"
-					label="Activity Type"
-					on:change={async (e) => {
-						$items = [];
-						$workout = [];
-					}}
-					bind:value={$form.activity_type}
-					disabled={!editing}
-					errors={$errors.activity_type}
-					constraints={$constraints.activity_type}
-				/>
-				{#if $form.activity_type !== ActivityType.SWIM}
-					<Button
-						shadow="shadow-md"
-						color="variant-filled-tertiary"
-						type="button"
-						on:click={triggerCreateWahooWorkoutModal}
-						class="btn ">Create Wahoo Workout</Button
-					>
-				{/if}
-			</div>
+
+			<DateInput
+				name="date"
+				label="Date"
+				disabled={!editing}
+				bind:value={$form.date}
+				errors={$errors.date}
+				constraints={$constraints.date}
+			/>
+			<EnumSelectInput
+				enumType={ActivityType}
+				name="activity_type"
+				label="Activity Type"
+				on:change={async (e) => {
+					$items = [];
+				}}
+				bind:value={$form.activity_type}
+				disabled={!editing}
+				errors={$errors.activity_type}
+				constraints={$constraints.activity_type}
+			/>
+			{#if $form.activity_type !== ActivityType.SWIM}
+				<Button
+					shadow="shadow-md"
+					color="variant-filled-tertiary"
+					type="button"
+					on:click={triggerCreateWahooWorkoutModal}
+					class="btn ">Create Wahoo Workout</Button
+				>
+			{/if}
+
 			<TextInput
 				name="title"
 				label="Title"
@@ -184,71 +188,113 @@
 				class="resize-none"
 			/>
 		</header>
-		<hr class="w-full" />
-		<section class="flex p-4 flex-col gap-4">
-			<div class="w-full flex flex-row flex-wrap justify-between gap-4">
-				<h3 class="h3">Duration: {secondsToHHMMSS($form.duration)}</h3>
 
-				{#if $form.activity_type === ActivityType.BIKE}
-					<h3 class="h3">
-						Avg Watts: {calculateAvgWatts(data.user, $form.plan).toFixed(0)} w
-					</h3>
-				{:else}
-					<h3 class="h3">
-						Distance: {convertDistance($form.distance, 'kilometers').toFixed(2)} km
-					</h3>
-				{/if}
-				<h3 class="h3">Stress Score: {$form.stress_score.toFixed(2)}</h3>
-			</div>
-			<hr class="w-full" />
-			<div class="w-full flex flex-row gap-4 flex-wrap items-center align-middle justify-between">
-				<h3 class="h3">Intervals</h3>
-				<Button
-					disabled={!editing}
-					color="variant-soft-tertiary"
-					type="button"
-					on:click={triggerAddIntervalModal}
-					class="btn"
+		<section class="p-4">
+			<!-- CREATE FORM -->
+			<div class="flex flex-col overflow-hidden rounded-md p-2 bg-surface-backdrop-token">
+				<div class="flex flex-row items-center justify-between">
+					<div class="flex flex-row justify-center align-middle gap-2">
+						<h3 class="text-sm">Duration: {secondsToHHMMSS($form.duration)}</h3>
+						{#if $form.activity_type != ActivityType.BIKE}
+							<h3 class="text-sm">Distance: {calculateDistance($form, $page.data.user)}</h3>
+						{/if}
+						<!-- IF THE ACTIVITTY IS A RUN OR SWIM, DISPLAY THE DISTANCE -->
+						<h3 class="text-sm">Stress Score: {$form.stress_score}</h3>
+					</div>
+
+					<div class="flex flex-row justify-center align-middle gap-2">
+						<Button
+							color="variant-ghost-surface"
+							type="button"
+							on:click={triggerAddIntervalModal}
+							class="btn p-1 rounded-sm w-fit flex flex-row gap-1"
+							disabled={!editing}
+						>
+							<span class="text-sm">Add Interval </span>
+							<PlusSquare class="w-4 h-4 !m-0 text-surface" />
+						</Button>
+						<Button
+							color="variant-ghost-surface"
+							type="button"
+							disabled={!editing}
+							on:click={() => {
+								items.update((curr) => []);
+							}}
+							class="btn p-1 rounded-sm w-fit flex flex-row gap-1"
+						>
+							<span class="text-sm">Clear</span>
+							<Undo2 class="w-4 h-4 !m-0 text-surface" />
+						</Button>
+					</div>
+				</div>
+
+				<section
+					use:dndzone={{ items: $items, dragDisabled: !editing }}
+					on:consider={handleSort}
+					on:finalize={handleSort}
+					class="w-full h-[100px] p-1 flex flex-row gap-px items-end justify-start snap-x hide-scrollbar overscroll-y-none"
 				>
-					<span>Add Interval </span>
-					<PlusSquare />
-				</Button>
-			</div>
-
-			<section
-				use:dndzone={{ items: $items, dragDisabled: !editing }}
-				on:consider={handleSort}
-				on:finalize={handleSort}
-				class=" w-full flex flex-row p-2 shadow-inner bg-surface-backdrop-token rounded-md gap-2 overflow-x-auto items-end justify-start snap-mandatory snap-normal snap-x"
-			>
-				{#if $items.length === 0}
-					<p class="w-full text-center">No Intervals</p>
-				{:else}
 					{#each $items as item, index (item.id)}
-						<div animate:flip={{ duration: 100 }} class="w-full">
-							<IntervalCard
-								on:delete={() => ($items = $items.filter((i) => i.id !== item.id))}
-								on:duplicate={() => {
-									const new_item = { ...item, id: item.id + 1 };
+						<div
+							animate:flip={{ duration: 50 }}
+							style="width: {Math.ceil(
+								(item.data.duration / $form.duration) * 100
+							)}%; height: {Math.ceil((item.data.intensity / max_intensity) * 100)}%"
+							class="w-fit p-2 snap-x rounded-sm {getIntensityColor(
+								item.data.intensity
+							)} overscroll-y-none"
+							use:popup={{
+								event: 'click',
+								target: 'intervalPopup-' + index,
+								placement: 'bottom'
+							}}
+						>
+							<div
+								class="bg-surface-backdrop-token p-1 rounded-sm w-fit overscroll-y-none"
+								data-popup="intervalPopup-{index}"
+							>
+								<div class="flex flex-row items-center align-middle justify-center gap-1">
+									<span class="text-sm text-nowrap"
+										>{getIntervalDisplay(item.data, $form.activity_type, $page.data.user)}</span
+									>
+									{#if editing}
+										<Button
+											id="duplicate"
+											type="button"
+											disabled={!editing}
+											on:click={() => {
+												const new_item = { ...item, id: $items.length + 1 };
+												items.update((curr) => [...curr, new_item]);
+											}}
+											color="variant-ghost-surface"
+											class="rounded-md p-px"
+										>
+											<CopyIcon class="w-6 h-6 p-1 text-surface-400" />
+										</Button>
 
-									$items = $items.map((i) => {
-										if (i.id > item.id) {
-											return { ...i, id: i.id + 1 };
-										} else {
-											return i;
-										}
-									});
-
-									$items = [...$items.slice(0, index + 1), new_item, ...$items.slice(index + 1)];
-								}}
-								bind:editing
-								bind:activity_type={$form.activity_type}
-								{item}
-							/>
+										<Button
+											id="delete"
+											type="button"
+											disabled={!editing}
+											on:click={() => {
+												items.update((curr) =>
+													curr
+														.filter((i) => i.id !== item.id)
+														.map((i, index) => ({ ...i, id: index }))
+												);
+											}}
+											color="variant-ghost-surface"
+											class=" rounded-md p-px"
+										>
+											<TrashIcon class="w-6 h-6 p-1 text-surface-400" />
+										</Button>
+									{/if}
+								</div>
+							</div>
 						</div>
 					{/each}
-				{/if}
-			</section>
+				</section>
+			</div>
 		</section>
 
 		<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">
