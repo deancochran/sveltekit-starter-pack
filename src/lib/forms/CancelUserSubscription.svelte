@@ -62,7 +62,7 @@
 		{:else}
 			<Button
 				shadow="shadow-md"
-				color="variant-filled-primary"
+				color="variant-filled-error"
 				form="cancelSubscription"
 				type="submit">Cancel Subscription</Button
 			>

@@ -119,7 +119,7 @@
 				<Button
 					on:click={toggleEditing}
 					shadow="shadow-md"
-					color="variant-filled-primary"
+					color="variant-filled-error"
 					form="updatePlan"
 					type="submit"
 					class="btn ">Cancel</Button
