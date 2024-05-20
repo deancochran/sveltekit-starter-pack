@@ -1,5 +1,7 @@
 <script lang="ts">
+	import 'highlight.js/styles/github-dark.css';
 	import '../app.postcss';
+	
 	// import 'maplibre-gl/dist/maplibre-gl.css';
 	import {
 		Toast,
@@ -12,8 +14,10 @@
 		Modal,
 		type ModalComponent,
 		type ModalSettings,
-		getModalStore
+		getModalStore,
+		storeHighlightJs
 	} from '@skeletonlabs/skeleton';
+	
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import { getFlash } from 'sveltekit-flash-message';
@@ -45,6 +49,26 @@
 
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 	initializeStores();
+
+
+	import hljs from 'highlight.js/lib/core';
+
+	// Import each language module you require
+	import xml from 'highlight.js/lib/languages/xml'; // for HTML
+	import css from 'highlight.js/lib/languages/css';
+	import json from 'highlight.js/lib/languages/json';
+	import javascript from 'highlight.js/lib/languages/javascript';
+	import typescript from 'highlight.js/lib/languages/typescript';
+	import shell from 'highlight.js/lib/languages/shell';
+
+	// Register each imported language module
+	hljs.registerLanguage('language-xml', xml); // for HTML
+	hljs.registerLanguage('language-css', css);
+	hljs.registerLanguage('language-json', json);
+	hljs.registerLanguage('language-js', javascript);
+	hljs.registerLanguage('language-ts', typescript);
+	hljs.registerLanguage('language-shell', shell);
+	storeHighlightJs.set(hljs);
 
 	// init Maplibre Stores
 	setMapContext();
@@ -175,9 +199,7 @@
 					>
 						<!-- <SearchIcon /> -->
 						<p class="flex">Search...</p>
-						<span class="hidden sm:flex badge rounded-sm variant-ghost-surface text-sm">
-							Ctrl-K
-						</span>
+						<kbd class="kbd">Ctrl + K</kbd>
 					</button>
 					<div class="hidden sm:flex w-full">
 						{#if data.user}

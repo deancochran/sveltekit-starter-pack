@@ -181,6 +181,7 @@ Positive TSB means you are “on form” and have higher fitness than fatigue. T
 - convert all distance measurements to meters in the database
   - update all corresponding functions that calculate distance
   - update the trainging session logic for creating a workout
+- change the 5 zones to 7 zones where zone 0 is rest, zone 1 is active recovery, zone 6 is neuromuscular, zone 7 is all out!
 
 # notes to self
 

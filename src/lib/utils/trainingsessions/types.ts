@@ -69,14 +69,13 @@ export function evaluatePlanTss(
 	let stress_score: number;
 	switch (activity_type) {
 		case ActivityType.RUN:
-			stress_score = evaluateRunPlan(user, intervals);
+			stress_score = Math.round(evaluateRunPlan(user, intervals));
 			return { stress_score, distance: 0, duration: 0 };
 		case ActivityType.BIKE:
-			stress_score = evaluateBikePlan(user, intervals);
+			stress_score = Math.round(evaluateBikePlan(user, intervals));
 			return { stress_score, distance: 0, duration: 0 };
-
 		case ActivityType.SWIM:
-			stress_score = evaluateSwimPlan(user, intervals);
+			stress_score = Math.round(evaluateSwimPlan(user, intervals));
 			return { stress_score, distance: 0, duration: 0 };
 
 		default:

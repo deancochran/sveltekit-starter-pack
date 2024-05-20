@@ -11,15 +11,15 @@ published: true
 slug: the-marathon
 ---
 
-The **Marathon** comes from the legend of _Pheidippides_, the Greek messenger. The legend states that,
-he was taking part in the **Battle of Marathon**, and ran the entire distance to **Athens** without stopping,
-before collapsing and dying.
+## Contents
 
-<p style="text-align: center;">"No human is limited" -Eliud Kipchoge</p>
+## Choosing a Marathon
+
+
+> "No human is limited" -Eliud Kipchoge
 
 Typically, marathon training plans last around 16 weeks, sometimes up to 20 weeks or longer. This is because it takes time for your body to adapt to running such a long distance.
 
-## Choosing a Marathon
 
 When selecting a marathon, it's important to find one that you care about finishing. Consider not just the race itself, but also the organization hosting the event. The host organization is responsible for the entire event, from course marshals to finish line officials. The team dedicated to the race operations is the one you'll be dealing with the most.
 
@@ -37,7 +37,7 @@ It's important to know your limits and not set yourself up for disappointment or
 
 An early spring or fall race no longer guarantees a cool race day, as many runners prefer. Of course, weather is an uncontrollable factor, but you can look at the weather from the last three to four years of a specific race to get a sense of the typical forecast.
 
-<P style="text-align: center;">The heat may increase the amount of oxygen we need since more blood flow is redirected to cool our bodies in warm weather.</P>
+> The heat may increase the amount of oxygen we need since more blood flow is redirected to cool our bodies in warm weather.
 
 ## Fundamental Training Concepts
 
@@ -59,4 +59,5 @@ Practicing intervals, tempo runs, and high intensity session to increase your sp
 
 Arguably the most important concept. Rest is essential for preventing injuries and mental burnout. Giving your body enough time to recover between runs and long runs will help you perform at your best on race day and come back stronger after the race.
 
-<p style="text-align: center;">Adaptation comes from ensuring you have proper rest, allowing your body to fully recover.</p>
+> Adaptation comes from ensuring you have proper rest, allowing your body to fully recover.
+

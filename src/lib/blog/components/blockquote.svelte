@@ -1,0 +1,1 @@
+<blockquote class="text-center border-l-4 variant-ghost-surface shadow-md rounded-sm my-4 border-grey-light italic font-semibold min-h-[10vh] flex items-center align-middle justify-center "><slot/></blockquote>
