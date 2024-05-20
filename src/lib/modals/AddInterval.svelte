@@ -10,7 +10,7 @@
 	import { page } from '$app/stores';
 	import AddRunInterval from '$lib/components/WorkoutInterval/AddRunInterval.svelte';
 	import AddSwimInterval from '$lib/components/WorkoutInterval/AddSwimInterval.svelte';
-	import { superForm, type Infer, type SuperForm, type SuperValidated } from 'sveltekit-superforms';
+	import SuperDebug, { superForm, type Infer, type SuperForm, type SuperValidated } from 'sveltekit-superforms';
 	import type { WorkoutInterval } from '$lib/utils/trainingsessions/types';
 	import type { ItemsStore } from '$lib/utils/dragndrop/stores';
 	import { zod } from 'sveltekit-superforms/adapters';
@@ -50,8 +50,11 @@
 
 </script>
 
+
+
 {#if $modal[0] && $page.data.user}
 	<div class="modal-example-form {cBase}">
+		<SuperDebug data={$form} />
 		<header class={cHeader}><h1>Add Interval</h1></header>
 		<form
 			id="NewSessionPlanForm"

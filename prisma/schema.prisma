@@ -151,7 +151,7 @@ model trainingSession {
   activity_type                 ActivityType
   description                   String?
   date                          DateTime
-  distance                      Int
+  distance                      Int?
   duration                      Int
   stress_score                  Float
   plan                          Json[]                                 @default([])

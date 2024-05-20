@@ -185,6 +185,7 @@ export type TrainPlanSchema = typeof training_plan_schema;
 
 export const IntervalSchema = z.object({
 	duration: z.number().min(0).default(0),
+	distance: z.number().optional(),
 	intensity: z.number().min(0).nonnegative()
 });
 export type Interval = z.infer<typeof IntervalSchema>;
@@ -195,8 +196,8 @@ export const training_session_schema = z.object({
 	activity_type: z.nativeEnum(ActivityType),
 	description: z.string().max(250, 'Must be at most 250 characters in length'),
 	date: z.date(),
-	distance: z.number().default(0),
 	duration: z.number().default(0),
+	distance: z.number().optional(),
 	stress_score: z.number().gte(0),
 	plan: z.array(IntervalSchema),
 	training_plan_id: z.number()

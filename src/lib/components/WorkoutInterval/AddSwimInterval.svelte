@@ -9,6 +9,8 @@
 	export let plan_form: Writable<WorkoutInterval>;
 	export let plan_errors: Writable<any>;
 	export let plan_constraints: Writable<any>;
+	
+	$plan_form.distance = 0;
 
 	function calculateDuration(interval: WorkoutInterval) {
 		let sec_p_100m: number;
@@ -17,17 +19,17 @@
 		} else {
 			sec_p_100m = user.swim_ftp + Math.round((1 - interval.intensity) * user.swim_ftp);
 		}
-		return Math.round(distance * (sec_p_100m / 100));
+		return Math.round($plan_form.distance! * (sec_p_100m / 100));
 	}
 	const onUpdate = () => {
 		$plan_form.duration = calculateDuration($plan_form);
 	};
-	let distance: number = 0;
+	
 </script>
 
 <div class="flex w-full flex-row flex-wrap gap-2">
 	<div class="flex w-full flex-row gap-2">
-		<DistanceInput name="distance" label="Distance" bind:value={distance} on:input={onUpdate} />
+		<DistanceInput name="distance" label="Distance" bind:value={$plan_form.distance} on:input={onUpdate} />
 	</div>
 	<SwimInterval bind:user bind:interval={$plan_form} on:input={onUpdate} />
 </div>

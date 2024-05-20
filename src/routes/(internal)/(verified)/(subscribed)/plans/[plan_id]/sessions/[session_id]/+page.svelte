@@ -9,8 +9,9 @@
 	import TextArea from '$lib/forms/inputs/TextArea.svelte';
 	import DateInput from '$lib/forms/inputs/DateInput.svelte';
 	import EnumSelectInput from '$lib/forms/inputs/EnumSelectInput.svelte';
-	import IntervalCard from '$lib/components/WorkoutInterval/IntervalCard.svelte';
+	// import IntervalCard from '$lib/compone	nts/WorkoutInterval/IntervalCard.svelte';
 	import { ActivityType } from '@prisma/client';
+	import ZoneDistribution from '$lib/components/WorkoutIntervals/ZoneDistribution.svelte';
 	import {
 		IntervalSchema,
 		create_wahoo_workout_schema,
@@ -19,9 +20,9 @@
 		type WorkoutInterval
 	} from '$lib/schemas';
 	import { type ItemsStore, ItemsStoreService } from '$lib/utils/dragndrop/stores';
-	import { WorkoutIntervalService } from '$lib/utils/trainingsessions/stores';
+	// import { WorkoutIntervalService } from '$lib/utils/trainingsessions/stores';
 	import {
-		calculateAvgWatts,
+		// calculateAvgWatts,
 		calculateDistance,
 		evaluatePlanTss,
 		getIntervalDisplay
@@ -29,11 +30,11 @@
 	import { CopyIcon, PlusSquare, TrashIcon, Undo2 } from 'lucide-svelte';
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
-	import { get } from 'svelte/store';
+	// import { get } from 'svelte/store';
 	import { secondsToHHMMSS } from '$lib/utils/datetime';
 	import { getWahooWorkoutIdFromTrainingSessionType } from '$lib/utils/integrations/wahoo/utils';
-	import WorkoutIntervals from '$lib/components/WorkoutIntervals/WorkoutIntervals.svelte';
-	import ZoneDistribution from '$lib/components/WorkoutIntervals/ZoneDistribution.svelte';
+	// import WorkoutIntervals from '$lib/components/WorkoutIntervals/WorkoutIntervals.svelte';
+
 	import { page } from '$app/stores';
 	import { getIntensityColor } from '$lib/components/WorkoutIntervals/types';
 
@@ -132,7 +133,6 @@
 			}
 		});
 	}
-	console.log(data);
 </script>
 
 <div class="card">
@@ -227,6 +227,7 @@
 						</Button>
 					</div>
 				</div>
+				<ZoneDistribution intervals={$form.plan} total_duration={$form.duration} />
 
 				<section
 					use:dndzone={{ items: $items, dragDisabled: !editing }}

@@ -65,10 +65,10 @@ export function secondsToHHMMSS(seconds: number): string {
 	const largestUnit = hours > 0 ? 'hr' : minutes > 0 ? 'min' : 's';
 	switch (largestUnit) {
 		case 'hr':
-			return `${paddedHours}:${paddedMinutes}:${paddedSeconds}${largestUnit}`;
+			return `${paddedHours}:${paddedMinutes}:${paddedSeconds} ${largestUnit}`;
 		case 'min':
-			return `${paddedMinutes}:${paddedSeconds}${largestUnit}`;
+			return `${paddedMinutes}:${paddedSeconds} ${largestUnit}`;
 		case 's':
-			return `${paddedSeconds}${largestUnit}`;
+			return `${paddedSeconds} ${largestUnit}`;
 	}
 }
