@@ -14,28 +14,30 @@ datasource db {
 }
 
 model user {
-  id               String                       @id @unique
-  username         String                       @unique
-  email            String                       @unique
-  email_verified   Boolean                      @default(false)
-  hashed_password  String
-  created_at       DateTime                     @default(now())
-  stripe_id        String?                      @unique
-  role             UserRole                     @default(BASE)
-  bike_ftp         Int                          @default(0)
-  run_ftp          Int                          @default(0)
-  swim_ftp         Int                          @default(0)
-  unit_type        UnitType                     @default(METRIC)
-  max_hr           Int                          @default(0)
-  activities       activities[]
-  email_tokens     emailVerificationToken[]
-  keys             key[]
-  password_tokens  passwordResetToken[]
-  auth_sessions    session[]
-  subscription     subscription?
-  integration_logs thirdPartyIntegrationLogs[]
-  integrations     thirdPartyIntegrationToken[]
-  training_plans   trainingPlan[]
+  id                String                       @id @unique
+  username          String                       @unique
+  email             String                       @unique
+  email_verified    Boolean                      @default(false)
+  hashed_password   String
+  created_at        DateTime                     @default(now())
+  stripe_id         String?                      @unique
+  role              UserRole                     @default(BASE)
+  bike_ftp          Int                          @default(0)
+  run_ftp           Int                          @default(0)
+  swim_ftp          Int                          @default(0)
+  unit_type         UnitType                     @default(METRIC)
+  max_hr            Int                          @default(0)
+  activities        activities[]
+  email_tokens      emailVerificationToken[]
+  keys              key[]
+  password_tokens   passwordResetToken[]
+  auth_sessions     session[]
+  subscription      subscription?
+  integration_logs  thirdPartyIntegrationLogs[]
+  integrations      thirdPartyIntegrationToken[]
+  training_sessions trainingSession[]
+  requested_friendships Friendship[]           @relation("requester_friendship")
+  addressed_friendships Friendship[]           @relation("addressee_friendship")
 
   @@index([id])
 }
@@ -56,9 +58,23 @@ model subscription {
   status               String
   stripe_sub_id        String    @unique
   user                 user      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "subscription_user_id_user_id_fk")
-
   @@index([user_id])
 }
+model Friendship {
+  requester_id          String
+  addressee_id          String
+  status               FriendshipStatus
+  timestamp            DateTime               @default(now())
+  requester            user                   @relation("requester_friendship", fields: [requester_id], references: [id])
+  addressee            user                   @relation("addressee_friendship", fields: [addressee_id], references: [id])
+
+  @@id([requester_id, addressee_id])
+  @@unique([requester_id, addressee_id])
+  @@index([requester_id])
+  @@index([addressee_id])
+}
+
+
 
 model session {
   id        String   @id @unique
@@ -131,32 +147,18 @@ model activities {
   user                   user                       @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "activities_user_id_user_id_fk")
 }
 
-model trainingPlan {
-  id                Int               @id @default(autoincrement())
-  name              String
-  description       String
-  start_date        DateTime
-  end_date          DateTime
-  user_id           String
-  user              user              @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "trainingPlan_user_id_user_id_fk")
-  training_sessions trainingSession[]
-
-  @@index([start_date, end_date])
-}
-
 model trainingSession {
   id                            Int                                    @id @default(autoincrement())
   uuid                          String                                 @default(uuid())
   title                         String
   activity_type                 ActivityType
   description                   String?
-  date                          DateTime
   distance                      Int?
   duration                      Int
   stress_score                  Float
   plan                          Json[]                                 @default([])
-  training_plan_id              Int
-  training_plan                 trainingPlan                           @relation(fields: [training_plan_id], references: [id], map: "trainingSession_training_plan_id_trainingPlan_id_fk")
+  user_id                       String
+  user                          user                                   @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "trainingPlan_user_id_user_id_fk")
   third_party_training_sessions thirdPartyIntegrationTrainingSession[]
 }
 
@@ -190,4 +192,11 @@ enum ThirdPartyIntegrationProvider {
 enum UnitType {
   IMPERIAL
   METRIC
+}
+
+enum FriendshipStatus {
+  REQUESTED
+  ACCEPTED
+  BLOCKED
+  DECLINED
 }

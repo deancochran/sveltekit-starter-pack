@@ -55,6 +55,7 @@
 					intervals={training_session.plan}
 					total_duration={totalDuration}
 				/>
+				
 				<WorkoutIntervals
 					intervals={training_session.plan}
 					total_duration={totalDuration}

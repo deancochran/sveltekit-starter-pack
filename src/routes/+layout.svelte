@@ -54,20 +54,20 @@
 	import hljs from 'highlight.js/lib/core';
 
 	// Import each language module you require
-	import xml from 'highlight.js/lib/languages/xml'; // for HTML
-	import css from 'highlight.js/lib/languages/css';
+	import html from 'highlight.js/lib/languages/xml'; 
+
 	import json from 'highlight.js/lib/languages/json';
 	import javascript from 'highlight.js/lib/languages/javascript';
 	import typescript from 'highlight.js/lib/languages/typescript';
 	import shell from 'highlight.js/lib/languages/shell';
 
 	// Register each imported language module
-	hljs.registerLanguage('language-xml', xml); // for HTML
-	hljs.registerLanguage('language-css', css);
-	hljs.registerLanguage('language-json', json);
-	hljs.registerLanguage('language-js', javascript);
-	hljs.registerLanguage('language-ts', typescript);
-	hljs.registerLanguage('language-shell', shell);
+	hljs.registerLanguage('html', html); 
+
+	hljs.registerLanguage('json', json);
+	hljs.registerLanguage('js', javascript);
+	hljs.registerLanguage('ts', typescript);
+	hljs.registerLanguage('shell', shell);
 	storeHighlightJs.set(hljs);
 
 	// init Maplibre Stores

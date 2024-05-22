@@ -195,7 +195,7 @@ export const training_session_schema = z.object({
 	title: z.string(),
 	activity_type: z.nativeEnum(ActivityType),
 	description: z.string().max(250, 'Must be at most 250 characters in length'),
-	date: z.date(),
+	// date: z.date(),
 	duration: z.number().default(0),
 	distance: z.number().optional(),
 	stress_score: z.number().gte(0),

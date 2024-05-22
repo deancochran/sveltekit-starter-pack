@@ -118,7 +118,7 @@
 			workout_type_id: getWahooWorkoutIdFromTrainingSessionType(
 				data.training_session.activity_type
 			),
-			starts: data.training_session.date,
+			starts: new Date(),
 			minutes: data.training_session.duration ?? 0,
 			workout_token: String(data.training_session.id)
 		};
@@ -140,14 +140,14 @@
 		<header class="card-header flex flex-col">
 			<h1 class="w-full py-2 text-center">Update Training Session</h1>
 
-			<DateInput
+			<!-- <DateInput
 				name="date"
 				label="Date"
 				disabled={!editing}
 				bind:value={$form.date}
 				errors={$errors.date}
 				constraints={$constraints.date}
-			/>
+			/> -->
 			<EnumSelectInput
 				enumType={ActivityType}
 				name="activity_type"

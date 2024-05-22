@@ -86,14 +86,14 @@
 	<form id="create" use:focusTrap={isFocused} method="POST" action="?/create" use:enhance>
 		<header class="card-header flex flex-col">
 			<h1 class="w-full py-2 text-center">New Training Session</h1>
-			<DateInput
+			<!-- <DateInput
 					name="date"
 					label="Date"
 					disabled={false}
 					bind:value={$form.date}
 					errors={$errors.date}
 					constraints={$constraints.date}
-				/>
+				/> -->
 				<EnumSelectInput
 				enumType={ActivityType}
 				name="activity_type"
