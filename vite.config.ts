@@ -6,7 +6,12 @@ import fs from 'fs';
 export default defineConfig({
 	plugins: [enhancedImages(), sveltekit()],
 	test: {
-		include: ['src/**/*.{test,spec}.{js,ts}']
+		include: ['src/**/*.test.ts'],
+		poolOptions: {
+			threads: {
+				singleThread: true
+			}
+		}
 	},
 	// Vite uses Chokidar under the hood to watch files,
 	// and its default method of doing so doesn't work in Docker containers.

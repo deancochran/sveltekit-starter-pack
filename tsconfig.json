@@ -8,7 +8,9 @@
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
 		"sourceMap": true,
-		"strict": true
+		"strict": true,
+		"verbatimModuleSyntax": true,
+		"module": "ES2015",
 	},
 	"files": ["src/app.d.ts"]
 }
