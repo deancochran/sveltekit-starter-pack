@@ -11,9 +11,13 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
 	const data = await parent();
-	const trainingSessionSchema = await superValidate( {
-		title: new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date()) + ' ' + 'Workout'
-	},zod(training_session_schema));
+	const trainingSessionSchema = await superValidate(
+		{
+			title:
+				new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date()) + ' ' + 'Workout'
+		},
+		zod(training_session_schema)
+	);
 	const workoutIntervalSchema = await superValidate(zod(IntervalSchema));
 
 	return { trainingSessionSchema, workoutIntervalSchema, ...data };
@@ -23,7 +27,6 @@ export const actions: Actions = {
 	create: async (event) => {
 		const { locals, request, params } = event;
 		const form = await superValidate(request, zod(training_session_schema));
-		form.data.training_plan_id = Number(params.plan_id);
 		if (!locals.user) r(302, handleSignInRedirect(event));
 		let t: ToastSettings;
 		if (form.data.plan.length === 0) {
@@ -31,7 +34,7 @@ export const actions: Actions = {
 				message: 'No Intervals Were Found',
 				background: 'variant-filled-warning'
 			} as const;
-			redirect(`/plans/${params.plan_id}/sessions/create`, t, event);
+			setFlash(t, event);
 		}
 		let created_session: trainingSession;
 		try {
@@ -39,7 +42,8 @@ export const actions: Actions = {
 
 			created_session = await prisma.trainingSession.create({
 				data: {
-					...form.data
+					...form.data,
+					user_id: locals.user.id
 				}
 			});
 			t = {
@@ -47,6 +51,7 @@ export const actions: Actions = {
 				background: 'variant-filled-success'
 			} as const;
 		} catch (e) {
+			console.log(e);
 			t = {
 				message: 'Failed to create session',
 				background: 'variant-filled-error'
@@ -54,6 +59,6 @@ export const actions: Actions = {
 			setFlash(t, event);
 			return fail(400, { form });
 		}
-		redirect(`/plans/${created_session.training_plan_id}/sessions/${created_session.id}`, t, event);
+		redirect(`/sessions/${created_session.id}`, t, event);
 	}
 };

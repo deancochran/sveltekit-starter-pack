@@ -12,7 +12,13 @@
 	import EnumSelectInput from '$lib/forms/inputs/EnumSelectInput.svelte';
 	import { ActivityType } from '@prisma/client';
 	import { CopyIcon, PlusSquare, TrashIcon, Undo2 } from 'lucide-svelte';
-	import { calculateDistance, evaluatePlanTss, getIntensityDisplay, getIntervalDisplay, type WorkoutInterval } from '$lib/utils/trainingsessions/types';
+	import {
+		calculateDistance,
+		evaluatePlanTss,
+		getIntensityDisplay,
+		getIntervalDisplay,
+		type WorkoutInterval
+	} from '$lib/utils/trainingsessions/types';
 	import { dndzone } from 'svelte-dnd-action';
 	import { type ItemsStore, ItemsStoreService } from '$lib/utils/dragndrop/stores';
 	import { getIntensityColor } from '$lib/components/WorkoutIntervals/types';
@@ -21,10 +27,8 @@
 	import { page } from '$app/stores';
 	import type { User } from 'lucia';
 
-
 	// Get page data
 	export let data: PageData;
-
 
 	// Init modal
 	let modal = getModalStore();
@@ -49,7 +53,6 @@
 		});
 	}
 
-
 	// Init form
 	let isFocused: boolean = false;
 	const { form, errors, constraints, enhance, delayed } = superForm(data.trainingSessionSchema, {
@@ -60,7 +63,6 @@
 		timeoutMs: 8000,
 		dataType: 'json'
 	});
-
 
 	// Init drag and drop sort
 	function handleSort(e: { detail: { items: { id: number; data: WorkoutInterval }[] } }) {
@@ -75,11 +77,7 @@
 		$form.plan = intervals;
 	});
 
-	
-	
 	$: max_intensity = $items.reduce((a, b) => Math.max(a, b.data.intensity), 0);
-
-	
 </script>
 
 <div class="card">
@@ -94,7 +92,7 @@
 					errors={$errors.date}
 					constraints={$constraints.date}
 				/> -->
-				<EnumSelectInput
+			<EnumSelectInput
 				enumType={ActivityType}
 				name="activity_type"
 				label="Activity Type"

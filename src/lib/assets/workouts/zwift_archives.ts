@@ -33,7 +33,6 @@ export type ZwiftBikeWorkout = {
 	duration: number;
 	stress_score: number;
 	plan: Array<WorkoutInterval>;
-	training_plan_id?: number;
 };
 export function convertZwiftWorkoutIntervals(workout: Zwift_Archive_Workout): ZwiftBikeWorkout {
 	return {

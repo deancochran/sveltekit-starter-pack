@@ -12,9 +12,8 @@
 		{#if label}<span>{label}</span><br />{/if}
 
 		<input
-
 			type="date"
-			value={value.toISOString().split('T')[0]}
+			value={`${value.getFullYear()}-${(value.getMonth() + 1).toString().padStart(2, '0')}-${value.getDate().toString().padStart(2, '0')}`}
 			on:input={(e) => (value = new Date(e.currentTarget.value))}
 			aria-invalid={errors ? 'true' : undefined}
 			{...constraints}

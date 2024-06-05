@@ -1,6 +1,6 @@
 ---
 title: Non Linear Number Inputs
-description: When dealing with real world relationships, often times the pattern at which values occur are not linear. Rather the relationship is often times best defined by a non-linear function. For some cases in this application, I've found it worth my time and effort to research some different methods for users to input data. 
+description: When dealing with real world relationships, often times the pattern at which values occur are not linear. Rather the relationship is often times best defined by a non-linear function. For some cases in this application, I've found it worth my time and effort to research some different methods for users to input data.
 author: Dean Cochran
 date: '2024-5-20'
 categories:
@@ -15,15 +15,15 @@ When providing users a way to select interval intensity percentages, distances, 
 
 ## The differences in the 3 disciplines
 
-Swimming (Indoors) and Running are similar in the fact, that they are not as affected by the same natural elements that cyclists must deal with. 
+Swimming (Indoors) and Running are similar in the fact, that they are not as affected by the same natural elements that cyclists must deal with.
 
 For this reason, I have made the large assumption, that when training. Users when creating interval workouts would likely know the distance of swim/run interval, but might not know the exact total time it takes to complete that interval.
 
-> Total Interval Time = distance / (Intensity * FTP)
->       
-> Ex: 
-> Total Time = 2km / (100% * 4:00min/km)
-> 
+> Total Interval Time = distance / (Intensity \* FTP)
+>
+> Ex:
+> Total Time = 2km / (100% \* 4:00min/km)
+>
 > Total Time = 8:00min
 
 The `time`, `distance`, and `duration` of an interval are all clearly correlated. However, with each discipline comes it's own conversions and calculations.
@@ -31,7 +31,6 @@ The `time`, `distance`, and `duration` of an interval are all clearly correlated
 Notably in the application, the functional threshold pace (FTP) swimming is represented as a measure of seconds per 100m (s/100m). For running as you have already seen, it is a measure of seconds per kilometer (s/km), and lastly, the black sheep of the three, cycling is measured in watts.
 
 > You will see that a lot of Swimming and Running calculations are similar. Since their unit of measurement is `time/distance`
-
 
 ## Issues with Creating Inputs FTP measurements
 
@@ -56,31 +55,30 @@ This is a key concept in interval training. By overloading your self at a percen
 
 > The takeaway here is that the intensity of a interval can be anywhere between 0 and infinity. (I just hope you don't plan on seriously running 999% of your FTP for more than 1s)
 
-
 ### The Issue with the app
 
 When dealing with a single input, you must represent the value with a single value.
 
 ```ts
-let value:number
+let value: number;
 ```
+
 ```html
 <!-- Using svelte -->
 <label>Cycling FTP</label>
-<input type='number' bind:value />
+<input type="number" bind:value />
 ```
 
-For cycling ftp inputs, I represent this input as a value between 0 - 2000. I do this such that I won't have to make another Frontend component that would get *"lost in the abyss"*.
+For cycling ftp inputs, I represent this input as a value between 0 - 2000. I do this such that I won't have to make another Frontend component that would get _"lost in the abyss"_.
 
 The issue this that I always run into UI/UX issues with this approach. If I was to make a line and make a point at where the avg ftp is for most people, the distribution would appear skewed.
 
 > 0 --- (avg watt ftp) ----------------------------------------- 2000
->
 
 This is also apparent with swimming and running, however their ftp is a measure of time/distance. So the input value is measured in `time` not `watts`
 
 > 1 ------ (avg run s ftp) ---------------------------------------- `inf`
-> 
+>
 > 1 ------ (avg swim s ftp) -------------------------------------- `inf`
 
 Did you notice anything strange about those two as well? Running and Swimming, since they are a measure of time/distance are unique in the fact that they must start at 1!
@@ -97,7 +95,6 @@ To recap there are two large issues with when letting users enter in a desired i
 
 Notably we saw that using **single value inputs are typically skewed**, as well as the issues found with swimming and running represented as a measurement of `time/distance`, and not a simple `wattage` value like cycling.
 
-
 ### Non-Linear inputs for skewed relationships
 
 Assuming we are inputting a cycling wattage value for a workout interval. The value can be anywhere between 0-2000 as we saw above, but we typically are not moving the slider value up past 1500w (lets be honest here...)
@@ -107,19 +104,19 @@ Since the data is naturally skewed, we could use a non-linear function to calcul
 > <iframe src="https://www.desmos.com/calculator/xglorxdsoc?embed" width="400" height="200" style="border: 1px solid #ccc" frameborder=0></iframe>
 
 ```ts
-let x:number
-let watts:number
+let x: number;
+let watts: number;
 
-const max_watts = 2000
+const max_watts = 2000;
 
-$:{
-    // this will run every time x is updated
-    watts = -Math.log(x) * max_watts
+$: {
+	// this will run every time x is updated
+	watts = -Math.log(x) * max_watts;
 }
 ```
+
 ```html
 <!-- Using svelte -->
 <label>Cycling Watts</label>
-<input type='range' name="watts" min=0 max=1 step="0.01" bind:value={x} />
+<input type="range" name="watts" min="0" max="1" step="0.01" bind:value="{x}" />
 ```
-

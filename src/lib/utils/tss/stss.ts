@@ -36,16 +36,24 @@ export function calc_sTss(S: number, NGP: number, FTP: number, INTENSITY_FACTOR:
 	return sTSS;
 }
 
-export function intensity_to_swim_speed(intensity: number, swim_ftp:number|undefined): [display:string, value:number] {
+export function intensity_to_swim_speed(
+	intensity: number,
+	swim_ftp: number | undefined
+): [display: string, value: number] {
 	if (swim_ftp === undefined) {
 		return ['00:00/100m', 0];
 	}
-	let sec_p_100m: number
+	let sec_p_100m: number;
 
 	if (intensity > 1) {
 		sec_p_100m = swim_ftp - Math.round((intensity - 1) * swim_ftp);
 	} else {
 		sec_p_100m = swim_ftp + Math.round((1 - intensity) * swim_ftp);
 	}
-	return [`${Math.floor(sec_p_100m / 60).toString().padStart(2, '0')}:${(sec_p_100m % 60).toFixed(0).padStart(2, '0')}/100m`, sec_p_100m];
+	return [
+		`${Math.floor(sec_p_100m / 60)
+			.toString()
+			.padStart(2, '0')}:${(sec_p_100m % 60).toFixed(0).padStart(2, '0')}/100m`,
+		sec_p_100m
+	];
 }

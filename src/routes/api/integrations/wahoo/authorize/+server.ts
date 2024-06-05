@@ -4,6 +4,7 @@ import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { redirect } from 'sveltekit-flash-message/server';
 
 export async function GET(event) {
+	console.log('hit');
 	const { locals, url } = event;
 	let t: ToastSettings;
 	if (url.searchParams.has('error')) {

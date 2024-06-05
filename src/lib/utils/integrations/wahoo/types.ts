@@ -309,7 +309,7 @@ export type WahooCreateWorkoutRequestBody = {
 		workout_type_id: WahooWorkoutTypeID;
 		starts: Date; // convert to ISO STRING
 		minutes: number;
-		workout_token?: string;
+		workout_token: string;
 		plan_id?: number;
 		workout_summary_id?: object;
 	};
@@ -322,7 +322,7 @@ export type WahooCreateWorkoutResponse = {
 	name: string;
 	created_at: Date; // DATE ISO STRING
 	updated_at: Date; // DATE ISO STRING
-	plan_id?: number;
+	plan_id: number;
 	workout_token: string;
 	workout_type_id: number;
 };

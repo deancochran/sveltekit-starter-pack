@@ -1,1 +1,1 @@
-<code class="code"><slot/></code>
+<code class="code"><slot /></code>

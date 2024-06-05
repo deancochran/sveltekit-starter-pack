@@ -16,44 +16,43 @@
 	const max_intensity = intervals.reduce((a, b) => Math.max(a, b.intensity), 0);
 	// Init drag and drop sort items
 	function handleSort(e: { detail: { items: { id: number; data: WorkoutInterval }[] } }) {
-			$items = e.detail.items;
-		}
+		$items = e.detail.items;
+	}
 	let items: ItemsStore<WorkoutInterval> = ItemsStoreService<WorkoutInterval>(
 		intervals.map((obj, i) => ({ id: i, data: obj }))
 	);
-	let activity_type:ActivityType
+	let activity_type: ActivityType;
 	let editing = false;
 </script>
+
 <section
-					use:dndzone={{ items: $items, dragDisabled: !editing }}
-					on:consider={handleSort}
-					on:finalize={handleSort}
-					class="w-full h-[100px] p-1 flex flex-row gap-px items-end justify-start snap-x hide-scrollbar overscroll-y-none"
-				>
-					{#each $items as item, index (item.id)}
-						<div
-							animate:flip={{ duration: 50 }}
-							style="width: {Math.ceil(
-								(item.data.duration / total_duration) * 100
-							)}%; height: {Math.ceil((item.data.intensity / max_intensity) * 100)}%"
-							class="w-fit p-2 snap-x rounded-sm {getIntensityColor(
-								item.data.intensity
-							)} overscroll-y-none"
-							use:popup={{
-								event: 'click',
-								target: 'intervalPopup-' + index,
-								placement: 'bottom'
-							}}
-						>
-							<div
-								class="bg-surface-backdrop-token p-1 rounded-sm w-fit overscroll-y-none"
-								data-popup="intervalPopup-{index}"
-							>
-								<div class="flex flex-row items-center align-middle justify-center gap-1">
-									<span class="text-sm text-nowrap"
-										>{getIntervalDisplay(item.data, activity_type, $page.data.user)}</span
-									>
-									<!-- {#if editing}
+	use:dndzone={{ items: $items, dragDisabled: !editing }}
+	on:consider={handleSort}
+	on:finalize={handleSort}
+	class="w-full h-[100px] p-1 flex flex-row gap-px items-end justify-start snap-x hide-scrollbar overscroll-y-none"
+>
+	{#each $items as item, index (item.id)}
+		<div
+			animate:flip={{ duration: 50 }}
+			style="width: {Math.ceil((item.data.duration / total_duration) * 100)}%; height: {Math.ceil(
+				(item.data.intensity / max_intensity) * 100
+			)}%"
+			class="w-fit p-2 snap-x rounded-sm {getIntensityColor(item.data.intensity)} overscroll-y-none"
+			use:popup={{
+				event: 'click',
+				target: 'intervalPopup-' + index,
+				placement: 'bottom'
+			}}
+		>
+			<div
+				class="bg-surface-backdrop-token p-1 rounded-sm w-fit overscroll-y-none"
+				data-popup="intervalPopup-{index}"
+			>
+				<div class="flex flex-row items-center align-middle justify-center gap-1">
+					<span class="text-sm text-nowrap"
+						>{getIntervalDisplay(item.data, activity_type, $page.data.user)}</span
+					>
+					<!-- {#if editing}
 										<Button
 											id="duplicate"
 											type="button"
@@ -85,11 +84,11 @@
 											<TrashIcon class="w-6 h-6 p-1 text-surface-400" />
 										</Button>
 									{/if} -->
-								</div>
-							</div>
-						</div>
-					{/each}
-				</section>
+				</div>
+			</div>
+		</div>
+	{/each}
+</section>
 
 <!-- {#key intervals}
 	<div class="relative w-full h-full">

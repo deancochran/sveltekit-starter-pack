@@ -15,11 +15,9 @@ slug: the-marathon
 
 ## Choosing a Marathon
 
-
 > "No human is limited" -Eliud Kipchoge
 
 Typically, marathon training plans last around 16 weeks, sometimes up to 20 weeks or longer. This is because it takes time for your body to adapt to running such a long distance.
-
 
 When selecting a marathon, it's important to find one that you care about finishing. Consider not just the race itself, but also the organization hosting the event. The host organization is responsible for the entire event, from course marshals to finish line officials. The team dedicated to the race operations is the one you'll be dealing with the most.
 
@@ -60,4 +58,3 @@ Practicing intervals, tempo runs, and high intensity session to increase your sp
 Arguably the most important concept. Rest is essential for preventing injuries and mental burnout. Giving your body enough time to recover between runs and long runs will help you perform at your best on race day and come back stronger after the race.
 
 > Adaptation comes from ensuring you have proper rest, allowing your body to fully recover.
-

@@ -9,7 +9,7 @@
 	export let plan_form: Writable<WorkoutInterval>;
 	export let plan_errors: Writable<any>;
 	export let plan_constraints: Writable<any>;
-	
+
 	$plan_form.distance = 0;
 
 	function calculateDuration(interval: WorkoutInterval) {
@@ -24,12 +24,16 @@
 	const onUpdate = () => {
 		$plan_form.duration = calculateDuration($plan_form);
 	};
-	
 </script>
 
 <div class="flex w-full flex-row flex-wrap gap-2">
 	<div class="flex w-full flex-row gap-2">
-		<DistanceInput name="distance" label="Distance" bind:value={$plan_form.distance} on:input={onUpdate} />
+		<DistanceInput
+			name="distance"
+			label="Distance"
+			bind:value={$plan_form.distance}
+			on:input={onUpdate}
+		/>
 	</div>
 	<SwimInterval bind:user bind:interval={$plan_form} on:input={onUpdate} />
 </div>

@@ -12,6 +12,7 @@
 		| 'btn-icon-xl'
 		| undefined = undefined;
 	export let color:
+		| 'variant-filled-surface'
 		| 'variant-soft-primary'
 		| 'variant-soft-secondary'
 		| 'variant-soft-tertiary'

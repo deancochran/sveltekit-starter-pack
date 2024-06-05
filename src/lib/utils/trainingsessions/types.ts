@@ -163,7 +163,7 @@ export function calculateDistance(
 	switch (data.activity_type) {
 		case ActivityType.SWIM:
 			const swim_distance = data.plan.reduce(
-				(distance: number, interval: { duration: number; intensity: number; }) =>
+				(distance: number, interval: { duration: number; intensity: number }) =>
 					distance +
 					(interval.duration /
 						getIntensityDisplay(interval.intensity, ActivityType.SWIM, user)[1]) *
@@ -173,10 +173,9 @@ export function calculateDistance(
 			return swim_distance.toFixed(0) + 'm';
 		case ActivityType.RUN:
 			const run_distance = data.plan.reduce(
-				(distance: number, interval: { duration: number; intensity: number; }) =>
+				(distance: number, interval: { duration: number; intensity: number }) =>
 					distance +
-					(interval.duration /
-						getIntensityDisplay(interval.intensity, ActivityType.RUN, user)[1]) *
+					(interval.duration / getIntensityDisplay(interval.intensity, ActivityType.RUN, user)[1]) *
 						1000,
 				0
 			);

@@ -19,7 +19,6 @@
 
 	<select
 		on:change={(e) => dispatch('change', e)}
-		
 		bind:value
 		aria-invalid={errors ? 'true' : undefined}
 		{...constraints}

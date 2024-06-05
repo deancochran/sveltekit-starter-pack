@@ -4,13 +4,17 @@ import type { LayoutServerLoad } from './$types';
 export const load: LayoutServerLoad = async (event) => {
 	const { parent, params } = event;
 	const data = await parent();
+
+	if (!Number(params.session_id)) {
+		const t: ToastSettings = {
+			message: 'Failed to find session',
+			background: 'variant-filled-error'
+		} as const;
+		redirect(`/sessions`, t, event);
+	}
 	const training_session = await prisma.trainingSession.findFirst({
 		where: {
-			id: Number(params.session_id),
-			training_plan_id: data.plan.id
-		},
-		include: {
-			third_party_training_sessions: true
+			id: Number(params.session_id)
 		}
 	});
 	if (!training_session) {
@@ -18,7 +22,7 @@ export const load: LayoutServerLoad = async (event) => {
 			message: 'Failed to find session',
 			background: 'variant-filled-error'
 		} as const;
-		redirect(`/plans/${data.plan.id}/sessions`, t, event);
+		redirect(`/sessions`, t, event);
 	}
 
 	return {

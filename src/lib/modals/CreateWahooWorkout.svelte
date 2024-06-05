@@ -4,12 +4,9 @@
 	import DateInput from '$lib/forms/inputs/DateInput.svelte';
 	import TextInput from '$lib/forms/inputs/TextInput.svelte';
 	import { create_wahoo_workout_schema, type CreateWahooWorkoutSchema } from '$lib/schemas';
-	import {
-		ThirdPartyIntegrationProvider,
-		type thirdPartyIntegrationTrainingSession,
-		type trainingSession
-	} from '@prisma/client';
+	import { type trainingSession } from '@prisma/client';
 	import { focusTrap, getModalStore } from '@skeletonlabs/skeleton';
+	import { generateId } from 'lucia';
 	import { PlusSquare } from 'lucide-svelte';
 	import type { SvelteComponent } from 'svelte';
 	import SuperDebug, { superForm, type SuperValidated } from 'sveltekit-superforms';
@@ -20,38 +17,25 @@
 	const modal = getModalStore();
 	const meta = $modal[0].meta as {
 		CreateWahooWorkForm: SuperValidated<Infer<CreateWahooWorkoutSchema>>;
-		training_session: trainingSession & {
-			third_party_training_sessions: thirdPartyIntegrationTrainingSession[];
-		};
+		training_session: trainingSession;
 	};
 
-	const { form, errors, constraints, enhance, delayed, reset } = superForm(
-		meta.CreateWahooWorkForm,
-		{
-			id: 'createWahooWorkout',
-			applyAction: true,
-			validators: zod(create_wahoo_workout_schema),
-			delayMs: 0,
-			timeoutMs: 8000,
-			dataType: 'json',
-			onResult(event) {
-				const { result } = event;
-				if (result.type == 'success') {
-					modal.close();
-				}
-				return;
+	const { form, errors, constraints, enhance, reset } = superForm(meta.CreateWahooWorkForm, {
+		id: 'createWahooWorkout',
+		applyAction: true,
+		validators: zod(create_wahoo_workout_schema),
+		delayMs: 0,
+		timeoutMs: 8000,
+		dataType: 'json',
+		onResult(event) {
+			const { result } = event;
+			if (result.type == 'success') {
+				modal.close();
 			}
+			return;
 		}
-	);
+	});
 	let training_session_wahoo_plan_id = undefined;
-	if (meta.training_session.third_party_training_sessions.length > 0) {
-		const sessions = meta.training_session.third_party_training_sessions.filter(
-			(ts) => ts.provider == ThirdPartyIntegrationProvider.WAHOO
-		);
-		training_session_wahoo_plan_id =
-			sessions.length > 0 ? sessions[0].provider_training_session_id : undefined;
-	}
-	$form.workout_token = meta.training_session.uuid;
 	$form.plan_id = training_session_wahoo_plan_id;
 	let isFocused: boolean = false;
 

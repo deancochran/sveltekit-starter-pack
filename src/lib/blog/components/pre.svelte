@@ -5,7 +5,7 @@
 <!-- <p class=" blur-md"> -->
 {#if $$props.code && $$props.language}
 	<CodeBlock
-        shadow={'shadow-md'}
+		shadow={'shadow-md'}
 		code={$$props.code}
 		language={$$props.language}
 		buttonLabel={'Copy'}
@@ -13,4 +13,4 @@
 		lineNumbers={true}
 	/>
 {/if}
-<br/>
+<br />

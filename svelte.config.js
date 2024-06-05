@@ -25,7 +25,7 @@ const mdsvexOptions = {
 	// },
 	highlight: {
 		highlighter(code, language = '') {
-			return `<Components.pre code={\`${code}\`} language={\`${language}\`} />`
+			return `<Components.pre code={\`${code}\`} language={\`${language}\`} />`;
 		}
 	},
 	remarkPlugins: [remarkParse, remarkUnwrapImages, [remarkToc, { tight: true }]],

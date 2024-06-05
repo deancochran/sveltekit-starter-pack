@@ -199,8 +199,7 @@ export const training_session_schema = z.object({
 	duration: z.number().default(0),
 	distance: z.number().optional(),
 	stress_score: z.number().gte(0),
-	plan: z.array(IntervalSchema),
-	training_plan_id: z.number()
+	plan: z.array(IntervalSchema)
 });
 export type TrainingSessionSchema = typeof training_session_schema;
 

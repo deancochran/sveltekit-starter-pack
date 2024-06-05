@@ -72,18 +72,24 @@ export function calc_rTss(S: number, NGP: number, FTP: number, INTENSITY_FACTOR:
 	return rTSS;
 }
 
-export function intensity_to_run_speed(intensity: number, run_ftp:number|undefined): [display:string, value:number] {
-
+export function intensity_to_run_speed(
+	intensity: number,
+	run_ftp: number | undefined
+): [display: string, value: number] {
 	if (run_ftp === undefined) {
 		return ['00:00/km', 0];
 	}
-	let sec_p_km: number
+	let sec_p_km: number;
 
 	if (intensity > 1) {
 		sec_p_km = run_ftp - Math.round((intensity - 1) * run_ftp);
 	} else {
 		sec_p_km = run_ftp + Math.round((1 - intensity) * run_ftp);
 	}
-	return [`${Math.floor(sec_p_km / 60).toString().padStart(2, '0')}:${(sec_p_km % 60).toFixed(0).padStart(2, '0')}/km` , sec_p_km]
+	return [
+		`${Math.floor(sec_p_km / 60)
+			.toString()
+			.padStart(2, '0')}:${(sec_p_km % 60).toFixed(0).padStart(2, '0')}/km`,
+		sec_p_km
+	];
 }
-

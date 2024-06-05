@@ -1,7 +1,7 @@
 <script lang="ts">
 	import 'highlight.js/styles/github-dark.css';
 	import '../app.postcss';
-	
+
 	// import 'maplibre-gl/dist/maplibre-gl.css';
 	import {
 		Toast,
@@ -17,7 +17,7 @@
 		getModalStore,
 		storeHighlightJs
 	} from '@skeletonlabs/skeleton';
-	
+
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import { getFlash } from 'sveltekit-flash-message';
@@ -50,19 +50,19 @@
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 	initializeStores();
 
-
 	import hljs from 'highlight.js/lib/core';
 
 	// Import each language module you require
-	import html from 'highlight.js/lib/languages/xml'; 
+	import html from 'highlight.js/lib/languages/xml';
 
 	import json from 'highlight.js/lib/languages/json';
 	import javascript from 'highlight.js/lib/languages/javascript';
 	import typescript from 'highlight.js/lib/languages/typescript';
 	import shell from 'highlight.js/lib/languages/shell';
+	import { UserRole } from '@prisma/client';
 
 	// Register each imported language module
-	hljs.registerLanguage('html', html); 
+	hljs.registerLanguage('html', html);
 
 	hljs.registerLanguage('json', json);
 	hljs.registerLanguage('js', javascript);
@@ -181,14 +181,21 @@
 	<svelte:fragment slot="header">
 		<AppBar shadow="shadow-md">
 			<svelte:fragment slot="lead">
-				<Link label={'cadence'} href="/">
-					<h1 class="h1 font-serif bg-op font-bold text-4xl">
-						<span
-							class="bg-gradient-to-br from-primary-500 to-tertiary-500 bg-clip-text text-transparent box-decoration-clone"
-							>cadence</span
+				<div class="relative">
+					<Link label={'cadence'} href="/">
+						<h1 class="h1 font-serif bg-op font-bold text-4xl">
+							<span
+								class="bg-gradient-to-br from-primary-500 to-tertiary-500 bg-clip-text text-transparent box-decoration-clone"
+								>cadence</span
+							>
+						</h1>
+					</Link>
+					{#if $page.data.user && String($page.data.user.role) != UserRole.BASE}
+						<span class="absolute top-0 -right-2 chip variant-filled px-1 p-px"
+							>{$page.data.user.role}</span
 						>
-					</h1>
-				</Link>
+					{/if}
+				</div>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
 				<div class=" flex flex-row items-center sm:gap-2">

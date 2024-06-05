@@ -10,7 +10,12 @@
 	import { page } from '$app/stores';
 	import AddRunInterval from '$lib/components/WorkoutInterval/AddRunInterval.svelte';
 	import AddSwimInterval from '$lib/components/WorkoutInterval/AddSwimInterval.svelte';
-	import SuperDebug, { superForm, type Infer, type SuperForm, type SuperValidated } from 'sveltekit-superforms';
+	import SuperDebug, {
+		superForm,
+		type Infer,
+		type SuperForm,
+		type SuperValidated
+	} from 'sveltekit-superforms';
 	import type { WorkoutInterval } from '$lib/utils/trainingsessions/types';
 	import type { ItemsStore } from '$lib/utils/dragndrop/stores';
 	import { zod } from 'sveltekit-superforms/adapters';
@@ -18,20 +23,22 @@
 	/** Exposes parent props to this component. */
 	export let parent: SvelteComponent;
 	const modal = getModalStore();
-	
+
 	const { items, activity_type, workoutIntervalForm } = $modal[0].meta as {
 		items: ItemsStore<WorkoutInterval>;
 		activity_type: ActivityType;
 		workoutIntervalForm: SuperValidated<Infer<typeof IntervalSchema>>;
-
 	};
-	const { form, errors, constraints, validateForm, enhance, delayed, reset } = superForm(workoutIntervalForm, {
-		id: 'NewSessionPlanForm',
-		resetForm: true,
-		validators: zod(IntervalSchema),
-		applyAction: false,
-		dataType: 'json'
-	});
+	const { form, errors, constraints, validateForm, enhance, delayed, reset } = superForm(
+		workoutIntervalForm,
+		{
+			id: 'NewSessionPlanForm',
+			resetForm: true,
+			validators: zod(IntervalSchema),
+			applyAction: false,
+			dataType: 'json'
+		}
+	);
 
 	// Base Classes
 	const cBase = 'card p-4 w-modal shadow-xl space-y-4';
@@ -47,10 +54,7 @@
 			modal.close();
 		}
 	}
-
 </script>
-
-
 
 {#if $modal[0] && $page.data.user}
 	<div class="modal-example-form {cBase}">

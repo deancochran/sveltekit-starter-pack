@@ -14,30 +14,35 @@ datasource db {
 }
 
 model user {
-  id                String                       @id @unique
-  username          String                       @unique
-  email             String                       @unique
-  email_verified    Boolean                      @default(false)
-  hashed_password   String
-  created_at        DateTime                     @default(now())
-  stripe_id         String?                      @unique
-  role              UserRole                     @default(BASE)
-  bike_ftp          Int                          @default(0)
-  run_ftp           Int                          @default(0)
-  swim_ftp          Int                          @default(0)
-  unit_type         UnitType                     @default(METRIC)
-  max_hr            Int                          @default(0)
-  activities        activities[]
-  email_tokens      emailVerificationToken[]
-  keys              key[]
-  password_tokens   passwordResetToken[]
-  auth_sessions     session[]
-  subscription      subscription?
-  integration_logs  thirdPartyIntegrationLogs[]
-  integrations      thirdPartyIntegrationToken[]
-  training_sessions trainingSession[]
-  requested_friendships Friendship[]           @relation("requester_friendship")
-  addressed_friendships Friendship[]           @relation("addressee_friendship")
+  id                    String                       @id @unique
+  username              String                       @unique
+  email                 String                       @unique
+  email_verified        Boolean                      @default(false)
+  hashed_password       String
+  created_at            DateTime                     @default(now())
+  stripe_id             String?                      @unique
+  role                  UserRole                     @default(BASE)
+  bike_ftp              Int                          @default(0)
+  run_ftp               Int                          @default(0)
+  swim_ftp              Int                          @default(0)
+  unit_type             UnitType                     @default(METRIC)
+  max_hr                Int                          @default(0)
+  private               Boolean                      @default(true)
+  activities            activities[]
+  email_tokens          emailVerificationToken[]
+  keys                  key[]
+  password_tokens       passwordResetToken[]
+  auth_sessions         session[]
+  subscription          subscription?
+  integration_logs      thirdPartyIntegrationLogs[]
+  integrations          thirdPartyIntegrationToken[]
+  training_sessions     trainingSession[]
+  requested_friendships Friendship[]                 @relation("requester_friendship")
+  addressed_friendships Friendship[]                 @relation("addressee_friendship")
+  LikedTrainingSession  likedTrainingSession[]
+  club_member           club_member[]
+  avatar_url            String?
+  banner_url            String?
 
   @@index([id])
 }
@@ -58,23 +63,57 @@ model subscription {
   status               String
   stripe_sub_id        String    @unique
   user                 user      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "subscription_user_id_user_id_fk")
+
   @@index([user_id])
 }
-model Friendship {
-  requester_id          String
-  addressee_id          String
-  status               FriendshipStatus
-  timestamp            DateTime               @default(now())
-  requester            user                   @relation("requester_friendship", fields: [requester_id], references: [id])
-  addressee            user                   @relation("addressee_friendship", fields: [addressee_id], references: [id])
 
-  @@id([requester_id, addressee_id])
+model Friendship {
+  requester_id String
+  addressee_id String
+  status       FriendshipStatus
+  created_at   DateTime         @default(now())
+  updated_at   DateTime         @updatedAt
+  requester    user             @relation("requester_friendship", fields: [requester_id], references: [id])
+  addressee    user             @relation("addressee_friendship", fields: [addressee_id], references: [id])
+
+  @@id(name: "friendship_id", [requester_id, addressee_id])
   @@unique([requester_id, addressee_id])
-  @@index([requester_id])
-  @@index([addressee_id])
 }
 
+model club {
+  id          Int           @id @default(autoincrement())
+  name        String
+  description String
+  avatar_url  String?
+  banner_url  String?
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+  members     club_member[]
+}
 
+model club_member {
+  user_id    String
+  club_id    Int
+  admin      Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  club club @relation(fields: [club_id], references: [id], onDelete: Cascade, map: "club_member_club_id_club_id_fk")
+  user user @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "club_member_user_id_user_id_fk")
+
+  @@id(name: "club_member_id", [user_id, club_id])
+  @@unique([user_id, club_id])
+}
+
+model club_event {
+  id                Int             @id @default(autoincrement())
+  club_id           Int
+  date              DateTime
+  name              String
+  description       String?
+  trainingSessionId Int
+  trainingSession   trainingSession @relation(fields: [trainingSessionId], references: [id])
+}
 
 model session {
   id        String   @id @unique
@@ -143,33 +182,36 @@ model activities {
   stress_score           Float
   thirdparty_log_id      Int?                       @unique
   intensity_factor_score Float
-  log                    thirdPartyIntegrationLogs? @relation(fields: [thirdparty_log_id], references: [id], onDelete: Cascade, map: "activities_thirdparty_log_id_thirdPartyIntegrationLogs_id_fk")
+  log                    thirdPartyIntegrationLogs? @relation(fields: [thirdparty_log_id], references: [id], map: "activities_thirdparty_log_id_thirdPartyIntegrationLogs_id_fk")
   user                   user                       @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "activities_user_id_user_id_fk")
 }
 
 model trainingSession {
-  id                            Int                                    @id @default(autoincrement())
-  uuid                          String                                 @default(uuid())
-  title                         String
-  activity_type                 ActivityType
-  description                   String?
-  distance                      Int?
-  duration                      Int
-  stress_score                  Float
-  plan                          Json[]                                 @default([])
-  user_id                       String
-  user                          user                                   @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "trainingPlan_user_id_user_id_fk")
-  third_party_training_sessions thirdPartyIntegrationTrainingSession[]
+  id                   Int                    @id @default(autoincrement())
+  title                String
+  activity_type        ActivityType
+  description          String?
+  distance             Int?
+  duration             Int
+  stress_score         Float
+  plan                 Json[]                 @default([])
+  user_id              String
+  user                 user                   @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "trainingPlan_user_id_user_id_fk")
+  likedTrainingSession likedTrainingSession[]
+  club_event           club_event[]
 }
 
-model thirdPartyIntegrationTrainingSession {
-  id                           Int                           @id @default(autoincrement())
-  provider                     ThirdPartyIntegrationProvider
-  training_session_id          Int
-  provider_training_session_id Int
-  meta                         Json?
+model likedTrainingSession {
+  user_id             String
+  training_session_id Int
+  timestamp           DateTime        @default(now())
+  user                user            @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "liked_training_session_user_id_user_id_fk")
+  training_session    trainingSession @relation(fields: [training_session_id], references: [id], onDelete: Cascade, map: "liked_training_session_ts_id_ts_id_fk")
 
-  training_session trainingSession @relation(fields: [training_session_id], onDelete: Cascade, references: [id])
+  @@id([user_id, training_session_id])
+  @@unique([user_id, training_session_id])
+  @@index([user_id])
+  @@index([training_session_id])
 }
 
 enum ActivityType {

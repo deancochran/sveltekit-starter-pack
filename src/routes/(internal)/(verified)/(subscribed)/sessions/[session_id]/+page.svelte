@@ -37,6 +37,7 @@
 
 	import { page } from '$app/stores';
 	import { getIntensityColor } from '$lib/components/WorkoutIntervals/types';
+	import { generateId } from 'lucia';
 
 	// Get page data
 	export let data: PageData;
@@ -70,7 +71,7 @@
 		data.training_session_form,
 		{
 			id: 'update',
-			resetForm: true,
+			resetForm: false,
 			validators: zod(training_session_schema),
 			delayMs: 0,
 			timeoutMs: 8000,
@@ -120,7 +121,7 @@
 			),
 			starts: new Date(),
 			minutes: data.training_session.duration ?? 0,
-			workout_token: String(data.training_session.id)
+			workout_token: generateId(50)
 		};
 		const CreateWahooWorkForm = await superValidate(init_data, zod(create_wahoo_workout_schema));
 
@@ -322,7 +323,7 @@
 					shadow="shadow-md"
 					color="variant-filled-error"
 					form="update"
-					type="submit"
+					type="button"
 					class="btn ">Cancel</Button
 				>
 				{#if $delayed}
