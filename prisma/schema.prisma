@@ -13,6 +13,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model file {
+  id         String   @id @default(uuid())
+  bucket     String
+  name       String
+  createdAt  DateTime @default(now())
+  updated_at DateTime @updatedAt
+  type       String
+  size       Int
+
+  avatar_file_users user[] @relation("user_avatar_file", map: "user_avatar_file")
+  banner_file_users user[] @relation("user_banner_file", map: "user_banner_file")
+  avatar_file_clubs club[] @relation("club_avatar_file", map: "club_avatar_file")
+  banner_file_clubs club[] @relation("club_banner_file", map: "club_banner_file")
+}
+
 model user {
   id                    String                       @id @unique
   username              String                       @unique
@@ -20,6 +35,7 @@ model user {
   email_verified        Boolean                      @default(false)
   hashed_password       String
   created_at            DateTime                     @default(now())
+  updated_at            DateTime                     @updatedAt
   stripe_id             String?                      @unique
   role                  UserRole                     @default(BASE)
   bike_ftp              Int                          @default(0)
@@ -41,8 +57,10 @@ model user {
   addressed_friendships Friendship[]                 @relation("addressee_friendship")
   LikedTrainingSession  likedTrainingSession[]
   club_member           club_member[]
-  avatar_url            String?
-  banner_url            String?
+  avatar_file           file?                        @relation("user_avatar_file", fields: [avatar_file_id], references: [id])
+  avatar_file_id        String?
+  banner_file           file?                        @relation("user_banner_file", fields: [banner_file_id], references: [id])
+  banner_file_id        String?
 
   @@index([id])
 }
@@ -81,14 +99,17 @@ model Friendship {
 }
 
 model club {
-  id          Int           @id @default(autoincrement())
-  name        String
-  description String
-  avatar_url  String?
-  banner_url  String?
-  created_at  DateTime      @default(now())
-  updated_at  DateTime      @updatedAt
-  members     club_member[]
+  id             Int           @id @default(autoincrement())
+  name           String
+  description    String
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+  members        club_member[]
+  club_event     club_event[]
+  avatar_file    file?         @relation("club_avatar_file", fields: [avatar_file_id], references: [id])
+  avatar_file_id String?
+  banner_file    file?         @relation("club_banner_file", fields: [banner_file_id], references: [id])
+  banner_file_id String?
 }
 
 model club_member {
@@ -106,13 +127,14 @@ model club_member {
 }
 
 model club_event {
-  id                Int             @id @default(autoincrement())
-  club_id           Int
-  date              DateTime
-  name              String
-  description       String?
-  trainingSessionId Int
-  trainingSession   trainingSession @relation(fields: [trainingSessionId], references: [id])
+  id                  Int             @id @default(autoincrement())
+  club_id             Int
+  date                DateTime
+  name                String
+  description         String?
+  training_session_id Int
+  trainingSession     trainingSession @relation(fields: [training_session_id], references: [id])
+  club                club            @relation(fields: [club_id], references: [id], onDelete: Cascade, map: "club_member_club_id_club_id_fk")
 }
 
 model session {

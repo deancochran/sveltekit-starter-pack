@@ -20,7 +20,7 @@
 				<div class="flex flex-row items-center align-middle gap-2">
 					<div class="relative">
 						<Avatar
-							src=""
+							src={`/api/images/${data.user?.avatar_file_id}`}
 							initials={String(data.profile_user.username).slice(0, 2)}
 							border="border-4 border-surface-300-600-token hover:!border-primary-500"
 						/>

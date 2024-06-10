@@ -5,14 +5,29 @@
 	import UpdateUserProfileForm from '$lib/forms/UpdateUserProfileForm.svelte';
 	import UpdateFtpForm from '$lib/forms/UpdateFTPForm.svelte';
 	import IntegrationsForm from '$lib/forms/IntegrationsForm.svelte';
+	import UserAvatarForm from '$lib/forms/UserAvatarForm.svelte';
+	import UserBannerForm from '$lib/forms/UserBannerForm.svelte';
 
 	export let data;
 </script>
 
 <div class="page-container">
-	<div class="mx-auto max-w-2xl space-y-16 sm:space-y-20 lg:mx-0 lg:max-w-none">
-		<div class="card p-4 flex-col gap-2 flex items-center justify-center align-middle">
-			<h1 class="h1 font-serif">Settings Page</h1>
+	<div class="mx-auto max-w-2xl space-y-16 sm:space-y-10 lg:mx-0 lg:max-w-none">
+		<div class="card">
+			<div class="card-header relative h-[30vh] overflow-hidden group">
+				<UserBannerForm form_data={data.userBannerForm} />
+			</div>
+			<div class="flex flex-row h-24 items-start align-baseline justify-start px-4">
+				<div class="flex flex-row h-24 -mt-6 items-end align-baseline justify-start px-12">
+					<div class="relative group h-36 w-36">
+						<UserAvatarForm form_data={data.userAvatarForm} />
+					</div>
+
+					<h2 class="h2 p-4">
+						{data.user?.username}
+					</h2>
+				</div>
+			</div>
 		</div>
 
 		<IntegrationsForm integrations={data.user_integrations} form_data={data.integrationsForm} />
