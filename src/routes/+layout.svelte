@@ -44,6 +44,8 @@
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { invalidateAll } from '$app/navigation';
 	import CreateWahooWorkout from '$lib/modals/CreateWahooWorkout.svelte';
+	import CreateClubEvent from '$lib/forms/CreateClubEvent.svelte';
+	import UpdateClubEvent from '$lib/modals/UpdateClubEvent.svelte';
 
 	export let data: LayoutData;
 
@@ -60,6 +62,8 @@
 	import typescript from 'highlight.js/lib/languages/typescript';
 	import shell from 'highlight.js/lib/languages/shell';
 	import { UserRole } from '@prisma/client';
+	import UpdateClubMembers from '$lib/modals/UpdateClubMembers.svelte';
+	import UpdateClub from '$lib/modals/UpdateClub.svelte';
 
 	// Register each imported language module
 	hljs.registerLanguage('html', html);
@@ -107,7 +111,11 @@
 		SearchPostsModal: { ref: SearchPostsModal },
 		AddInterval: { ref: AddInterval },
 		CookiePolicy: { ref: CookiePolicy },
-		CreateWahooWorkout: { ref: CreateWahooWorkout }
+		CreateWahooWorkout: { ref: CreateWahooWorkout },
+		CreateClubEvent: { ref: CreateClubEvent },
+		UpdateClub: { ref: UpdateClub },
+		UpdateClubEvent: { ref: UpdateClubEvent },
+		UpdateClubMembers: { ref: UpdateClubMembers }
 	};
 
 	const swUpdateModal: ModalSettings = {
@@ -226,7 +234,28 @@
 		</AppBar>
 	</svelte:fragment>
 
-	<div class="flex items-center justify-center p-4 align-middle shadow-inner">
+	<div class="flex flex-col items-start justify-start align-middle gap-4 p-4 shadow-inner">
+		{#if $page.url.href}
+			{@const crumbs = $page.url.pathname.split('/').slice(1)}
+			{#if crumbs.length > 1}
+				<ol class="flex flex-row gap-2 px-2">
+					{#each crumbs as crumb, i}
+						{#key crumb}
+							{#if i + 1 != crumbs.length}
+								<li>
+									<a class="anchor" href={'/' + crumbs.slice(0, i + 1).join('/')}
+										>{crumb.charAt(0).toUpperCase() + crumb.slice(1)}</a
+									>
+								</li>
+								<li class="crumb-separator" aria-hidden="true">&rsaquo;</li>
+							{:else}
+								<li>{crumb.charAt(0).toUpperCase() + crumb.slice(1)}</li>
+							{/if}
+						{/key}
+					{/each}
+				</ol>
+			{/if}
+		{/if}
 		<Transition bind:key={data.pathname}>
 			<slot />
 		</Transition>

@@ -43,7 +43,7 @@
 			alt="Club Banner"
 		/>
 	{:else}
-		<div class="placeholder bg-cover h-full w-full rounded-none" />
+		<div class="placeholder bg-cover bg-surface-backdrop-token h-full w-full rounded-none" />
 	{/if}
 	<FileDropzone
 		type="file"

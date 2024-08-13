@@ -1,16 +1,19 @@
+<script lang="ts" context="module">
+	type T = Record<string, unknown>;
+</script>
+
 <script lang="ts">
+	import { type SuperForm } from 'sveltekit-superforms';
 	import type { WorkoutInterval } from '$lib/schemas';
-	import type { Writable } from 'svelte/store';
-	import SwimInterval from './Intervals/SwimInterval.svelte';
 	import type { User } from 'lucia';
-	import DistanceInput from '$lib/forms/inputs/customInputs/DistanceInput.svelte';
+	import RangeInput from '$lib/forms/inputs/RangeInput.svelte';
+	import NumberInput from '$lib/forms/inputs/NumberInput.svelte';
+	import InputLabel from '$lib/forms/inputs/InputLabel.svelte';
 
 	export let user: User;
-	export let plan_form: Writable<WorkoutInterval>;
-	export let plan_errors: Writable<any>;
-	export let plan_constraints: Writable<any>;
+	export let superform: SuperForm<WorkoutInterval>;
 
-	$plan_form.distance = 0;
+	let { form } = superform;
 
 	function calculateDuration(interval: WorkoutInterval) {
 		let sec_p_100m: number;
@@ -19,21 +22,39 @@
 		} else {
 			sec_p_100m = user.swim_ftp + Math.round((1 - interval.intensity) * user.swim_ftp);
 		}
-		return Math.round($plan_form.distance! * (sec_p_100m / 100));
+		return Math.round($form.distance! * (sec_p_100m / 100));
 	}
+
+	$form.distance = 0;
 	const onUpdate = () => {
-		$plan_form.duration = calculateDuration($plan_form);
+		$form.duration = calculateDuration($form);
 	};
+
+	let speed = Math.ceil(user.swim_ftp / 5) * 5;
+	$: {
+		$form.intensity = 1 - speed / user.swim_ftp + 1;
+	}
+
+	$: swim_ftp_display = `${Math.floor(speed / 60)
+		.toString()
+		.padStart(2, '0')}:${(speed % 60).toFixed(0).padStart(2, '0')}`;
+
+	$: label_display = 'Speed: ' + swim_ftp_display + '/100m';
 </script>
 
 <div class="flex w-full flex-row flex-wrap gap-2">
-	<div class="flex w-full flex-row gap-2">
-		<DistanceInput
-			name="distance"
-			label="Distance"
-			bind:value={$plan_form.distance}
+	<InputLabel label="Distance">
+		<NumberInput
+			{superform}
+			field="distance"
+			bind:value={$form.distance}
 			on:input={onUpdate}
-		/>
-	</div>
-	<SwimInterval bind:user bind:interval={$plan_form} on:input={onUpdate} />
+			step={'25'}
+			min="0"
+			{...$$restProps}
+		/></InputLabel
+	>
+	<InputLabel bind:label={label_display}>
+		<RangeInput {superform} field="duration" on:input={onUpdate} />
+	</InputLabel>
 </div>

@@ -8,13 +8,15 @@
 	import Button from '$lib/components/Button.svelte';
 	import TextInput from './inputs/TextInput.svelte';
 	import { zod } from 'sveltekit-superforms/adapters';
+	import InputLabel from './inputs/InputLabel.svelte';
 
-	const { form, errors, constraints, enhance } = superForm(form_data, {
+	const superform = superForm(form_data, {
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: true,
 		validators: zod(reset_forgot_pass_schema)
 	});
+	const { form, errors, constraints, enhance } = superform;
 	let isFocused: boolean = false;
 </script>
 
@@ -30,27 +32,15 @@
 			action="?/reset_forgot"
 			use:enhance
 		>
-			<TextInput
-				name="code"
-				label="Password Reset Code"
-				bind:value={$form.code}
-				errors={$errors.code}
-				constraints={$constraints.code}
-			/>
-			<PasswordInput
-				name="password"
-				label="New Password"
-				bind:value={$form.password}
-				errors={$errors.password}
-				constraints={$constraints.password}
-			/>
-			<PasswordInput
-				name="val_password"
-				label="Verify Password"
-				bind:value={$form.val_password}
-				errors={$errors.val_password}
-				constraints={$constraints.val_password}
-			/>
+			<InputLabel label="Email">
+				<TextInput {superform} field="code" />
+			</InputLabel>
+			<InputLabel label="Password">
+				<PasswordInput {superform} field="password" />
+			</InputLabel>
+			<InputLabel label="Verify Password">
+				<PasswordInput {superform} field="val_password" />
+			</InputLabel>
 		</form>
 	</section>
 	<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">

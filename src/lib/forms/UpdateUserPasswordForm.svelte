@@ -12,7 +12,7 @@
 
 	export let form_data: SuperValidated<Infer<UpdateUserPasswordSchema>>;
 
-	const { form, errors, constraints, enhance, delayed } = superForm(form_data, {
+	const superform = superForm(form_data, {
 		id: 'updateUserPassword',
 		applyAction: true,
 		invalidateAll: true,
@@ -21,6 +21,7 @@
 		delayMs: 0,
 		timeoutMs: 8000
 	});
+	const { form, errors, constraints, enhance, delayed } = superform;
 	let isFocused: boolean = false;
 </script>
 
@@ -36,20 +37,8 @@
 			action="/settings/?/updateUserPassword"
 			use:enhance
 		>
-			<PasswordInput
-				name="password"
-				label="New Password"
-				bind:value={$form.password}
-				errors={$errors.password}
-				constraints={$constraints.password}
-			/>
-			<PasswordInput
-				name="val_password"
-				label="Verify New Password"
-				bind:value={$form.val_password}
-				errors={$errors.val_password}
-				constraints={$constraints.val_password}
-			/>
+			<PasswordInput {superform} field="password" />
+			<PasswordInput {superform} field="val_password" />
 		</form>
 	</section>
 	<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">

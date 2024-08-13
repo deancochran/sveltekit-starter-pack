@@ -11,13 +11,14 @@
 	import Button from '$lib/components/Button.svelte';
 	import { zod } from 'sveltekit-superforms/adapters';
 
-	const { form, errors, constraints, enhance, timeout } = superForm(form_data, {
+	const superform = superForm(form_data, {
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: true,
 		validators: zod(signup_schema),
 		timeoutMs: 8000
 	});
+	const { enhance } = superform;
 	let isFocused: boolean = true;
 </script>
 
@@ -27,34 +28,10 @@
 	</header>
 	<section class="p-4">
 		<form id="signup" use:focusTrap={isFocused} method="POST" action="?/signup" use:enhance>
-			<EmailInput
-				name="email"
-				label="Email"
-				bind:value={$form.email}
-				errors={$errors.email}
-				constraints={$constraints.email}
-			/>
-			<TextInput
-				name="username"
-				label="Username"
-				bind:value={$form.username}
-				errors={$errors.username}
-				constraints={$constraints.username}
-			/>
-			<PasswordInput
-				name="password"
-				label="Password"
-				bind:value={$form.password}
-				errors={$errors.password}
-				constraints={$constraints.password}
-			/>
-			<PasswordInput
-				name="val_password"
-				label="Verify Password"
-				bind:value={$form.val_password}
-				errors={$errors.val_password}
-				constraints={$constraints.val_password}
-			/>
+			<EmailInput {superform} field="email" />
+			<TextInput {superform} field="username" />
+			<PasswordInput {superform} field="password" />
+			<PasswordInput {superform} field="val_password" />
 		</form>
 	</section>
 	<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">

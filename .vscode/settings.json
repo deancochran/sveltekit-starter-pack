@@ -16,12 +16,14 @@
 		"skeletonlabs",
 		"Strava",
 		"stss",
+		"superform",
 		"superforms",
 		"Tableof",
 		"tailwindcss",
 		"trainingsessions",
 		"Unfollow",
-		"uuidv"
+		"uuidv",
+		"valibot"
 	],
 	"svg.preview.background": "dark-transparent"
 }

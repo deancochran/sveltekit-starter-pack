@@ -6,16 +6,8 @@
 	import { ActivityType } from '@prisma/client';
 	// import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { IntervalSchema, type training_session_schema } from '$lib/schemas';
-	import AddBikeInterval from '$lib/components/WorkoutInterval/AddBikeInterval.svelte';
 	import { page } from '$app/stores';
-	import AddRunInterval from '$lib/components/WorkoutInterval/AddRunInterval.svelte';
-	import AddSwimInterval from '$lib/components/WorkoutInterval/AddSwimInterval.svelte';
-	import SuperDebug, {
-		superForm,
-		type Infer,
-		type SuperForm,
-		type SuperValidated
-	} from 'sveltekit-superforms';
+	import { superForm, type Infer, type SuperForm, type SuperValidated } from 'sveltekit-superforms';
 	import type { WorkoutInterval } from '$lib/utils/trainingsessions/types';
 	import type { ItemsStore } from '$lib/utils/dragndrop/stores';
 	import { zod } from 'sveltekit-superforms/adapters';
@@ -29,16 +21,14 @@
 		activity_type: ActivityType;
 		workoutIntervalForm: SuperValidated<Infer<typeof IntervalSchema>>;
 	};
-	const { form, errors, constraints, validateForm, enhance, delayed, reset } = superForm(
-		workoutIntervalForm,
-		{
-			id: 'NewSessionPlanForm',
-			resetForm: true,
-			validators: zod(IntervalSchema),
-			applyAction: false,
-			dataType: 'json'
-		}
-	);
+	const superform = superForm(workoutIntervalForm, {
+		id: 'NewSessionPlanForm',
+		resetForm: true,
+		validators: zod(IntervalSchema),
+		applyAction: false,
+		dataType: 'json'
+	});
+	const { form, errors, constraints, validateForm, enhance, delayed, reset } = superform;
 
 	// Base Classes
 	const cBase = 'card p-4 w-modal shadow-xl space-y-4';
@@ -58,7 +48,6 @@
 
 {#if $modal[0] && $page.data.user}
 	<div class="modal-example-form {cBase}">
-		<SuperDebug data={$form} />
 		<header class={cHeader}><h1>Add Interval</h1></header>
 		<form
 			id="NewSessionPlanForm"
@@ -67,35 +56,11 @@
 		>
 			{#key activity_type}
 				{#if activity_type === ActivityType.SWIM}
-					<AddSwimInterval
-						user={$page.data.user}
-						plan_form={form}
-						plan_errors={errors}
-						plan_constraints={constraints}
-						on:reset={() => {
-							reset();
-						}}
-					/>
+					<AddSwimInterval {superform} user={$page.data.user} />
 				{:else if activity_type === ActivityType.RUN}
-					<AddRunInterval
-						user={$page.data.user}
-						plan_form={form}
-						plan_errors={errors}
-						plan_constraints={constraints}
-						on:reset={() => {
-							reset();
-						}}
-					/>
+					<AddRunInterval {superform} user={$page.data.user} />
 				{:else if activity_type === ActivityType.BIKE}
-					<AddBikeInterval
-						user={$page.data.user}
-						plan_form={form}
-						plan_errors={errors}
-						plan_constraints={constraints}
-						on:reset={() => {
-							reset();
-						}}
-					/>
+					<AddBikeInterval {superform} user={$page.data.user} />
 				{:else}
 					<p>No activity type found</p>
 				{/if}

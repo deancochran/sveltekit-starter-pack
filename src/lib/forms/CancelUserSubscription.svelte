@@ -8,10 +8,11 @@
 	import Button from '$lib/components/Button.svelte';
 	import { cancel_user_subscription_schema, type CancelUserSubscription } from '$lib/schemas';
 	import { zod } from 'sveltekit-superforms/adapters';
+	import InputLabel from './inputs/InputLabel.svelte';
 
 	export let form_data: SuperValidated<Infer<CancelUserSubscription>>;
 
-	const { form, errors, constraints, enhance, delayed } = superForm(form_data, {
+	const superform = superForm(form_data, {
 		id: 'cancelSubscription',
 		applyAction: true,
 		invalidateAll: true,
@@ -20,6 +21,7 @@
 		delayMs: 0,
 		timeoutMs: 8000
 	});
+	const { form, errors, constraints, enhance, delayed } = superform;
 	let isFocused: boolean = false;
 </script>
 
@@ -47,13 +49,9 @@
 			action="/settings/?/cancelSubscription"
 			use:enhance
 		>
-			<PasswordInput
-				name="password"
-				label="Password"
-				bind:value={$form.password}
-				errors={$errors.password}
-				constraints={$constraints.password}
-			/>
+			<InputLabel label="password">
+				<PasswordInput {superform} field="password" />
+			</InputLabel>
 		</form>
 	</section>
 	<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">

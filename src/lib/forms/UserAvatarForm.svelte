@@ -14,13 +14,13 @@
 		validators: zod(new_image_schema),
 		delayMs: 0,
 		timeoutMs: 8000,
-		onResult: async ({result})=>{
-			switch(result.type){
-				case('success'):
-					await invalidateAll()
+		onResult: async ({ result }) => {
+			switch (result.type) {
+				case 'success':
+					await invalidateAll();
 					break;
 			}
-			console.log(result)
+			console.log(result);
 		}
 	});
 	let isFocused: boolean = false;
@@ -37,16 +37,28 @@
 	use:enhance
 >
 	{#if $page.data.user}
-		<Avatar
-			src={`/api/images/${$page.data.user.avatar_file_id}`}
-			initials={String($page.data.user.username).slice(0, 2)}
-			width="w-36"
-			shadow="shadow-lg"
-			rounded="rounded-sm"
-			fetchpriority="high"
-			loading="eager"
-			class="group-hover:hidden"
-		/>
+		{#if $page.data.user.avatar_file_id}
+			<Avatar
+				src={`/api/images/${$page.data.user.avatar_file_id}`}
+				initials={String($page.data.user.username).slice(0, 2)}
+				width="w-36"
+				shadow="shadow-lg"
+				rounded="rounded-sm"
+				fetchpriority="high"
+				loading="eager"
+				class="group-hover:hidden"
+			/>
+		{:else}
+			<Avatar
+				initials={String($page.data.user.username).slice(0, 2)}
+				width="w-36"
+				shadow="shadow-lg"
+				rounded="rounded-sm"
+				fetchpriority="high"
+				loading="eager"
+				class="group-hover:hidden"
+			/>
+		{/if}
 		<FileDropzone
 			type="file"
 			name="image"

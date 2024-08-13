@@ -1,26 +1,29 @@
-<script lang="ts">
-	import type { InputConstraint } from 'sveltekit-superforms';
-
-	export let value: string | undefined = undefined;
-	export let rows: number = 2;
-	export let label: string | undefined = undefined;
-	export let errors: string[] | undefined = undefined;
-	export let constraints: InputConstraint | undefined = undefined;
+<script lang="ts" context="module">
+	type T = Record<string, unknown>;
 </script>
 
-<label class="label w-full">
-	{#if label}<span>{label}</span><br />{/if}
-	<textarea
-		{rows}
-		bind:value
-		aria-invalid={errors ? 'true' : undefined}
-		{...constraints}
-		{...$$restProps}
-		class="textarea {$$props.class}"
-	/>
-</label>
-{#if errors}<span class="flex flex-inline space-x-2 text-error-500"
-		>{#each errors as err}
-			<p class="">{err}</p>
-		{/each}</span
-	>{/if}
+<script lang="ts" generics="T extends Record<string, unknown>">
+	import {
+		formFieldProxy,
+		type FormFieldProxy,
+		type SuperForm,
+		type FormPathLeaves
+	} from 'sveltekit-superforms';
+
+	import InputLabel from './InputLabel.svelte';
+
+	export let superform: SuperForm<T>;
+	export let field: FormPathLeaves<T>;
+
+	const { value, errors, constraints } = formFieldProxy(superform, field);
+</script>
+
+<textarea
+	name={field}
+	aria-invalid={$errors ? 'true' : undefined}
+	bind:value={$value}
+	{...$constraints}
+	{...$$restProps}
+	class="textarea {$$props.class}"
+/>
+{#if errors}<span class="invalid">{errors}</span>{/if}

@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 
 	let slotId = '';
-	let slotContentElement;
+	let slotContentElement: HTMLHeadingElement;
 
 	onMount(() => {
 		// Set the slotId based on the slot content

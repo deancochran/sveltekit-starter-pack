@@ -11,7 +11,10 @@
 	};
 
 	const dispatch = createEventDispatcher();
-
+export let value: number = Math.ceil(user.run_ftp / 5) * 5;
+	$: {
+		interval.intensity = 1 - value / user.run_ftp + 1;
+	}
 	$: run_ftp_display = `${Math.floor(value / 60)
 		.toString()
 		.padStart(2, '0')}:${(value % 60).toFixed(0).padStart(2, '0')}`;

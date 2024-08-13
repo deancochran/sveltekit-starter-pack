@@ -70,18 +70,43 @@
 					on:click={() => {
 						goto(`/clubs/${membership.club.id}`);
 					}}
-					class="snap-start shrink-0 card card-hover w-40 md:w-80 h-32 relative overflow-auto flex items-end align-middle justify-center"
+					class="snap-start shrink-0 card card-hover w-40 md:w-80 h-32 relative overflow-hidden flex items-end align-middle justify-center"
 				>
 					{#if membership.club.banner_file_id}
-						<!-- BAD -->
-						<!-- <enhanced:img -->
-						<!-- 	class="bg-cover brightness-75 z-0 absolute inset-0" -->
-						<!-- 	src={membership.club.banner_file_id} -->
-						<!-- 	alt="lost" -->
-						<!-- /> -->
+						<img
+							src={`/api/images/${membership.club.banner_file_id}`}
+							class="absolute object-cover object-bottom rounded-none overflow-hidden w-full group-hover:hidden"
+							alt="Club Banner"
+						/>
+					{:else}
+						<div
+							class="placeholder bg-cover bg-surface-backdrop-token h-full w-full rounded-none"
+						/>
 					{/if}
+
 					<div class="isolate h-1/3 w-full flex flex-row bg-surface-500">
-						<Avatar src={''} rounded="rounded-none"><LucideUsers /></Avatar>
+						{#if membership.club?.avatar_file_id}
+							<Avatar
+								src={`/api/images/${membership.club?.avatar_file_id}`}
+								initials={String(membership.club.name).slice(0, 2)}
+								width="w-16"
+								shadow="shadow-lg"
+								rounded="rounded-sm"
+								fetchpriority="high"
+								loading="eager"
+								class="group-hover:hidden"
+							/>
+						{:else}
+							<Avatar
+								initials={String(membership.club?.name).slice(0, 2)}
+								width="w-16"
+								shadow="shadow-lg"
+								rounded="rounded-sm"
+								fetchpriority="high"
+								loading="eager"
+								class="group-hover:hidden"
+							/>
+						{/if}
 						<h4 class="w-full h4 flex items-center align-middle justify-center text-center">
 							{membership.club.name}
 						</h4>
@@ -121,7 +146,28 @@
 			{#each clubs as club}
 				<tr on:click={() => goto(`/clubs/${club.id}`)}>
 					<td>
-						<Avatar src={''} rounded="rounded-none"><LucideUsers /></Avatar>
+						{#if club?.avatar_file_id}
+							<Avatar
+								src={`/api/images/${club?.avatar_file_id}`}
+								initials={String(club.name).slice(0, 2)}
+								width="w-16"
+								shadow="shadow-lg"
+								rounded="rounded-sm"
+								fetchpriority="high"
+								loading="eager"
+								class="group-hover:hidden"
+							/>
+						{:else}
+							<Avatar
+								initials={String(club?.name).slice(0, 2)}
+								width="w-16"
+								shadow="shadow-lg"
+								rounded="rounded-sm"
+								fetchpriority="high"
+								loading="eager"
+								class="group-hover:hidden"
+							/>
+						{/if}
 					</td>
 					<td>
 						<div class="flex flex-col gap-1">
@@ -133,7 +179,7 @@
 							</span>
 						</div>
 					</td>
-					<td>{club.created_at instanceof Date}</td>
+					<td>{club.created_at}</td>
 					<td>{club._count.members}</td>
 				</tr>
 			{/each}

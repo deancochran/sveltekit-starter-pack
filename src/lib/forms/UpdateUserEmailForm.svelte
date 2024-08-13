@@ -20,7 +20,7 @@
 	$: successfullySentCode = false;
 	$: lock_verify_code = !successfullySentCode;
 
-	const { form, errors, constraints, enhance, delayed } = superForm(form_data, {
+	const superform = superForm(form_data, {
 		id: 'updateUserEmailForm',
 		applyAction: true,
 		invalidateAll: true,
@@ -36,6 +36,7 @@
 			return;
 		}
 	});
+	const { form, errors, constraints, enhance, delayed } = superform;
 	let isFocused: boolean = false;
 
 	const {
@@ -83,13 +84,7 @@
 					use:SendNewUserEmailCodeEnhance
 					class="flex flex-row"
 				>
-					<EmailInput
-						name="email"
-						label="email"
-						bind:value={$SendNewUserEmailCodeForm.email}
-						errors={$SendNewUserEmailCodeErrors.email}
-						constraints={$SendNewUserEmailCodeConstraints.email}
-					/>
+					<EmailInput {superform} field="email" />
 
 					{#if $SendNewUserEmailCodeDelayed}
 						<div class="flex items-center justify-center mt-6">
@@ -120,13 +115,7 @@
 					<svelte:fragment slot="header">Submit Your Code</svelte:fragment>
 					<input hidden={true} name="email" bind:value={$form.email} />
 					<div class="relative flex space-x-4 flex-row h-full">
-						<TextInput
-							name="code"
-							label="code"
-							bind:value={$form.code}
-							errors={$errors.code}
-							constraints={$constraints.code}
-						/>
+						<TextInput {superform} field="code" />
 
 						<div class="flex items-center justify-center">
 							{#if $delayed}

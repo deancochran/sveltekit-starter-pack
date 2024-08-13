@@ -9,7 +9,7 @@
 	import { zod } from 'sveltekit-superforms/adapters';
 	export let form_data: SuperValidated<Infer<UpdateUserSchema>>;
 
-	const { form, errors, constraints, enhance, delayed } = superForm(form_data, {
+	const superform = superForm(form_data, {
 		id: 'updateUser',
 		applyAction: true,
 		invalidateAll: true,
@@ -18,6 +18,7 @@
 		delayMs: 0,
 		timeoutMs: 8000
 	});
+	const { form, errors, constraints, enhance, delayed } = superform;
 	let isFocused: boolean = false;
 </script>
 
@@ -33,13 +34,7 @@
 			action="/settings/?/updateUser"
 			use:enhance
 		>
-			<TextInput
-				name="username"
-				label="Username"
-				bind:value={$form.username}
-				errors={$errors.username}
-				constraints={$constraints.username}
-			/>
+			<TextInput {superform} field="username" />
 		</form>
 	</section>
 	<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">

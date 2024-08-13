@@ -50,7 +50,6 @@
 			</header>
 			<section class="p-4 flex flex-col">
 				<ZoneDistribution intervals={training_session.plan} total_duration={totalDuration} />
-
 				<WorkoutIntervals intervals={training_session.plan} total_duration={totalDuration} />
 			</section>
 			<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">

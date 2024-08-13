@@ -1,14 +1,23 @@
 import { fail } from '@sveltejs/kit';
 import { stripe } from '$lib/server/stripe';
-import { auth } from '$lib/server/lucia';
+import { lucia } from '$lib/server/lucia';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { setFlash, redirect } from 'sveltekit-flash-message/server';
 import { getActiveSubscription } from '$lib/utils/stripe/subscriptions';
+import type { PageServerLoad } from '../$types';
+
+export const load: PageServerLoad = async (event) => {
+	const { parent } = event;
+	const data = await parent();
+	return {
+		...data
+	};
+};
 
 export const actions = {
 	checkout: async (event) => {
 		const { request, url } = event;
-		const session_id = event.cookies.get(auth.sessionCookieName);
+		const session_id = event.cookies.get(lucia.sessionCookieName);
 		let t: ToastSettings;
 		if (!session_id) {
 			t = {
@@ -18,7 +27,7 @@ export const actions = {
 			redirect('/sign-in', t, event);
 		}
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { session, user } = await auth.validateSession(session_id);
+		const { session, user } = await lucia.validateSession(session_id);
 		if (!user) {
 			t = {
 				message: 'User Kicked for Security Measures',

@@ -29,6 +29,8 @@ export const load: PageServerLoad = async (event) => {
 			created_at: true,
 			private: true,
 			training_sessions: true,
+			avatar_file_id: true,
+			banner_file_id: true,
 			addressed_friendships: {
 				where: {
 					requester_id: data.user.id
@@ -37,6 +39,11 @@ export const load: PageServerLoad = async (event) => {
 			requested_friendships: {
 				where: {
 					addressee_id: data.user.id
+				}
+			},
+			club_memberships: {
+				include: {
+					club: true
 				}
 			}
 		}

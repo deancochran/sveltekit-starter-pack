@@ -1,4 +1,4 @@
-import { auth } from '$lib/server/lucia';
+import { lucia } from '$lib/server/lucia';
 import type { Actions } from './$types';
 import type { PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms/server';
@@ -6,11 +6,6 @@ import { signup_schema } from '$lib/schemas';
 import { setFlash, redirect } from 'sveltekit-flash-message/server';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { fail } from '@sveltejs/kit';
-import {
-	PrismaClientKnownRequestError,
-	PrismaClientUnknownRequestError
-} from '@prisma/client/runtime/library';
-// import { stripe } from '$lib/server/stripe';
 import { sendEmailVerificationLink } from '$lib/utils/emails';
 import { generateId, type User } from 'lucia';
 import * as argon from 'argon2';
@@ -26,7 +21,7 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
 	signup: async (event) => {
-		const { request, url } = event;
+		const { request, url, locals } = event;
 		const form = await superValidate(request, zod(signup_schema));
 		if (form.valid) {
 			try {
@@ -40,8 +35,10 @@ export const actions: Actions = {
 					}
 				});
 				setConsentCookie(event);
-				const session = await auth.createSession(user.id, {});
-				const sessionCookie = auth.createSessionCookie(session.id);
+				const session = await lucia.createSession(user.id, {
+					ip_country: locals.session?.ip_country
+				});
+				const sessionCookie = lucia.createSessionCookie(session.id);
 				event.cookies.set(sessionCookie.name, sessionCookie.value, {
 					path: '.',
 					...sessionCookie.attributes
@@ -49,34 +46,11 @@ export const actions: Actions = {
 				await sendEmailVerificationLink(user as unknown as User, url.origin);
 			} catch (error) {
 				let t: ToastSettings;
-				if (error instanceof PrismaClientKnownRequestError) {
-					t = {
-						message: 'Request Error',
-						background: 'variant-filled-warning'
-					} as const;
-					if (error.meta) {
-						if (error.meta.target == 'email')
-							t = {
-								message: 'Email Already Exists',
-								background: 'variant-filled-warning'
-							} as const;
-						if (error.meta.target == 'username')
-							t = {
-								message: 'Username Already Exists',
-								background: 'variant-filled-warning'
-							} as const;
-					}
-				} else if (error instanceof PrismaClientUnknownRequestError) {
-					t = {
-						message: error.message,
-						background: 'variant-filled-warning'
-					} as const;
-				} else {
-					t = {
-						message: `Unknown Error:`,
-						background: 'variant-filled-warning'
-					} as const;
-				}
+				// eslint-disable-next-line prefer-const
+				t = {
+					message: `Unknown Error:`,
+					background: 'variant-filled-warning'
+				} as const;
 				setFlash(t, event);
 				return fail(500, { form });
 			}

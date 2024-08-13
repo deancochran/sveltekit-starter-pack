@@ -15,7 +15,6 @@ declare global {
 		}
 		interface PageData {
 			flash?: ToastSettings;
-			session?: Session;
 			session?: import('lucia').Session;
 			user?: import('lucia').User;
 			consent_cookie?: boolean;

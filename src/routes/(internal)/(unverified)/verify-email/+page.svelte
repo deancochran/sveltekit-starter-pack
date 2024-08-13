@@ -10,7 +10,7 @@
 	import { zod } from 'sveltekit-superforms/adapters';
 	export let data: PageData;
 
-	const { form, errors, constraints, enhance, delayed } = superForm(data.verifyEmailForm, {
+	const superform = superForm(data.verifyEmailForm, {
 		id: 'updateUser',
 		applyAction: true,
 		invalidateAll: false,
@@ -19,6 +19,7 @@
 		delayMs: 0,
 		timeoutMs: 8000
 	});
+	const { form, errors, constraints, enhance, delayed } = superform;
 	let isFocused: boolean = false;
 </script>
 
@@ -26,13 +27,7 @@
 	<form id="verify" use:focusTrap={isFocused} method="POST" action="?/verify" use:enhance>
 		<h1>Submit Your Code</h1>
 		<div class="relative flex space-x-4 flex-row h-full">
-			<TextInput
-				name="code"
-				label="code"
-				bind:value={$form.code}
-				errors={$errors.code}
-				constraints={$constraints.code}
-			/>
+			<TextInput {superform} field="code" />
 
 			<div class="flex items-center justify-center">
 				{#if $delayed}

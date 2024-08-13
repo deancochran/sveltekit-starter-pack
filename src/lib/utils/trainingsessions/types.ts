@@ -121,6 +121,7 @@ export function getIntervalDisplay(
 	activity_type: string,
 	user: User | undefined
 ) {
+	console.log(interval, activity_type, user);
 	if (!user) throw new Error('User not defined.');
 
 	switch (activity_type) {

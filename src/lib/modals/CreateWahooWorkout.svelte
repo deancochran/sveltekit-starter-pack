@@ -6,10 +6,9 @@
 	import { create_wahoo_workout_schema, type CreateWahooWorkoutSchema } from '$lib/schemas';
 	import { type trainingSession } from '@prisma/client';
 	import { focusTrap, getModalStore } from '@skeletonlabs/skeleton';
-	import { generateId } from 'lucia';
 	import { PlusSquare } from 'lucide-svelte';
 	import type { SvelteComponent } from 'svelte';
-	import SuperDebug, { superForm, type SuperValidated } from 'sveltekit-superforms';
+	import { superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zod, type Infer } from 'sveltekit-superforms/adapters';
 
 	/** Exposes parent props to this component. */
@@ -20,14 +19,14 @@
 		training_session: trainingSession;
 	};
 
-	const { form, errors, constraints, enhance, reset } = superForm(meta.CreateWahooWorkForm, {
+	const superform = superForm(meta.CreateWahooWorkForm, {
 		id: 'createWahooWorkout',
 		applyAction: true,
 		validators: zod(create_wahoo_workout_schema),
 		delayMs: 0,
 		timeoutMs: 8000,
-		dataType: 'json',
 		onResult(event) {
+			console.log('recieved data', event);
 			const { result } = event;
 			if (result.type == 'success') {
 				modal.close();
@@ -35,6 +34,7 @@
 			return;
 		}
 	});
+	const { form, errors, constraints, enhance, reset } = superform;
 	let training_session_wahoo_plan_id = undefined;
 	$form.plan_id = training_session_wahoo_plan_id;
 	let isFocused: boolean = false;
@@ -47,30 +47,17 @@
 
 {#if $modal[0] && $page.data.user}
 	<div class="modal-example-form {cBase}">
-		<SuperDebug data={$form} />
 		<header class={cHeader}><h1>New Wahoo Workout</h1></header>
 		<form
 			id="createWahooWorkout"
-			action="?/CreateWahooWorkout"
+			action={`/sessions/${meta.training_session.id}?/CreateWahooWorkout`}
 			use:enhance
 			use:focusTrap={isFocused}
 			method="POST"
 			class="modal-form {cForm}"
 		>
-			<TextInput
-				name="name"
-				label="Workout Name"
-				bind:value={$form.name}
-				errors={$errors.name}
-				constraints={$constraints.name}
-			/>
-			<DateInput
-				name="starts"
-				label="Workout Date"
-				bind:value={$form.starts}
-				errors={$errors.starts}
-				constraints={$constraints.starts}
-			/>
+			<TextInput {superform} field="name" />
+			<DateInput {superform} field="starts" />
 
 			<div class="modal-footer {parent.regionFooter}">
 				<Button

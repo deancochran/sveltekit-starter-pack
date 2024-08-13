@@ -1,23 +1,29 @@
 <script lang="ts">
-	import EnumSelectInput from '$lib/forms/inputs/EnumSelectInput.svelte';
+	import InputLabel from '$lib/forms/inputs/InputLabel.svelte';
+	import RangeInput from '$lib/forms/inputs/RangeInput.svelte';
+
+	import { type SuperForm } from 'sveltekit-superforms';
+
 	import type { WorkoutInterval } from '$lib/schemas';
-	import type { Writable } from 'svelte/store';
 	import type { User } from 'lucia';
-	import { createEventDispatcher } from 'svelte';
 	import DurationInput from '$lib/forms/inputs/customInputs/DurationInput.svelte';
-	import BikeInterval from '$lib/components/WorkoutInterval/Intervals/BikeInterval.svelte';
 
-	const dispatch = createEventDispatcher();
-
+	export let superform: SuperForm<WorkoutInterval>;
+	const { form } = superform;
 	export let user: User;
-	export let plan_form: Writable<WorkoutInterval>;
-	export let plan_errors: Writable<any>;
-	export let plan_constraints: Writable<any>;
+	const onUpdate = () => {
+		$form.intensity = $form.power ?? 1 / user.bike_ftp;
+	};
 </script>
 
 <div class="flex w-full flex-row flex-wrap gap-2">
+	<h1>intensity: {$form.intensity}% watts: {$form.power}w</h1>
 	<div class="flex w-full flex-row gap-2">
-		<DurationInput name="duration" label="Duration" bind:value={$plan_form.duration} />
+		<InputLabel label="Duration">
+			<DurationInput {superform} field="duration" />
+		</InputLabel>
 	</div>
-	<BikeInterval bind:user bind:interval={$plan_form} on:input={() => dispatch('input')} />
+	<InputLabel label="Watts">
+		<RangeInput {superform} field="power" on:input={onUpdate} />
+	</InputLabel>
 </div>

@@ -5,14 +5,12 @@
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
 	import Button from '$lib/components/Button.svelte';
-	import SwimFtpInput from './inputs/customInputs/SwimFTPInput.svelte';
-	import BikeFtpInput from './inputs/customInputs/BikeFTPInput.svelte';
-	import RunFtpInput from './inputs/customInputs/RunFTPInput.svelte';
-	import MaxHrInput from './inputs/customInputs/MaxHrInput.svelte';
 	import { zod } from 'sveltekit-superforms/adapters';
+	import InputLabel from './inputs/InputLabel.svelte';
+	import RangeInput from './inputs/RangeInput.svelte';
 	export let form_data: SuperValidated<Infer<UpdateFTP_HRSchema>>;
 
-	const { form, errors, constraints, enhance, delayed } = superForm(form_data, {
+	const superform = superForm(form_data, {
 		id: 'updateFTPHR',
 		applyAction: true,
 		invalidateAll: true,
@@ -21,6 +19,7 @@
 		delayMs: 0,
 		timeoutMs: 8000
 	});
+	const { enhance, delayed } = superform;
 	let isFocused: boolean = false;
 </script>
 
@@ -36,46 +35,18 @@
 			action="/settings/?/updateFTPHR"
 			use:enhance
 		>
-			<MaxHrInput
-				name="max_hr"
-				label="Max HR"
-				max={220}
-				min={25}
-				step={1}
-				bind:value={$form.max_hr}
-				errors={$errors.max_hr}
-				constraints={$constraints.max_hr}
-			/>
-			<SwimFtpInput
-				name="swim_ftp"
-				label="Swim FTP"
-				max={240}
-				min={30}
-				step={1}
-				bind:value={$form.swim_ftp}
-				errors={$errors.swim_ftp}
-				constraints={$constraints.swim_ftp}
-			/>
-			<BikeFtpInput
-				name="bike_ftp"
-				label="Bike FTP"
-				max={500}
-				min={100}
-				step={1}
-				bind:value={$form.bike_ftp}
-				errors={$errors.bike_ftp}
-				constraints={$constraints.bike_ftp}
-			/>
-			<RunFtpInput
-				name="run_ftp"
-				label="Run FTP"
-				max={480}
-				min={180}
-				step={1}
-				bind:value={$form.run_ftp}
-				errors={$errors.run_ftp}
-				constraints={$constraints.run_ftp}
-			/>
+			<InputLabel label="Max HR">
+				<RangeInput {superform} field="max_hr" />
+			</InputLabel>
+			<InputLabel label="Swim FTP (m/s)">
+				<RangeInput {superform} field="swim_ftp" />
+			</InputLabel>
+			<InputLabel label="Bike FTP (watts)">
+				<RangeInput {superform} field="bike_ftp" />
+			</InputLabel>
+			<InputLabel label="Run FTP (m/s)">
+				<RangeInput {superform} field="run_ftp" />
+			</InputLabel>
 		</form>
 	</section>
 	<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">

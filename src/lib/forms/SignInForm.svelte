@@ -10,8 +10,9 @@
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import { zod } from 'sveltekit-superforms/adapters';
+	import InputLabel from './inputs/InputLabel.svelte';
 
-	const { form, errors, constraints, enhance, delayed } = superForm(form_data, {
+	const superform = superForm(form_data, {
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: true,
@@ -19,6 +20,7 @@
 		delayMs: 0,
 		timeoutMs: 8000
 	});
+	const { form, errors, constraints, enhance, delayed } = superform;
 	let isFocused: boolean = false;
 </script>
 
@@ -28,20 +30,12 @@
 	</header>
 	<section class="p-4">
 		<form id="signin" use:focusTrap={isFocused} method="POST" action="?/signin" use:enhance>
-			<EmailInput
-				name="email"
-				label="Email"
-				bind:value={$form.email}
-				errors={$errors.email}
-				constraints={$constraints.email}
-			/>
-			<PasswordInput
-				name="password"
-				label="Password"
-				bind:value={$form.password}
-				errors={$errors.password}
-				constraints={$constraints.password}
-			/>
+			<InputLabel label="Email">
+				<EmailInput {superform} field="email" />
+			</InputLabel>
+			<InputLabel label="Password">
+				<PasswordInput {superform} field="password" />
+			</InputLabel>
 		</form>
 	</section>
 	<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">

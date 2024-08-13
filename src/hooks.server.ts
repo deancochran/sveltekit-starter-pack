@@ -1,19 +1,19 @@
 import { checkConsentCookie, setConsentCookie } from '$lib/cookies';
-import { auth } from '$lib/server/lucia';
+import { lucia } from '$lib/server/lucia';
 import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const session_id = event.cookies.get(auth.sessionCookieName);
+	const session_id = event.cookies.get(lucia.sessionCookieName);
 	if (!session_id) {
 		event.locals.user = undefined;
 		event.locals.session = undefined;
 		event.locals.consent_cookie = checkConsentCookie(event);
 	} else {
-		const { session, user } = await auth.validateSession(session_id);
+		const { session, user } = await lucia.validateSession(session_id);
 		// Assuming they have accepted to the terms and conditions of the app, then they would've accepted the privacy policy
 		if (session && session.fresh) {
 			setConsentCookie(event);
-			const sessionCookie = auth.createSessionCookie(session.id);
+			const sessionCookie = lucia.createSessionCookie(session.id);
 			if (event.locals.consent_cookie) {
 				event.cookies.set(sessionCookie.name, sessionCookie.value, {
 					path: '/',
@@ -22,7 +22,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			}
 		}
 		if (!session) {
-			const sessionCookie = auth.createBlankSessionCookie();
+			const sessionCookie = lucia.createBlankSessionCookie();
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: '/',
 				...sessionCookie.attributes

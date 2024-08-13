@@ -70,6 +70,7 @@
 	$: d3.select(gy).call(d3.axisLeft(y));
 	//@ts-ignore
 	$: d3.select(gx).call(
+		//@ts-ignore
 		d3.axisBottom(x).ticks(d3.timeDay.every(1)).tickFormat(d3.timeFormat('%m-%d-%y'))
 	);
 	let svg: SVGElement;

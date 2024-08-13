@@ -1,4 +1,4 @@
-import { auth } from '$lib/server/lucia';
+import { lucia } from '$lib/server/lucia';
 import { redirect } from 'sveltekit-flash-message/server';
 import type { Actions } from './$types';
 import type { PageServerLoad } from './$types';
@@ -19,7 +19,7 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
 	signin: async (event) => {
-		const { request } = event;
+		const { request, locals } = event;
 		const form = await superValidate(request, zod(signin_schema));
 		let t: ToastSettings;
 		if (form.valid) {
@@ -43,8 +43,10 @@ export const actions: Actions = {
 					return fail(500, { form });
 				}
 
-				const session = await auth.createSession(user.id, {});
-				const sessionCookie = auth.createSessionCookie(session.id);
+				const session = await lucia.createSession(user.id, {
+					ip_country: locals.session?.ip_country
+				});
+				const sessionCookie = lucia.createSessionCookie(session.id);
 				event.cookies.set(sessionCookie.name, sessionCookie.value, {
 					path: '.',
 					...sessionCookie.attributes

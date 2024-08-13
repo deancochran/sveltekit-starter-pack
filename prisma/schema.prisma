@@ -37,12 +37,12 @@ model user {
   created_at            DateTime                     @default(now())
   updated_at            DateTime                     @updatedAt
   stripe_id             String?                      @unique
-  role                  UserRole                     @default(BASE)
-  bike_ftp              Int                          @default(0)
-  run_ftp               Int                          @default(0)
-  swim_ftp              Int                          @default(0)
-  unit_type             UnitType                     @default(METRIC)
-  max_hr                Int                          @default(0)
+  role                  UserRole                     @default(BASE) // subscription type
+  bike_ftp              Int                          @default(0) // watts
+  run_ftp               Int                          @default(0) // m/s 
+  swim_ftp              Int                          @default(0) // m/s 
+  unit_type             UnitType                     @default(METRIC) // controls user display
+  max_hr                Int                          @default(0) // 0-240
   private               Boolean                      @default(true)
   activities            activities[]
   email_tokens          emailVerificationToken[]
@@ -56,10 +56,10 @@ model user {
   requested_friendships Friendship[]                 @relation("requester_friendship")
   addressed_friendships Friendship[]                 @relation("addressee_friendship")
   LikedTrainingSession  likedTrainingSession[]
-  club_member           club_member[]
-  avatar_file           file?                        @relation("user_avatar_file", fields: [avatar_file_id], references: [id])
+  club_memberships      club_member[]
+  avatar_file           file?                        @relation("user_avatar_file", fields: [avatar_file_id], onDelete: Cascade, references: [id])
   avatar_file_id        String?
-  banner_file           file?                        @relation("user_banner_file", fields: [banner_file_id], references: [id])
+  banner_file           file?                        @relation("user_banner_file", fields: [banner_file_id], onDelete: Cascade, references: [id])
   banner_file_id        String?
 
   @@index([id])
@@ -106,18 +106,20 @@ model club {
   updated_at     DateTime      @updatedAt
   members        club_member[]
   club_event     club_event[]
-  avatar_file    file?         @relation("club_avatar_file", fields: [avatar_file_id], references: [id])
+  avatar_file    file?         @relation("club_avatar_file", onDelete: Cascade, fields: [avatar_file_id], references: [id])
   avatar_file_id String?
-  banner_file    file?         @relation("club_banner_file", fields: [banner_file_id], references: [id])
+  banner_file    file?         @relation("club_banner_file", onDelete: Cascade, fields: [banner_file_id], references: [id])
   banner_file_id String?
+  private        Boolean       @default(false)
 }
 
 model club_member {
   user_id    String
   club_id    Int
-  admin      Boolean  @default(false)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  status     FriendshipStatus
+  admin      Boolean          @default(false)
+  created_at DateTime         @default(now())
+  updated_at DateTime         @updatedAt
 
   club club @relation(fields: [club_id], references: [id], onDelete: Cascade, map: "club_member_club_id_club_id_fk")
   user user @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "club_member_user_id_user_id_fk")
@@ -127,14 +129,15 @@ model club_member {
 }
 
 model club_event {
-  id                  Int             @id @default(autoincrement())
+  id                  Int              @id @default(autoincrement())
   club_id             Int
   date                DateTime
   name                String
-  description         String?
-  training_session_id Int
-  trainingSession     trainingSession @relation(fields: [training_session_id], references: [id])
-  club                club            @relation(fields: [club_id], references: [id], onDelete: Cascade, map: "club_member_club_id_club_id_fk")
+  description         String
+  training_session_id Int?
+  training_session    trainingSession? @relation(fields: [training_session_id], references: [id], map: "club_event_training_session_id_fk")
+  club                club             @relation(fields: [club_id], references: [id], onDelete: Cascade, map: "club_event_club_id_club_id_fk")
+  recurrence_id       String?
 }
 
 model session {

@@ -7,13 +7,15 @@
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import Button from '$lib/components/Button.svelte';
 	import { zod } from 'sveltekit-superforms/adapters';
+	import InputLabel from './inputs/InputLabel.svelte';
 
-	const { form, errors, constraints, enhance, message } = superForm(form_data, {
+	const superform = superForm(form_data, {
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: true,
 		validators: zod(forgot_pass_schema)
 	});
+	const { form, errors, constraints, enhance, delayed } = superform;
 	let isFocused: boolean = true;
 </script>
 
@@ -23,13 +25,10 @@
 	</header>
 	<section class="p-4">
 		<form id="forgot" use:focusTrap={isFocused} method="POST" action="?/forgot" use:enhance>
-			<EmailInput
-				name="email"
-				label="Email"
-				bind:value={$form.email}
-				errors={$errors.email}
-				constraints={$constraints.email}
-			/>
+		<InputLabel label="Email">
+		
+			<EmailInput {superform} field="email" />
+		</InputLabel>
 		</form>
 	</section>
 	<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">

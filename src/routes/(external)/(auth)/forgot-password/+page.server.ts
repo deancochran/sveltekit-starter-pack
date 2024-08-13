@@ -7,7 +7,7 @@ import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { sendForgottenPasswordResetLink } from '$lib/utils/emails';
 import { fail } from '@sveltejs/kit';
 import { validatePasswordResetToken } from '$lib/utils/token';
-import { auth } from '$lib/server/lucia';
+import { lucia } from '$lib/server/lucia';
 import type { User } from 'lucia';
 
 export const load: PageServerLoad = async () => {
@@ -63,9 +63,11 @@ export const actions: Actions = {
 					} as const;
 					setFlash(t, event);
 				}
-				await auth.invalidateUserSessions(user.id);
-				const session = await auth.createSession(locals.user!.id, {});
-				const sessionCookie = auth.createSessionCookie(session.id);
+				await lucia.invalidateUserSessions(user.id);
+				const session = await lucia.createSession(user.id, {
+					ip_country: locals.session?.ip_country
+				});
+				const sessionCookie = lucia.createSessionCookie(session.id);
 				event.cookies.set(sessionCookie.name, sessionCookie.value, {
 					path: '.',
 					...sessionCookie.attributes

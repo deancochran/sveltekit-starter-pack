@@ -1,7 +1,7 @@
 import { redirect } from 'sveltekit-flash-message/server';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import type { RequestHandler } from '@sveltejs/kit';
-import { auth } from '$lib/server/lucia';
+import { lucia } from '$lib/server/lucia';
 
 export const GET: RequestHandler = async (event) => {
 	if (!event.locals.session) {
@@ -11,8 +11,8 @@ export const GET: RequestHandler = async (event) => {
 		} as const;
 		redirect('/sign-in', t, event);
 	}
-	await auth.invalidateSession(event.locals.session.id);
-	const sessionCookie = auth.createBlankSessionCookie();
+	await lucia.invalidateSession(event.locals.session.id);
+	const sessionCookie = lucia.createBlankSessionCookie();
 	event.cookies.set(sessionCookie.name, sessionCookie.value, {
 		path: '.',
 		...sessionCookie.attributes

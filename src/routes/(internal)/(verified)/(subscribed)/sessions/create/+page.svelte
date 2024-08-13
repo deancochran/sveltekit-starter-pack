@@ -55,7 +55,7 @@
 
 	// Init form
 	let isFocused: boolean = false;
-	const { form, errors, constraints, enhance, delayed } = superForm(data.trainingSessionSchema, {
+	const superform = superForm(data.trainingSessionSchema, {
 		id: 'create',
 		resetForm: true,
 		validators: zod(training_session_schema),
@@ -63,6 +63,8 @@
 		timeoutMs: 8000,
 		dataType: 'json'
 	});
+
+	const { form, errors, constraints, enhance, delayed } = superform;
 
 	// Init drag and drop sort
 	function handleSort(e: { detail: { items: { id: number; data: WorkoutInterval }[] } }) {
@@ -84,43 +86,16 @@
 	<form id="create" use:focusTrap={isFocused} method="POST" action="?/create" use:enhance>
 		<header class="card-header flex flex-col">
 			<h1 class="w-full py-2 text-center">New Training Session</h1>
-			<!-- <DateInput
-					name="date"
-					label="Date"
-					disabled={false}
-					bind:value={$form.date}
-					errors={$errors.date}
-					constraints={$constraints.date}
-				/> -->
 			<EnumSelectInput
+				field="activity_type"
 				enumType={ActivityType}
-				name="activity_type"
-				label="Activity Type"
+				{superform}
 				on:change={async (e) => {
 					$items = [];
 				}}
-				bind:value={$form.activity_type}
-				disabled={false}
-				errors={$errors.activity_type}
-				constraints={$constraints.activity_type}
 			/>
-			<TextInput
-				name="title"
-				label="Title"
-				disabled={false}
-				bind:value={$form.title}
-				errors={$errors.title}
-				constraints={$constraints.title}
-			/>
-			<TextArea
-				name="description"
-				label="Description"
-				disabled={false}
-				bind:value={$form.description}
-				errors={$errors.description}
-				constraints={$constraints.description}
-				class="resize-none"
-			/>
+			<TextInput field="title" {superform} />
+			<TextArea field="description" {superform} name="description" label="Description" />
 		</header>
 
 		<section class="p-4">

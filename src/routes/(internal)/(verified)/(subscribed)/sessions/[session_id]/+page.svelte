@@ -67,22 +67,21 @@
 
 	// Init form
 	let isFocused: boolean = false;
-	const { form, errors, constraints, enhance, delayed, reset } = superForm(
-		data.training_session_form,
-		{
-			id: 'update',
-			resetForm: false,
-			validators: zod(training_session_schema),
-			delayMs: 0,
-			timeoutMs: 8000,
-			dataType: 'json',
-			onResult: (e) => {
-				if (e.result.type === 'success') {
-					toggleEditing();
-				}
+
+	const superform = superForm(data.training_session_form, {
+		id: 'update',
+		resetForm: false,
+		validators: zod(training_session_schema),
+		delayMs: 0,
+		timeoutMs: 8000,
+		dataType: 'json',
+		onResult: (e) => {
+			if (e.result.type === 'success') {
+				toggleEditing();
 			}
 		}
-	);
+	});
+	const { form, errors, constraints, enhance, delayed, reset } = superform;
 
 	// Init edit mode
 	$: editing = false;
@@ -91,7 +90,7 @@
 		isFocused = !isFocused;
 		if (!editing) {
 			reset();
-			$items = $form.plan.map((obj, i) => ({ id: i, data: obj }));
+			$items = $form.plan.map((obj: any, i: any) => ({ id: i, data: obj }));
 		}
 	}
 
@@ -100,7 +99,7 @@
 		$items = e.detail.items;
 	}
 	let items: ItemsStore<WorkoutInterval> = ItemsStoreService<WorkoutInterval>(
-		$form.plan.map((obj, i) => ({ id: i, data: obj }))
+		$form.plan.map((obj: any, i: any) => ({ id: i, data: obj }))
 	);
 
 	items.subscribe((curr) => {
@@ -141,25 +140,14 @@
 		<header class="card-header flex flex-col">
 			<h1 class="w-full py-2 text-center">Update Training Session</h1>
 
-			<!-- <DateInput
-				name="date"
-				label="Date"
-				disabled={!editing}
-				bind:value={$form.date}
-				errors={$errors.date}
-				constraints={$constraints.date}
-			/> -->
 			<EnumSelectInput
 				enumType={ActivityType}
-				name="activity_type"
-				label="Activity Type"
+				field="activity_type"
+				{superform}
 				on:change={async (e) => {
 					$items = [];
 				}}
-				bind:value={$form.activity_type}
 				disabled={!editing}
-				errors={$errors.activity_type}
-				constraints={$constraints.activity_type}
 			/>
 			{#if $form.activity_type !== ActivityType.SWIM}
 				<Button
@@ -171,23 +159,8 @@
 				>
 			{/if}
 
-			<TextInput
-				name="title"
-				label="Title"
-				disabled={!editing}
-				bind:value={$form.title}
-				errors={$errors.title}
-				constraints={$constraints.title}
-			/>
-			<TextArea
-				name="description"
-				label="Description"
-				disabled={!editing}
-				bind:value={$form.description}
-				errors={$errors.description}
-				constraints={$constraints.description}
-				class="resize-none"
-			/>
+			<TextInput field="title" {superform} label="Title" disabled={!editing} />
+			<TextArea field="description" {superform} label="Title" disabled={!editing} />
 		</header>
 
 		<section class="p-4">

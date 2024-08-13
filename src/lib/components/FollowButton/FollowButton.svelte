@@ -11,9 +11,13 @@
 	<!-- PRIVATE PROFILE -->
 	{#if friendship}
 		{#if friendship.status == FriendshipStatus.ACCEPTED}
-			<button formaction="?/accept" type="submit" class="btn">Unfollow</button>
+			<Button color="variant-ghost-surface" formaction="?/unfollow" type="submit" class="btn"
+				>Unfollow</Button
+			>
 		{:else if friendship.status == FriendshipStatus.DECLINED || friendship.status == FriendshipStatus.BLOCKED}
-			<button formaction="?/request" type="submit" class="btn">Follow</button>
+			<Button color="variant-ghost-surface" formaction="?/request" type="submit" class="btn"
+				>Follow</Button
+			>
 		{:else if friendship.status == FriendshipStatus.REQUESTED}
 			<Button
 				disabled={true}
@@ -26,6 +30,8 @@
 		{/if}
 	{:else if $page.data.user && $page.data.user.id != addressed_user.id}
 		<!-- PUBLIC PROFILE -->
-		<button formaction="?/request" type="submit" class="btn">Follow</button>
+		<Button color="variant-ghost-surface" formaction="?/request" type="submit" class="btn"
+			>Follow</Button
+		>
 	{/if}
 </form>

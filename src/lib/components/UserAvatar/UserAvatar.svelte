@@ -6,12 +6,23 @@
 	const dispatch = createEventDispatcher();
 </script>
 
-<Avatar
-	src={`/api/images/${$page.data.user?.avatar_file_id}`}
-	initials={String($page.data.user?.username).slice(0, 2)}
-	border="border-4 border-surface-300-600-token hover:!border-primary-500"
-	cursor="cursor-pointer"
-	on:click={() => {
-		dispatch('click');
-	}}
-/>
+{#if $page.data.user?.avatar_file_id}
+	<Avatar
+		src={`/api/images/${$page.data.user?.avatar_file_id}`}
+		initials={String($page.data.user?.username).slice(0, 2)}
+		border="border-4 border-surface-300-600-token hover:!border-primary-500"
+		cursor="cursor-pointer"
+		on:click={() => {
+			dispatch('click');
+		}}
+	/>
+{:else}
+	<Avatar
+		initials={String($page.data.user?.username).slice(0, 2)}
+		border="border-4 border-surface-300-600-token hover:!border-primary-500"
+		cursor="cursor-pointer"
+		on:click={() => {
+			dispatch('click');
+		}}
+	/>
+{/if}
