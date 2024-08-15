@@ -5,7 +5,7 @@ import { redirect } from 'sveltekit-flash-message/server';
 export const load: LayoutServerLoad = async (event) => {
 	const { parent, locals } = event;
 	const data = await parent();
-	if (data.session) {
+	if (locals.session) {
 		if (!data.user?.email_verified) {
 			redirect('/verify-email', event);
 		} else {
