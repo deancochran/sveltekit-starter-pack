@@ -35,9 +35,7 @@ export const actions: Actions = {
 					}
 				});
 				setConsentCookie(event);
-				const session = await lucia.createSession(user.id, {
-					ip_country: locals.session?.ip_country
-				});
+				const session = await lucia.createSession(user.id, {});
 				const sessionCookie = lucia.createSessionCookie(session.id);
 				event.cookies.set(sessionCookie.name, sessionCookie.value, {
 					path: '.',
@@ -58,7 +56,7 @@ export const actions: Actions = {
 				message: `Successfully Registered`,
 				background: 'variant-filled-success'
 			} as const;
-			redirect('/verify-email', t, event);
+			redirect('/dashboard', t, event);
 		} else {
 			const t: ToastSettings = {
 				message: 'Invalid Form',

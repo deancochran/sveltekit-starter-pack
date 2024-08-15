@@ -11,6 +11,9 @@
 	import type { WorkoutInterval } from '$lib/utils/trainingsessions/types';
 	import type { ItemsStore } from '$lib/utils/dragndrop/stores';
 	import { zod } from 'sveltekit-superforms/adapters';
+	import InputLabel from '$lib/forms/inputs/InputLabel.svelte';
+	import NumberInput from '$lib/forms/inputs/NumberInput.svelte';
+	import RangeInput from '$lib/forms/inputs/RangeInput.svelte';
 
 	/** Exposes parent props to this component. */
 	export let parent: SvelteComponent;
@@ -56,11 +59,29 @@
 		>
 			{#key activity_type}
 				{#if activity_type === ActivityType.SWIM}
-					<AddSwimInterval {superform} user={$page.data.user} />
+					<InputLabel label="Distance">
+						<NumberInput {superform} field="distance" />
+					</InputLabel>
+
+					<InputLabel label="Duration">
+						<RangeInput {superform} field="duration" />
+					</InputLabel>
 				{:else if activity_type === ActivityType.RUN}
-					<AddRunInterval {superform} user={$page.data.user} />
+					<InputLabel label="Distance">
+						<NumberInput {superform} field="distance" />
+					</InputLabel>
+
+					<InputLabel label="Duration">
+						<RangeInput {superform} field="duration" />
+					</InputLabel>
 				{:else if activity_type === ActivityType.BIKE}
-					<AddBikeInterval {superform} user={$page.data.user} />
+					<InputLabel label="Distance">
+						<NumberInput {superform} field="distance" />
+					</InputLabel>
+
+					<InputLabel label="Duration">
+						<RangeInput {superform} field="duration" />
+					</InputLabel>
 				{:else}
 					<p>No activity type found</p>
 				{/if}

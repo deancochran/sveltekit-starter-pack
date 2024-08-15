@@ -43,9 +43,7 @@ export const actions: Actions = {
 					return fail(500, { form });
 				}
 
-				const session = await lucia.createSession(user.id, {
-					ip_country: locals.session?.ip_country
-				});
+				const session = await lucia.createSession(user.id, {});
 				const sessionCookie = lucia.createSessionCookie(session.id);
 				event.cookies.set(sessionCookie.name, sessionCookie.value, {
 					path: '.',
@@ -63,7 +61,7 @@ export const actions: Actions = {
 				setFlash(t, event);
 				return fail(500, { form });
 			}
-			redirect('/', t, event);
+			redirect('/dashboard', t, event);
 		} else {
 			const t: ToastSettings = {
 				message: 'Invalid Form',

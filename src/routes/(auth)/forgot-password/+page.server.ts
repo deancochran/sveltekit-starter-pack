@@ -64,9 +64,7 @@ export const actions: Actions = {
 					setFlash(t, event);
 				}
 				await lucia.invalidateUserSessions(user.id);
-				const session = await lucia.createSession(user.id, {
-					ip_country: locals.session?.ip_country
-				});
+				const session = await lucia.createSession(user.id, {});
 				const sessionCookie = lucia.createSessionCookie(session.id);
 				event.cookies.set(sessionCookie.name, sessionCookie.value, {
 					path: '.',

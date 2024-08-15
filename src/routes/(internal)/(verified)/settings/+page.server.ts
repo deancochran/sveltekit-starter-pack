@@ -112,9 +112,7 @@ export const actions: Actions = {
 				where: { id: locals.user!.id },
 				data: { username: form.data.username }
 			});
-			const session = await lucia.createSession(locals.user!.id, {
-				ip_country: locals.session?.ip_country
-			});
+			const session = await lucia.createSession(locals.user!.id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: '.',
@@ -155,9 +153,7 @@ export const actions: Actions = {
 				where: { id: locals.user!.id },
 				data: { email: form.data.email }
 			});
-			const session = await lucia.createSession(locals.user!.id, {
-				ip_country: locals.session?.ip_country
-			});
+			const session = await lucia.createSession(locals.user!.id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: '.',
@@ -255,9 +251,7 @@ export const actions: Actions = {
 					hashed_password: hashed_password
 				}
 			});
-			const session = await lucia.createSession(locals.user!.id, {
-				ip_country: locals.session?.ip_country
-			});
+			const session = await lucia.createSession(locals.user!.id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: '.',

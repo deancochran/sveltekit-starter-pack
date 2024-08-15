@@ -2,13 +2,11 @@ import { Lucia } from 'lucia';
 import { TimeSpan } from 'oslo';
 import type { UserRole } from '@prisma/client';
 import { adapter } from './prisma';
+import { webcrypto } from 'node:crypto';
+
+globalThis.crypto = webcrypto as Crypto;
 
 export const lucia = new Lucia(adapter, {
-	getSessionAttributes: (attributes) => {
-		return {
-			ip_country: attributes.ip_country
-		};
-	},
 	getUserAttributes: (attributes) => {
 		return {
 			email: attributes.email,
@@ -30,16 +28,13 @@ export const lucia = new Lucia(adapter, {
 		name: 'session',
 		expires: true, // session cookies have very long lifespan (2 years)
 		attributes: {
-			secure: process.env.NODE_ENV === 'prod',
+			secure: process.env.NODE_ENV === 'production',
 			sameSite: 'strict',
 			domain: process.env.PUBLIC_DOMAIN
 		}
 	}
 });
 
-interface DatabaseSessionAttributes {
-	ip_country?: string;
-}
 interface DatabaseUserAttributes {
 	email: string;
 	username: string;
@@ -61,4 +56,21 @@ declare module 'lucia' {
 		DatabaseSessionAttributes: DatabaseSessionAttributes;
 		DatabaseUserAttributes: DatabaseUserAttributes;
 	}
+}
+interface DatabaseSessionAttributes {
+	ip_country?: string;
+}
+interface DatabaseUserAttributes {
+	email: string;
+	username: string;
+	email_verified: boolean;
+	created_at: Date;
+	stripe_id: string | null;
+	role: typeof UserRole;
+	bike_ftp: number;
+	swim_ftp: number;
+	run_ftp: number;
+	max_hr: number;
+	avatar_file_id?: string;
+	banner_file_id?: string;
 }

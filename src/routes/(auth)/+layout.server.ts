@@ -3,7 +3,7 @@ import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { redirect } from 'sveltekit-flash-message/server';
 
 export const load: LayoutServerLoad = async (event) => {
-	const { parent } = event;
+	const { parent, locals } = event;
 	const data = await parent();
 	if (data.session) {
 		if (!data.user?.email_verified) {
@@ -13,7 +13,7 @@ export const load: LayoutServerLoad = async (event) => {
 		}
 	}
 
-	if (!data.consent_cookie) {
+	if (!locals.consent_cookie) {
 		const t: ToastSettings = {
 			message: `Accept the Cookie Policy to Continue`,
 			background: 'variant-filled-warning'
