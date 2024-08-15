@@ -23,9 +23,7 @@ export const actions: Actions = {
 		let t: ToastSettings;
 		try {
 			const user = await validateEmailVerificationToken(form.data.code);
-			const session = await lucia.createSession(user!.id, {
-				ip_country: locals.session?.ip_country
-			});
+			const session = await lucia.createSession(user!.id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: '.',
