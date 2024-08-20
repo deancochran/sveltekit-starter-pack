@@ -25,10 +25,9 @@
 	</header>
 	<section class="p-4">
 		<form id="forgot" use:focusTrap={isFocused} method="POST" action="?/forgot" use:enhance>
-		<InputLabel label="Email">
-		
-			<EmailInput {superform} field="email" />
-		</InputLabel>
+			<InputLabel label="Email">
+				<EmailInput {superform} field="email" />
+			</InputLabel>
 		</form>
 	</section>
 	<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">
