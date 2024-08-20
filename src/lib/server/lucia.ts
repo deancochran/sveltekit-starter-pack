@@ -2,9 +2,6 @@ import { Lucia } from 'lucia';
 import { TimeSpan } from 'oslo';
 import type { UserRole } from '@prisma/client';
 import { adapter } from './prisma';
-import { webcrypto } from 'node:crypto';
-
-globalThis.crypto = webcrypto as Crypto;
 
 export const lucia = new Lucia(adapter, {
 	getUserAttributes: (attributes) => {
