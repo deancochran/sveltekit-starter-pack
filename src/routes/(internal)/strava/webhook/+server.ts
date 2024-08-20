@@ -1,3 +1,9 @@
+import type { StravaSubscriptionWebhookEvent } from '$lib/utils/integrations/strava/types.js';
+import { SportType } from '$lib/utils/integrations/strava/typescript-fetch-client/models';
+import { getUserActivityByID } from '$lib/utils/integrations/strava/utils';
+import { calc_cTss } from '$lib/utils/tss/ctss';
+import { calcRunPace, calc_rIF, calc_rTss } from '$lib/utils/tss/rtss';
+import { calcSwimPace, calc_sIF, calc_sTss } from '$lib/utils/tss/stss';
 import {
 	ActivityType,
 	ThirdPartyIntegrationProvider,
@@ -5,13 +11,7 @@ import {
 	type thirdPartyIntegrationToken,
 	type user
 } from '@prisma/client';
-import type { StravaSubscriptionWebhookEvent } from '$lib/utils/integrations/strava/types.js';
 import { error, json } from '@sveltejs/kit';
-import { getUserActivityByID } from '$lib/utils/integrations/strava/utils';
-import { SportType } from '$lib/utils/integrations/strava/typescript-fetch-client/models';
-import { calcSwimPace, calc_sIF, calc_sTss } from '$lib/utils/tss/stss';
-import { calcRunPace, calc_rIF, calc_rTss } from '$lib/utils/tss/rtss';
-import { calc_cTss } from '$lib/utils/tss/ctss';
 
 const valid_cTss_sport_types = [
 	SportType.EMountainBikeRide,

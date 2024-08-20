@@ -1,14 +1,14 @@
-import { superValidate } from 'sveltekit-superforms/server';
-import { zod } from 'sveltekit-superforms/adapters';
-import type { Actions, PageServerLoad } from './$types';
 import { forgot_pass_schema, reset_forgot_pass_schema, signin_schema } from '$lib/schemas';
-import type { ToastSettings } from '@skeletonlabs/skeleton';
-import { redirect, setFlash } from 'sveltekit-flash-message/server';
-import { sendForgottenPasswordResetLink } from '$lib/utils/emails';
-import { fail } from '@sveltejs/kit';
-import { validatePasswordResetToken } from '$lib/utils/token';
 import { lucia } from '$lib/server/lucia';
+import { sendForgottenPasswordResetLink } from '$lib/utils/emails';
+import { validatePasswordResetToken } from '$lib/utils/token';
+import type { ToastSettings } from '@skeletonlabs/skeleton';
+import { fail } from '@sveltejs/kit';
 import type { User } from 'lucia';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
+import { zod } from 'sveltekit-superforms/adapters';
+import { superValidate } from 'sveltekit-superforms/server';
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
 	const forgotPassForm = await superValidate(zod(signin_schema));

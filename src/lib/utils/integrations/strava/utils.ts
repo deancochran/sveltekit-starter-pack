@@ -1,7 +1,7 @@
 import { ThirdPartyIntegrationProvider, type thirdPartyIntegrationToken } from '@prisma/client';
-import type { DetailedActivity, StreamSet } from './typescript-fetch-client/models';
-import { authenticateStravaIntegration, deauthorizeStravaIntegration } from './auth';
 import { WahooAPI } from '../wahoo/api';
+import { authenticateStravaIntegration, deauthorizeStravaIntegration } from './auth';
+import type { DetailedActivity, StreamSet } from './typescript-fetch-client/models';
 
 type userHasStravaIntegrationResponse = {
 	exists: boolean;

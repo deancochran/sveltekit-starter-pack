@@ -1,7 +1,7 @@
-import { redirect } from 'sveltekit-flash-message/server';
+import { lucia } from '$lib/server/lucia';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import type { RequestHandler } from '@sveltejs/kit';
-import { lucia } from '$lib/server/lucia';
+import { redirect } from 'sveltekit-flash-message/server';
 
 export const GET: RequestHandler = async (event) => {
 	if (!event.locals.session) {

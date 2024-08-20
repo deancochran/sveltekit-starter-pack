@@ -1,13 +1,13 @@
-import { fail, type Actions } from '@sveltejs/kit';
-import type { ToastSettings } from '@skeletonlabs/skeleton';
-import { redirect, setFlash } from 'sveltekit-flash-message/server';
-import { sendEmailVerificationLink } from '$lib/utils/emails';
-import { superValidate } from 'sveltekit-superforms/client';
-import { lucia } from '$lib/server/lucia';
-import { validateEmailVerificationToken } from '$lib/utils/token';
 import { verify_user_email_schema } from '$lib/schemas';
-import type { PageServerLoad } from './$types';
+import { lucia } from '$lib/server/lucia';
+import { sendEmailVerificationLink } from '$lib/utils/emails';
+import { validateEmailVerificationToken } from '$lib/utils/token';
+import type { ToastSettings } from '@skeletonlabs/skeleton';
+import { fail, type Actions } from '@sveltejs/kit';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { zod } from 'sveltekit-superforms/adapters';
+import { superValidate } from 'sveltekit-superforms/client';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;

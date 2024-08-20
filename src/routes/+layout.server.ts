@@ -1,5 +1,5 @@
+import { flashCookieOptions, loadFlash } from 'sveltekit-flash-message/server';
 import type { LayoutServerLoad } from './$types';
-import { loadFlash, flashCookieOptions } from 'sveltekit-flash-message/server';
 flashCookieOptions.domain = process.env.PUBLIC_DOMAIN;
 flashCookieOptions.sameSite = 'strict';
 flashCookieOptions.secure = process.env.NODE_ENV === 'prod';

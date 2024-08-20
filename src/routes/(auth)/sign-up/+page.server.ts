@@ -1,16 +1,15 @@
-import { lucia } from '$lib/server/lucia';
-import type { Actions } from './$types';
-import type { PageServerLoad } from './$types';
-import { superValidate } from 'sveltekit-superforms/server';
+import { setConsentCookie } from '$lib/cookies';
 import { signup_schema } from '$lib/schemas';
-import { setFlash, redirect } from 'sveltekit-flash-message/server';
+import { lucia } from '$lib/server/lucia';
+import { sendEmailVerificationLink } from '$lib/utils/emails';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { fail } from '@sveltejs/kit';
-import { sendEmailVerificationLink } from '$lib/utils/emails';
-import { generateId, type User } from 'lucia';
 import * as argon from 'argon2';
+import { generateId, type User } from 'lucia';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { zod } from 'sveltekit-superforms/adapters';
-import { setConsentCookie } from '$lib/cookies';
+import { superValidate } from 'sveltekit-superforms/server';
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;

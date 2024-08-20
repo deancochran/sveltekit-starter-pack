@@ -1,8 +1,8 @@
-import type Stripe from 'stripe';
-import { error, json } from '@sveltejs/kit';
 import { STRIPE_WEBHOOK_SECRET } from '$env/static/private';
 import { stripe } from '$lib/server/stripe';
 import { upsertSubscription } from '$lib/utils/stripe/subscriptions';
+import { error, json } from '@sveltejs/kit';
+import type Stripe from 'stripe';
 
 export async function POST(event) {
 	let stripe_event_type: string | null = null;

@@ -1,6 +1,6 @@
+import type { UserRole } from '@prisma/client';
 import { Lucia } from 'lucia';
 import { TimeSpan } from 'oslo';
-import type { UserRole } from '@prisma/client';
 import { adapter } from './prisma';
 
 export const lucia = new Lucia(adapter, {

@@ -1,20 +1,20 @@
 <script context="module">
 	import {
-		p,
-		img,
 		a,
+		blockquote,
+		code,
+		codeblock,
 		h2,
 		h3,
 		h4,
 		h5,
-		ul,
+		img,
 		ol,
+		p,
 		pre,
-		blockquote,
-		code,
-		codeblock
+		ul
 	} from '$lib/blog/components';
-	export { p, img, a, h2, h3, h4, h5, ul, ol, pre, blockquote, code, codeblock };
+	export { a, blockquote, code, codeblock, h2, h3, h4, h5, img, ol, p, pre, ul };
 </script>
 
 <slot />

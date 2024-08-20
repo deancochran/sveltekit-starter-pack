@@ -2,6 +2,8 @@ import { SECRET_WAHOO_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_WAHOO_CLIENT_ID, PUBLIC_WAHOO_CLIENT_REDIRECT_URI } from '$env/static/public';
 import { addHours } from '$lib/utils/datetime';
 import { ThirdPartyIntegrationProvider, type thirdPartyIntegrationToken } from '@prisma/client';
+import { error } from 'console';
+import type { User } from 'lucia';
 import { isWithinExpirationDate } from 'oslo';
 import type {
 	WahooCreateWorkoutRequestBody,
@@ -11,8 +13,6 @@ import type {
 	WahooV1PlanRequestBody,
 	WahooV1PlanResponse
 } from './types';
-import type { User } from 'lucia';
-import { error } from 'console';
 
 export class WahooAPI {
 	private readonly BASE_URL: string = 'https://api.wahooligan.com';

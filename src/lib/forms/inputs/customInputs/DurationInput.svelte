@@ -40,4 +40,4 @@
 	<NumberInput superform={time_superform} field="minutes" min="0" max="59" />
 	<NumberInput superform={time_superform} field="seconds" min="0" max="59" />
 </InputLabel>
-{#if errors}<span class="invalid">{errors}</span>{/if}
+{#if $errors}<span class="invalid">{$errors}</span>{/if}

@@ -1,10 +1,9 @@
 import { ActivityType, ThirdPartyIntegrationProvider } from '@prisma/client';
-import { z } from 'zod';
-import { WahooWorkoutTypeID } from './utils/integrations/wahoo/types';
-import { addDays } from './utils/datetime';
 import dayjs from 'dayjs';
-import { disjoint } from 'd3';
 import type { Infer } from 'sveltekit-superforms';
+import { z } from 'zod';
+import { addDays } from './utils/datetime';
+import { WahooWorkoutTypeID } from './utils/integrations/wahoo/types';
 
 const one_upper_case_letter: RegExp = new RegExp('.*[A-Z].*');
 const one_lower_case_letter: RegExp = new RegExp('.*[a-z].*');

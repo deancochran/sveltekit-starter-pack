@@ -1,16 +1,16 @@
+import { secondsToHHMMSS } from '$lib/utils/datetime';
 import { type WorkoutSession } from '$lib/utils/trainingsessions/types';
 import { ActivityType, type trainingSession, type user } from '@prisma/client';
-import {
-	WAHOO_PLAN_FAMILY_TYPE,
-	WAHOO_PLAN_INTENSITY_TYPE,
-	WAHOO_PLAN_TARGET_TYPE,
-	WAHOO_PLAN_TRIGGER_TYPE,
-	WahooWorkoutTypeID,
-	type WAHOO_PLAN_INTERVALS,
-	type WahooV1Plan
-} from './types';
 import type { User } from 'lucia';
-import { secondsToHHMMSS } from '$lib/utils/datetime';
+import {
+    WAHOO_PLAN_FAMILY_TYPE,
+    WAHOO_PLAN_INTENSITY_TYPE,
+    WAHOO_PLAN_TARGET_TYPE,
+    WAHOO_PLAN_TRIGGER_TYPE,
+    WahooWorkoutTypeID,
+    type WAHOO_PLAN_INTERVALS,
+    type WahooV1Plan
+} from './types';
 
 function getWahooIntervalIntensityType(intensity: number) {
 	if (intensity < 0.01) {

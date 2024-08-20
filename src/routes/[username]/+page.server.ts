@@ -1,9 +1,8 @@
 import { FriendshipStatus, type Friendship } from '@prisma/client';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { error, fail, type Actions } from '@sveltejs/kit';
-import { redirect, setFlash } from 'sveltekit-flash-message/server';
+import { setFlash } from 'sveltekit-flash-message/server';
 import type { PageServerLoad } from './$types';
-import { invalidateAll } from '$app/navigation';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent, params } = event;

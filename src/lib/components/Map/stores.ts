@@ -1,6 +1,6 @@
+import type { Map } from 'maplibre-gl';
 import { getContext, setContext } from 'svelte';
 import { writable } from 'svelte/store';
-import type { Map } from 'maplibre-gl';
 
 function initMap() {
 	const { subscribe, set, update } = writable<Map | undefined>(undefined);

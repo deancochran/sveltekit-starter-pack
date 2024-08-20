@@ -39,4 +39,4 @@
 		</option>
 	{/each}
 </select>
-{#if errors}<span class="invalid">{errors}</span>{/if}
+{#if $errors}<span class="invalid">{$errors}</span>{/if}

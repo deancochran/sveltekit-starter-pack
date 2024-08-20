@@ -1,7 +1,7 @@
-import { ThirdPartyIntegrationProvider } from '@prisma/client';
-import type { PageServerLoad } from './$types';
 import { getStravaActivities } from '$lib/utils/integrations/strava/server';
 import type { DetailedActivity } from '$lib/utils/integrations/strava/typescript-fetch-client/models';
+import { ThirdPartyIntegrationProvider } from '@prisma/client';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ parent, fetch, locals }) => {
 	const data = await parent();

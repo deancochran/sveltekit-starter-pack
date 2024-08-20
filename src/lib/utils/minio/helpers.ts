@@ -1,5 +1,5 @@
-import { error } from 'console';
 import { minio } from '$lib/server/minio';
+import { error } from 'console';
 
 export const PICTURE_BUCKET = 'cadence-pictures';
 

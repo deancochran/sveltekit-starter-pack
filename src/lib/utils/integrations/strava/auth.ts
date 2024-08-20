@@ -1,8 +1,8 @@
 import { SECRET_STRAVA_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_STRAVA_CLIENT_ID } from '$env/static/public';
 import { type thirdPartyIntegrationToken } from '@prisma/client';
-import { SummaryAthlete } from './typescript-fetch-client/models';
 import { isWithinExpirationDate } from 'oslo';
+import { SummaryAthlete } from './typescript-fetch-client/models';
 
 export type StravaOAuth = {
 	token_type: string;

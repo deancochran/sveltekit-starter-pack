@@ -1,5 +1,3 @@
-import type { ToastSettings } from '@skeletonlabs/skeleton';
-import { redirect } from 'sveltekit-flash-message/server';
 import type { LayoutServerLoad } from './$types';
 export const load: LayoutServerLoad = async (event) => {
 	const { parent } = event;

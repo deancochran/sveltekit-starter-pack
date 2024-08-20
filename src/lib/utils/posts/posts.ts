@@ -1,8 +1,8 @@
-import matter from 'gray-matter';
-import path from 'path';
 import fs from 'fs/promises';
-import type { Post, ContentType } from './types';
+import matter from 'gray-matter';
 import { compile } from 'mdsvex';
+import path from 'path';
+import type { ContentType, Post } from './types';
 
 export async function getPosts() {
 	let posts: Post[] = [];

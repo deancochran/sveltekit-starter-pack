@@ -1,9 +1,9 @@
+import { handleSignInRedirect } from '$lib/utils/redirects/loginRedirect';
+import { FriendshipStatus } from '@prisma/client';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { redirect as r } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
 import type { LayoutServerLoad } from './$types';
-import { handleSignInRedirect } from '$lib/utils/redirects/loginRedirect';
-import { FriendshipStatus } from '@prisma/client';
 export const load: LayoutServerLoad = async (event) => {
 	const { parent, params } = event;
 	const data = await parent();

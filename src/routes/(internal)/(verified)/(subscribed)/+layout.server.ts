@@ -1,8 +1,8 @@
 import { UserRole } from '@prisma/client';
+import { redirect } from 'sveltekit-flash-message/server';
 import type { LayoutServerLoad } from '../$types';
 // import { UserRole } from '@prisma/client';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
-import { redirect } from 'sveltekit-flash-message/server';
 
 export const load: LayoutServerLoad = async (event) => {
 	const { parent } = event;

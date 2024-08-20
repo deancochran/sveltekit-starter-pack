@@ -1,10 +1,9 @@
 import type { emailVerificationToken, user } from '@prisma/client';
 import { error } from '@sveltejs/kit';
-import { TimeSpan, createDate, isWithinExpirationDate } from 'oslo';
-import { generateRandomString, alphabet } from 'oslo/crypto';
-import { sha256 } from 'oslo/crypto';
-import { encodeHex } from 'oslo/encoding';
 import * as argon from 'argon2';
+import { TimeSpan, createDate, isWithinExpirationDate } from 'oslo';
+import { alphabet, generateRandomString, sha256 } from 'oslo/crypto';
+import { encodeHex } from 'oslo/encoding';
 
 export async function generatePasswordResetToken(user_id: string): Promise<string> {
 	const new_code = await prisma.$transaction(async (db) => {

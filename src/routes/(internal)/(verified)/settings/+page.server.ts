@@ -1,9 +1,3 @@
-import type { Actions } from './$types';
-import type { PageServerLoad } from './$types';
-import { stripe } from '$lib/server/stripe';
-import { redirect, setFlash } from 'sveltekit-flash-message/server';
-import type { Toast, ToastSettings } from '@skeletonlabs/skeleton';
-import { superValidate, withFiles } from 'sveltekit-superforms/server';
 import {
 	cancel_user_subscription_schema,
 	delete_user_schema,
@@ -15,19 +9,23 @@ import {
 	update_user_password_schema,
 	update_user_schema
 } from '$lib/schemas';
-import { validateEmailVerificationToken } from '$lib/utils/token';
 import { lucia } from '$lib/server/lucia';
-import * as argon from 'argon2';
+import { stripe } from '$lib/server/stripe';
 import { sendEmailChangeCode } from '$lib/utils/emails';
-import { fail } from '@sveltejs/kit';
-import { getActiveSubscription } from '$lib/utils/stripe/subscriptions';
-import { zod } from 'sveltekit-superforms/adapters';
-import { handleSignInRedirect } from '$lib/utils/redirects/loginRedirect';
 import { disconnect_integration } from '$lib/utils/integrations/strava/utils';
 import { PICTURE_BUCKET, uploadImage } from '$lib/utils/minio/helpers';
-import { randomUUID } from 'crypto';
-import { local } from 'd3';
+import { handleSignInRedirect } from '$lib/utils/redirects/loginRedirect';
+import { getActiveSubscription } from '$lib/utils/stripe/subscriptions';
+import { validateEmailVerificationToken } from '$lib/utils/token';
 import type { file } from '@prisma/client';
+import type { ToastSettings } from '@skeletonlabs/skeleton';
+import { fail } from '@sveltejs/kit';
+import * as argon from 'argon2';
+import { randomUUID } from 'crypto';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
+import { zod } from 'sveltekit-superforms/adapters';
+import { superValidate, withFiles } from 'sveltekit-superforms/server';
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;

@@ -1,7 +1,7 @@
 import { stripe } from '$lib/server/stripe';
 import { UserRole } from '@prisma/client';
-import { toDateTime } from '../datetime';
 import type Stripe from 'stripe';
+import { toDateTime } from '../datetime';
 
 export async function getActiveSubscription(user_id: string) {
 	const res = await prisma.subscription.findFirst({ where: { user_id: user_id, ended_at: null } });

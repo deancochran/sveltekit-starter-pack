@@ -1,6 +1,6 @@
+import { handleVerifyEmailRedirect } from '$lib/utils/redirects/verifyEmailRedirect';
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from '../$types';
-import { handleVerifyEmailRedirect } from '$lib/utils/redirects/verifyEmailRedirect';
 
 export const load: LayoutServerLoad = async (event) => {
 	const { parent } = event;

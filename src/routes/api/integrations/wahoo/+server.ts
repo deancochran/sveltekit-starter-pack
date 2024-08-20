@@ -1,6 +1,6 @@
 import { ThirdPartyIntegrationProvider } from '@prisma/client';
-import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async (event) => {
 	const { locals } = event;

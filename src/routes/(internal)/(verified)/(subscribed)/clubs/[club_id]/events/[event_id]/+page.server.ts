@@ -1,10 +1,10 @@
-import { error, type Actions } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
-import { zod } from 'sveltekit-superforms/adapters';
-import { fail, superValidate } from 'sveltekit-superforms';
 import { new_club_event_schema } from '$lib/schemas';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
+import { error, type Actions } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
+import { fail, superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent, params } = event;

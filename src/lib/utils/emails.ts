@@ -1,13 +1,13 @@
-import nodemailer from 'nodemailer';
-import { NODEMAILER_GMAIL_PASSWORD, NODEMAILER_GMAIL } from '$env/static/private';
-import { render } from 'svelte-email';
-
-import VerifyEmail from '$lib/emails/VerifyEmail.svelte';
-import ForgottenPassword from '$lib/emails/FogottenPassword.svelte';
-import { generateEmailVerificationToken, generatePasswordResetToken } from './token';
-import type { User } from 'lucia';
-import NewEmailCode from '$lib/emails/NewEmailCode.svelte';
 import { dev } from '$app/environment';
+import { NODEMAILER_GMAIL, NODEMAILER_GMAIL_PASSWORD } from '$env/static/private';
+import nodemailer from 'nodemailer';
+import { render } from 'svelte-email';
+import { generateEmailVerificationToken, generatePasswordResetToken } from './token';
+
+import ForgottenPassword from '$lib/emails/FogottenPassword.svelte';
+import NewEmailCode from '$lib/emails/NewEmailCode.svelte';
+import VerifyEmail from '$lib/emails/VerifyEmail.svelte';
+import type { User } from 'lucia';
 
 const transporter = nodemailer.createTransport({
 	service: 'gmail',

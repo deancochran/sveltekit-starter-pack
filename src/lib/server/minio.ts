@@ -1,6 +1,6 @@
 // import Minio from "minio"
+import { MINIO_ROOT_PASSWORD, MINIO_ROOT_USER } from '$env/static/private';
 import * as Minio from 'minio';
-import { MINIO_ROOT_USER, MINIO_ROOT_PASSWORD } from '$env/static/private';
 
 export const minio = new Minio.Client({
 	endPoint: 'localhost', // Minio server endpoint (change as needed)

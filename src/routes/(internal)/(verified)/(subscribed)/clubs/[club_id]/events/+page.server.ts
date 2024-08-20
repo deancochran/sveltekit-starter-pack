@@ -1,13 +1,13 @@
-import { fail, type Actions } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
-import dayjs from 'dayjs';
 import { type NewClubEventSchema, RecurrenceFrequency, new_club_event_schema } from '$lib/schemas';
 import type { Prisma, club_event } from '@prisma/client';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
+import { type Actions, fail } from '@sveltejs/kit';
+import dayjs from 'dayjs';
+import { generateId } from 'lucia';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { type Infer, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { generateId } from 'lucia';
+import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
 	const data = await parent();

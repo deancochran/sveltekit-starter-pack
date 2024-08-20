@@ -1,8 +1,8 @@
 import { accept_club_member, new_club_schema, new_image_schema } from '$lib/schemas';
-import { uploadImage, PICTURE_BUCKET } from '$lib/utils/minio/helpers';
+import { PICTURE_BUCKET, uploadImage } from '$lib/utils/minio/helpers';
 import type { PageServerLoad } from './$types';
 
-import { FriendshipStatus, type club_event, type club_member, type file } from '@prisma/client';
+import { FriendshipStatus, type club_member, type file } from '@prisma/client';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { fail, type Actions } from '@sveltejs/kit';
 import { randomUUID } from 'crypto';

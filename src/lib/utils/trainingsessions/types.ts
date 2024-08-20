@@ -1,12 +1,12 @@
 /* eslint-disable no-case-declarations */
-import { calc_rIF, calc_rTss, intensity_to_run_speed } from '../tss/rtss';
-import { calc_cIF, calc_cTss, intensity_to_bike_watts } from '../tss/ctss';
-import { calc_sIF, calc_sTss, intensity_to_swim_speed } from '../tss/stss';
+import type { training_session_schema } from '$lib/schemas';
 import { ActivityType } from '@prisma/client';
 import type { User } from 'lucia';
-import { secondsToHHMMSS } from '../datetime';
-import type { training_session_schema } from '$lib/schemas';
 import type { Infer } from 'sveltekit-superforms';
+import { secondsToHHMMSS } from '../datetime';
+import { calc_cIF, calc_cTss, intensity_to_bike_watts } from '../tss/ctss';
+import { calc_rIF, calc_rTss, intensity_to_run_speed } from '../tss/rtss';
+import { calc_sIF, calc_sTss, intensity_to_swim_speed } from '../tss/stss';
 
 export type WorkoutInterval = {
 	duration: number;

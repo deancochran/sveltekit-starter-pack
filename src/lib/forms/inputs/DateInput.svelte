@@ -25,4 +25,4 @@
 	{...$$restProps}
 	class="input {$$props.class}"
 />
-{#if errors}<span class="invalid">{errors}</span>{/if}
+{#if $errors}<span class="invalid">{$errors}</span>{/if}

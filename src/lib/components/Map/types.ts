@@ -1,5 +1,5 @@
-import type { EventDispatcher } from 'svelte';
 import type { Map } from 'maplibre-gl';
+import type { EventDispatcher } from 'svelte';
 
 export type MapEvent = {
 	load: Map;

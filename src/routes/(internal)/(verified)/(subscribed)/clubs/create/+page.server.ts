@@ -1,11 +1,11 @@
+import { new_club_schema } from '$lib/schemas';
+import { FriendshipStatus, type club } from '@prisma/client';
+import type { ToastSettings } from '@skeletonlabs/skeleton';
+import { fail } from '@sveltejs/kit';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
+import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms/server';
 import type { Actions, PageServerLoad } from './$types';
-import { zod } from 'sveltekit-superforms/adapters';
-import { new_club_schema } from '$lib/schemas';
-import { fail } from '@sveltejs/kit';
-import type { ToastSettings } from '@skeletonlabs/skeleton';
-import { FriendshipStatus, type club } from '@prisma/client';
-import { redirect, setFlash } from 'sveltekit-flash-message/server';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;

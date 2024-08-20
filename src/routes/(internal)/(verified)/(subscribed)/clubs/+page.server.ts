@@ -2,7 +2,7 @@ import { handleSignInRedirect } from '$lib/utils/redirects/loginRedirect';
 import { FriendshipStatus } from '@prisma/client';
 import type { PageServerLoad } from './$types';
 
-import { redirect as r, type Actions } from '@sveltejs/kit';
+import { redirect as r } from '@sveltejs/kit';
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
 	const data = await parent();

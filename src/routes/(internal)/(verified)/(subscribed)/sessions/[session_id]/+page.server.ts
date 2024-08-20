@@ -1,21 +1,20 @@
 import {
 	create_wahoo_workout_schema,
-	training_session_schema,
 	IntervalSchema,
+	training_session_schema,
 	type TrainingSessionSchema
 } from '$lib/schemas';
+import { WahooAPI } from '$lib/utils/integrations/wahoo/api';
+import type { WahooV1PlanRequestBody } from '$lib/utils/integrations/wahoo/types';
+import { convertTrainingSessionToWahooPlan } from '$lib/utils/integrations/wahoo/utils';
+import { handleSignInRedirect } from '$lib/utils/redirects/loginRedirect';
+import { ThirdPartyIntegrationProvider } from '@prisma/client';
+import type { ToastSettings } from '@skeletonlabs/skeleton';
+import { redirect as r, type Actions } from '@sveltejs/kit';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { fail, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
-import { redirect as r, type Actions } from '@sveltejs/kit';
-import { redirect } from 'sveltekit-flash-message/server';
-import { handleSignInRedirect } from '$lib/utils/redirects/loginRedirect';
-import type { ToastSettings } from '@skeletonlabs/skeleton';
-import { setFlash } from 'sveltekit-flash-message/server';
-import { ThirdPartyIntegrationProvider } from '@prisma/client';
-import type { WahooV1PlanRequestBody } from '$lib/utils/integrations/wahoo/types';
-import { WahooAPI } from '$lib/utils/integrations/wahoo/api';
-import { convertTrainingSessionToWahooPlan } from '$lib/utils/integrations/wahoo/utils';
 
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;

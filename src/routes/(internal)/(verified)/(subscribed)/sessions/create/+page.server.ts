@@ -1,10 +1,10 @@
-import { training_session_schema, IntervalSchema } from '$lib/schemas';
+import { IntervalSchema, training_session_schema } from '$lib/schemas';
 import { handleSignInRedirect } from '$lib/utils/redirects/loginRedirect';
 import type { trainingSession } from '@prisma/client';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { type Actions, redirect as r } from '@sveltejs/kit';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
-import { superValidate, fail } from 'sveltekit-superforms';
+import { fail, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
 
