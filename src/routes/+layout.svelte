@@ -1,51 +1,56 @@
 <script lang="ts">
 	import 'highlight.js/styles/github-dark.css';
 	import '../app.postcss';
-
 	// import 'maplibre-gl/dist/maplibre-gl.css';
+	import { page } from '$app/stores';
+	import Link from '$lib/components/Link.svelte';
+	import Cadence from '$lib/components/logo/Cadence.svelte';
+	import { setMapContext } from '$lib/components/Map/stores';
+	import NavBarMobile from '$lib/components/NavBarMobile.svelte';
+	import Seo from '$lib/components/Seo.svelte';
+	import DeleteUserForm from '$lib/forms/DeleteUserForm.svelte';
+	import AddInterval from '$lib/modals/AddInterval.svelte';
+	import Transition from '$lib/transitions/transition.svelte';
 	import {
-		Toast,
-		initializeStores,
-		AppShell,
-		Drawer,
+		arrow,
+		autoUpdate,
+		computePosition,
+		flip,
+		offset,
+		shift
+	} from '@floating-ui/dom';
+	import {
 		AppBar,
-		getDrawerStore,
+		AppShell,
+		Avatar,
+		Drawer,
 		type DrawerSettings,
 		Modal,
 		type ModalComponent,
 		type ModalSettings,
+		Toast,
+		getDrawerStore,
 		getModalStore,
-		storeHighlightJs
+		getToastStore,
+		initializeStores,
+		storeHighlightJs,
+		storePopup
 	} from '@skeletonlabs/skeleton';
-
-	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
-	import { getToastStore } from '@skeletonlabs/skeleton';
-	import { getFlash } from 'sveltekit-flash-message';
-	import { page } from '$app/stores';
-	import { storePopup } from '@skeletonlabs/skeleton';
-	import Link from '$lib/components/Link.svelte';
-	import ProfilePopup from '$lib/components/profilePopup.svelte';
-	import type { LayoutData } from './$types';
-	import SideBarButton from '$lib/components/SideBarButton.svelte';
-	import NavBarMobile from '$lib/components/NavBarMobile.svelte';
-	import DeleteUserForm from '$lib/forms/DeleteUserForm.svelte';
-	import Seo from '$lib/components/Seo.svelte';
-	import { setMapContext } from '$lib/components/Map/stores';
+	import { Menu } from 'lucide-svelte';
 	import { onMount } from 'svelte';
-	import SearchPostsModal from '$lib/modals/SearchPostsModal.svelte';
-	import Transition from '$lib/transitions/transition.svelte';
-	import AddInterval from '$lib/modals/AddInterval.svelte';
+	import { getFlash } from 'sveltekit-flash-message';
+	import type { LayoutData } from './$types';
 
-	import { slide } from 'svelte/transition';
 	import Button from '$lib/components/Button.svelte';
 	import CookiePolicy from '$lib/modals/CookiePolicy.svelte';
+	import { slide } from 'svelte/transition';
 
 	import { enhance } from '$app/forms';
-	import type { SubmitFunction } from '@sveltejs/kit';
 	import { invalidateAll } from '$app/navigation';
-	import CreateWahooWorkout from '$lib/modals/CreateWahooWorkout.svelte';
 	import CreateClubEvent from '$lib/forms/CreateClubEvent.svelte';
+	import CreateWahooWorkout from '$lib/modals/CreateWahooWorkout.svelte';
 	import UpdateClubEvent from '$lib/modals/UpdateClubEvent.svelte';
+	import type { SubmitFunction } from '@sveltejs/kit';
 
 	export let data: LayoutData;
 
@@ -54,16 +59,15 @@
 
 	import hljs from 'highlight.js/lib/core';
 
-	// Import each language module you require
+	// import each language module you require
 	import html from 'highlight.js/lib/languages/xml';
 
-	import json from 'highlight.js/lib/languages/json';
-	import javascript from 'highlight.js/lib/languages/javascript';
-	import typescript from 'highlight.js/lib/languages/typescript';
-	import shell from 'highlight.js/lib/languages/shell';
-	import { UserRole } from '@prisma/client';
-	import UpdateClubMembers from '$lib/modals/UpdateClubMembers.svelte';
 	import UpdateClub from '$lib/modals/UpdateClub.svelte';
+	import UpdateClubMembers from '$lib/modals/UpdateClubMembers.svelte';
+	import javascript from 'highlight.js/lib/languages/javascript';
+	import json from 'highlight.js/lib/languages/json';
+	import shell from 'highlight.js/lib/languages/shell';
+	import typescript from 'highlight.js/lib/languages/typescript';
 
 	// Register each imported language module
 	hljs.registerLanguage('html', html);
@@ -80,7 +84,6 @@
 	const toastStore = getToastStore();
 	const toast = getFlash(page, {
 		clearOnNavigate: false
-		// flashCookieOptions: { sameSite: 'lax' , secure: false},
 	});
 
 	toast.subscribe(($toast) => {
@@ -100,15 +103,17 @@
 	const openDrawer = async () => {
 		drawerStore.open(drawerSettings);
 	};
-	const closeDrawer = async () => {
-		drawerStore.close();
-	};
+
+	page.subscribe((curr) => {
+		if (curr.url.pathname === $page.data.pathname) {
+			drawerStore.close();
+		}
+	});
 
 	const modalStore = getModalStore();
 	const modalRegistry: Record<string, ModalComponent> = {
 		// Set a unique modal ID, then pass the component reference
 		DeleteUserForm: { ref: DeleteUserForm },
-		SearchPostsModal: { ref: SearchPostsModal },
 		AddInterval: { ref: AddInterval },
 		CookiePolicy: { ref: CookiePolicy },
 		CreateWahooWorkout: { ref: CreateWahooWorkout },
@@ -144,13 +149,6 @@
 		});
 	}
 
-	function triggerSearchPostsModal() {
-		modalStore.trigger({
-			type: 'component',
-			component: 'SearchPostsModal'
-		});
-	}
-
 	onMount(() => {
 		detectServiceWorkerUpdate();
 	});
@@ -161,80 +159,81 @@
 			component: 'CookiePolicy'
 		});
 	}
-	const handleConsent: SubmitFunction = (e) => {
+	const handleConsent: SubmitFunction = () => {
 		invalidateAll();
 	};
 </script>
-
-<svelte:window
-	on:keydown={(e) => {
-		if (e.ctrlKey || e.metaKey) {
-			if (e.key === 'k' || e.key === 'K') {
-				modalStore.close();
-				e.preventDefault();
-				e.stopPropagation();
-				triggerSearchPostsModal();
-			}
-		}
-	}}
-/>
 
 <Seo />
 <Modal zIndex="z-[998]" components={modalRegistry} />
 <Toast zIndex="z-[999]" />
 <Drawer>
-	<NavBarMobile on:close={closeDrawer} />
+	<NavBarMobile />
 </Drawer>
 <AppShell>
 	<svelte:fragment slot="header">
-		<AppBar shadow="shadow-md">
+		<AppBar
+			shadow="shadow-md"
+			gridColumns="grid-cols-3"
+			slotDefault="place-self-center"
+			slotTrail="place-content-end"
+			padding="py-2 px-4"
+		>
 			<svelte:fragment slot="lead">
-				<div class="relative">
-					<Link label={'cadence'} href="/">
-						<h1 class="h1 font-serif bg-op font-bold text-4xl">
-							<span
-								class="bg-gradient-to-br from-primary-500 to-tertiary-500 bg-clip-text text-transparent box-decoration-clone"
-								>cadence</span
-							>
-						</h1>
-					</Link>
-					{#if $page.data.user && String($page.data.user.role) != UserRole.BASE}
-						<span class="absolute top-0 -right-2 chip variant-filled px-1 p-px"
-							>{$page.data.user.role}</span
-						>
-					{/if}
-				</div>
+				<Link class="p-0 m-0" label={'cadence'} href="/">
+					<Cadence
+						sizing="w-20 h-20 transition-all ease-in-out duration-50 hover:scale-[1.05] hover:scale-[1.1] hover:rotate-6 active:rotate-12"
+					/>
+				</Link>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
-				<div class=" flex flex-row items-center sm:gap-2">
-					<button
-						type="button"
-						on:click={triggerSearchPostsModal}
-						class="btn variant-ghost-surface flex w-full items-center align-middle justify-between space-x-4 text-base"
+				{#if $page.data.user}
+					<Button
+						class="btn p-2 m-0 relative min-w-20 w-20"
+						on:click={openDrawer}
 					>
-						<!-- <SearchIcon /> -->
-						<p class="flex">Search...</p>
-						<kbd class="kbd">Ctrl + K</kbd>
-					</button>
-					<div class="hidden sm:flex w-full">
-						{#if data.user}
-							<ProfilePopup bind:user={data.user} />
+						{#if $page.data.user.avatarFileId}
+							<Avatar
+								src={`/api/images/${$page.data.user.avatarFileId}`}
+								shadow="shadow-lg"
+								rounded="rounded-sm"
+								fetchpriority="high"
+								loading="eager"
+								width="w-full"
+							/>
 						{:else}
-							<Link
-								label={'Sign In'}
-								shadow="shadow-md"
-								color="variant-filled-primary"
-								href="/sign-in">Sign In</Link
+							<Avatar
+								initials={String($page.data.user.username).slice(0, 2)}
+								shadow="shadow-lg"
+								rounded="rounded-sm"
+								fetchpriority="high"
+								background="bg-gradient-to-br variant-gradient-tertiary-primary"
+								loading="eager"
+								width="w-full"
+							/>
+						{/if}
+						{#if $page.data.user.role !== 'BASE'}
+							<span
+								class="absolute top-0 -right-2 chip variant-filled-surface px-1 p-px"
+								>{$page.data.user.role}</span
 							>
 						{/if}
-					</div>
-					<SideBarButton on:click={openDrawer} />
-				</div>
+					</Button>
+				{:else}
+					<Button
+						class="btn p-2 m-0 w-16 h-16 variant-soft-surface rounded-sm"
+						on:click={openDrawer}
+					>
+						<Menu class="w-full h-full" />
+					</Button>
+				{/if}
 			</svelte:fragment>
 		</AppBar>
 	</svelte:fragment>
 
-	<div class="flex flex-col items-start justify-start align-middle gap-4 p-4 shadow-inner">
+	<div
+		class="flex flex-col items-start justify-start align-middle gap-4 p-4 shadow-inner"
+	>
 		{#if $page.url.href}
 			{@const crumbs = $page.url.pathname.split('/').slice(1)}
 			{#if crumbs.length > 1}
@@ -243,7 +242,9 @@
 						{#key crumb}
 							{#if i + 1 != crumbs.length}
 								<li>
-									<a class="anchor" href={'/' + crumbs.slice(0, i + 1).join('/')}
+									<a
+										class="anchor"
+										href={'/' + crumbs.slice(0, i + 1).join('/')}
 										>{crumb.charAt(0).toUpperCase() + crumb.slice(1)}</a
 									>
 								</li>
@@ -277,7 +278,9 @@
 						on:click={triggerCookiePolicy}>Cookie Policy</button
 					>
 				</span>
-				<Button type="submit" class="btn variant-filled-primary py-2">Accept</Button>
+				<Button type="submit" class="btn variant-filled-primary py-2"
+					>Accept</Button
+				>
 			</form>
 		{/if}
 	</svelte:fragment>

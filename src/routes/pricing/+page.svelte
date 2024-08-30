@@ -34,7 +34,11 @@
 	</ol>
 
 	<form id="checkout" method="POST" action="?/checkout" use:enhance>
-		<input type="hidden" name="priceId" value={PUBLIC_STRIPE_SUBSCRIPTION_PRICE_ID} />
+		<input
+			type="hidden"
+			name="priceId"
+			value={PUBLIC_STRIPE_SUBSCRIPTION_PRICE_ID}
+		/>
 		<Button
 			type="submit"
 			form="checkout"

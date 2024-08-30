@@ -1,31 +1,31 @@
 <script lang="ts">
-	import { IntervalSchema, training_session_schema } from '$lib/schemas';
-	import { superForm, superValidate } from 'sveltekit-superforms/client';
-	import { focusTrap, getModalStore, popup } from '@skeletonlabs/skeleton';
-	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
+	import { page } from '$app/stores';
 	import Button from '$lib/components/Button.svelte';
-	import { zod, type Infer } from 'sveltekit-superforms/adapters';
-	import TextInput from '$lib/forms/inputs/TextInput.svelte';
-	import TextArea from '$lib/forms/inputs/TextArea.svelte';
-	import DateInput from '$lib/forms/inputs/DateInput.svelte';
-	import type { PageData } from './$types';
+	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
+	import { getIntensityColor } from '$lib/components/WorkoutIntervals/types';
 	import EnumSelectInput from '$lib/forms/inputs/EnumSelectInput.svelte';
-	import { ActivityType } from '@prisma/client';
-	import { CopyIcon, PlusSquare, TrashIcon, Undo2 } from 'lucide-svelte';
+	import TextArea from '$lib/forms/inputs/TextArea.svelte';
+	import TextInput from '$lib/forms/inputs/TextInput.svelte';
+	import { IntervalSchema, trainingSessionSchema } from '$lib/schemas';
+	import { activityType } from '$lib/drizzle/schema';
+	import { secondsToHHMMSS } from '$lib/utils/datetime';
+	import {
+		ItemsStoreService,
+		type ItemsStore
+	} from '$lib/utils/dragndrop/stores';
 	import {
 		calculateDistance,
 		evaluatePlanTss,
-		getIntensityDisplay,
 		getIntervalDisplay,
 		type WorkoutInterval
 	} from '$lib/utils/trainingsessions/types';
+	import { focusTrap, getModalStore, popup } from '@skeletonlabs/skeleton';
+	import { CopyIcon, PlusSquare, TrashIcon, Undo2 } from 'lucide-svelte';
 	import { dndzone } from 'svelte-dnd-action';
-	import { type ItemsStore, ItemsStoreService } from '$lib/utils/dragndrop/stores';
-	import { getIntensityColor } from '$lib/components/WorkoutIntervals/types';
-	import { secondsToHHMMSS } from '$lib/utils/datetime';
 	import { flip } from 'svelte/animate';
-	import { page } from '$app/stores';
-	import type { User } from 'lucia';
+	import { zod } from 'sveltekit-superforms/adapters';
+	import { superForm, superValidate } from 'sveltekit-superforms/client';
+	import type { PageData } from './$types';
 
 	// Get page data
 	export let data: PageData;
@@ -41,7 +41,7 @@
 			meta: {
 				workoutIntervalForm,
 				items,
-				activity_type: $form.activity_type
+				activityType: $form.activityType
 			},
 			response: (r: WorkoutInterval) => {
 				if (r) {
@@ -55,10 +55,10 @@
 
 	// Init form
 	let isFocused: boolean = false;
-	const superform = superForm(data.trainingSessionSchema, {
+	const superform = superForm(data.newTrainingSessionForm, {
 		id: 'create',
 		resetForm: true,
-		validators: zod(training_session_schema),
+		validators: zod(trainingSessionSchema),
 		delayMs: 0,
 		timeoutMs: 8000,
 		dataType: 'json'
@@ -67,15 +67,23 @@
 	const { form, errors, constraints, enhance, delayed } = superform;
 
 	// Init drag and drop sort
-	function handleSort(e: { detail: { items: { id: number; data: WorkoutInterval }[] } }) {
+	function handleSort(e: {
+		detail: { items: { id: number; data: WorkoutInterval }[] };
+	}) {
 		$items = e.detail.items;
 	}
-	let items: ItemsStore<WorkoutInterval> = ItemsStoreService<WorkoutInterval>([]);
+	let items: ItemsStore<WorkoutInterval> = ItemsStoreService<WorkoutInterval>(
+		[]
+	);
 
 	items.subscribe((curr) => {
 		$form.duration = curr.reduce((a, b) => a + b.data.duration, 0);
 		const intervals = [...curr.map((i) => i.data)];
-		$form.stress_score = evaluatePlanTss(data.user, $form.activity_type, intervals).stress_score;
+		$form.stressScore = evaluatePlanTss(
+			data.user!,
+			$form.activityType,
+			intervals
+		).stressScore;
 		$form.plan = intervals;
 	});
 
@@ -83,31 +91,46 @@
 </script>
 
 <div class="card">
-	<form id="create" use:focusTrap={isFocused} method="POST" action="?/create" use:enhance>
+	<form
+		id="create"
+		use:focusTrap={isFocused}
+		method="POST"
+		action="?/create"
+		use:enhance
+	>
 		<header class="card-header flex flex-col">
 			<h1 class="w-full py-2 text-center">New Training Session</h1>
 			<EnumSelectInput
-				field="activity_type"
-				enumType={ActivityType}
+				field="activityType"
+				enumType={activityType.enumValues}
 				{superform}
 				on:change={async (e) => {
 					$items = [];
 				}}
 			/>
 			<TextInput field="title" {superform} />
-			<TextArea field="description" {superform} name="description" label="Description" />
+			<TextArea
+				field="description"
+				{superform}
+				name="description"
+				label="Description"
+			/>
 		</header>
 
 		<section class="p-4">
-			<div class="flex flex-col overflow-hidden rounded-md p-2 bg-surface-backdrop-token">
+			<div
+				class="flex flex-col overflow-hidden rounded-md p-2 bg-surface-backdrop-token"
+			>
 				<div class="flex flex-row items-center justify-between">
 					<div class="flex flex-row justify-center align-middle gap-2">
 						<h3 class="text-sm">Duration: {secondsToHHMMSS($form.duration)}</h3>
-						{#if $form.activity_type != ActivityType.BIKE}
-							<h3 class="text-sm">Distance: {calculateDistance($form, $page.data.user)}</h3>
+						{#if $form.activityType != 'BIKE'}
+							<h3 class="text-sm">
+								Distance: {calculateDistance($form, $page.data.user)}
+							</h3>
 						{/if}
 						<!-- IF THE ACTIVITTY IS A RUN OR SWIM, DISPLAY THE DISTANCE -->
-						<h3 class="text-sm">Stress Score: {$form.stress_score}</h3>
+						<h3 class="text-sm">Stress Score: {$form.stressScore}</h3>
 					</div>
 
 					<div class="flex flex-row justify-center align-middle gap-2">
@@ -145,7 +168,9 @@
 							animate:flip={{ duration: 50 }}
 							style="width: {Math.ceil(
 								(item.data.duration / $form.duration) * 100
-							)}%; height: {Math.ceil((item.data.intensity / max_intensity) * 100)}%"
+							)}%; height: {Math.ceil(
+								(item.data.intensity / max_intensity) * 100
+							)}%"
 							class="w-fit p-2 snap-x rounded-sm {getIntensityColor(
 								item.data.intensity
 							)} overscroll-y-none"
@@ -159,9 +184,15 @@
 								class="bg-surface-backdrop-token p-1 rounded-sm w-fit overscroll-y-none"
 								data-popup="intervalPopup-{index}"
 							>
-								<div class="flex flex-row items-center align-middle justify-center gap-1">
+								<div
+									class="flex flex-row items-center align-middle justify-center gap-1"
+								>
 									<span class="text-sm text-nowrap"
-										>{getIntervalDisplay(item.data, $form.activity_type, $page.data.user)}</span
+										>{getIntervalDisplay(
+											item.data,
+											$form.activityType,
+											$page.data.user
+										)}</span
 									>
 									<Button
 										id="duplicate"

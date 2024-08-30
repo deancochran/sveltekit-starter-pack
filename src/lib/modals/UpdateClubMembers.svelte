@@ -2,8 +2,6 @@
 	import { page } from '$app/stores';
 	import Button from '$lib/components/Button.svelte';
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
-	import { accept_club_member, new_club_event_schema, type AcceptClubMember } from '$lib/schemas';
-	import type { club_member, user } from '@prisma/client';
 	import {
 		Avatar,
 		Paginator,
@@ -13,28 +11,34 @@
 	} from '@skeletonlabs/skeleton';
 	import type { SvelteComponent } from 'svelte';
 	import { superForm, type SuperValidated } from 'sveltekit-superforms';
-	import { zod, type Infer } from 'sveltekit-superforms/adapters';
+	import { type Infer } from 'sveltekit-superforms/adapters';
+	import { z } from 'zod';
+	const acceptClubMember = z.object({
+		userId: z.string()
+	});
+
+	type AcceptClubMember = typeof acceptClubMember;
 
 	/** Exposes parent props to this component. */
 	export let parent: SvelteComponent;
 	const modal = getModalStore();
 	let meta = $modal[0].meta as {
 		form: SuperValidated<Infer<AcceptClubMember>>;
-		potential_members: Array<club_member & { user: user }>;
+		potential_members: Array<any>;
 	};
 
 	const { enhance, delayed, formId } = superForm(meta.form, {
 		id: 'UpdateClubMembers',
 		applyAction: true,
-		validators: zod(accept_club_member),
 		delayMs: 0,
 		timeoutMs: 8000,
 		onResult(event) {
 			const { result } = event;
 			if (result.type == 'success') {
 				if ($modal[0].response) $modal[0].response(true);
-				console.log($formId);
-				meta.potential_members = meta.potential_members.filter((obj) => obj.user.id == $formId);
+				meta.potential_members = meta.potential_members.filter(
+					(obj) => String(obj.user.id) == $formId
+				);
 			}
 			return;
 		}
@@ -44,7 +48,8 @@
 	// Base Classes
 	const cBase = 'card p-4 w-modal shadow-xl space-y-4';
 	const cHeader = 'text-2xl font-bold';
-	const cForm = 'border border-surface-500 p-4 space-y-4 rounded-container-token';
+	const cForm =
+		'border border-surface-500 p-4 space-y-4 rounded-container-token';
 
 	$: paginationSettings = {
 		page: 0,
@@ -55,7 +60,8 @@
 
 	$: paginated_members = meta.potential_members.slice(
 		paginationSettings.page * paginationSettings.limit,
-		paginationSettings.page * paginationSettings.limit + paginationSettings.limit
+		paginationSettings.page * paginationSettings.limit +
+			paginationSettings.limit
 	);
 </script>
 
@@ -76,9 +82,9 @@
 						{#each paginated_members as member}
 							<tr class="flex w-full h-full items-center align-middle">
 								<td>
-									{#if member.user.avatar_file_id}
+									{#if member.user.avatarFileId}
 										<Avatar
-											src={`/api/images/${member.user.avatar_file_id}`}
+											src={`/api/images/${member.user.avatarFileId}`}
 											initials={String(member.user.username).slice(0, 2)}
 											border="border-4 border-surface-300-600-token hover:!border-primary-500"
 										/>
@@ -93,18 +99,22 @@
 									<span class="flex h-full h4 font-bold">
 										{member.user.username}
 									</span>
-									{#if member.admin}<span class=" chip variant-filled p-1">Admin</span>{/if}
+									{#if member.admin}<span class=" chip variant-filled p-1"
+											>Admin</span
+										>{/if}
 								</td>
-								<td class="flex w-full h-full items-center align-middle justify-evenly">
+								<td
+									class="flex w-full h-full items-center align-middle justify-evenly"
+								>
 									{#if $delayed}
 										<LoadingIcon />
 									{:else}
 										<Button
 											shadow="shadow-md"
 											formaction="?/accept"
-											name="user_id"
-											value={member.user_id}
-											on:click={() => ($formId = member.user_id.toString())}
+											name="userId"
+											value={member.userId}
+											on:click={() => ($formId = member.userId.toString())}
 											color="variant-filled-primary"
 											class="btn {parent.buttonPositive}"
 											type="submit">Accept</Button
@@ -112,9 +122,9 @@
 										<Button
 											shadow="shadow-md"
 											formaction="?/reject"
-											name="user_id"
-											value={member.user_id}
-											on:click={() => ($formId = member.user_id.toString())}
+											name="userId"
+											value={member.userId}
+											on:click={() => ($formId = member.userId.toString())}
 											color="variant-filled-primary"
 											class="btn {parent.buttonPositive}"
 											type="submit">Reject</Button
@@ -126,7 +136,9 @@
 					</tbody>
 				</table>
 				{#if meta.potential_members.length < 1}
-					<div class="flex items-center align-middle justify-center py-20 w-full">
+					<div
+						class="flex items-center align-middle justify-center py-20 w-full"
+					>
 						<h3 class="h3">No Members Found</h3>
 					</div>
 				{/if}

@@ -8,10 +8,9 @@
 
 	export let data: PageData;
 	// polyline decodes the coordinates in Lat Lng output, but it is needed to be in Lng Lat.
-	$: coordinates = decode(data.activity.map?.polyline as string).map((coord) => [
-		coord[1],
-		coord[0]
-	]) as LngLatLike[];
+	$: coordinates = decode(data.activity.map?.polyline as string).map(
+		(coord) => [coord[1], coord[0]]
+	) as LngLatLike[];
 
 	$: loaded = false;
 	function handledMapLoaded() {

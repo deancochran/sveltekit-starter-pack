@@ -1,22 +1,19 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import Link from '$lib/components/Link.svelte';
 	import {
 		Avatar,
 		Paginator,
 		getToastStore,
-		type PaginationSettings,
 		type ToastSettings
 	} from '@skeletonlabs/skeleton';
 	import type { PageData } from './$types';
-	import { LucideUsers } from 'lucide-svelte';
-	import { goto } from '$app/navigation';
 	export let data: PageData;
 	let toastStore = getToastStore();
 
 	// Pagination
 	async function onPageChange(e: CustomEvent): Promise<void> {
 		const response = await fetch(`/api/clubs?page=${e.detail}`);
-		console.log(response);
 		if (response.ok) {
 			clubs = await response.json();
 		} else {
@@ -29,15 +26,15 @@
 	}
 
 	function onAmountChange(e: CustomEvent): void {
-		console.log('event:amount', e.detail);
+		// console.log('event:amount', e.detail);
 	}
 
 	let paginationSettings = {
 		page: 0,
 		limit: 5,
-		size: data.clubs_count,
+		size: data.clubsCount.count,
 		amounts: [5]
-	} as PaginationSettings;
+	};
 
 	$: pagination_disabled = false;
 	$: clubs = data.clubs;
@@ -57,24 +54,26 @@
 			href="/clubs/create">Create Club</Link
 		>
 	</div>
-	{#if data.user_memberships.length < 1}
+	{#if data.userMemberships.length < 1}
 		<div class="py-5">
 			<div class="card py-20 gap-4 text-center">
 				<h1 class="h3">No Clubs</h1>
 			</div>
 		</div>
 	{:else}
-		<div class="snap-x scroll-px-4 snap-mandatory scroll-smooth flex gap-4 overflow-x-auto py-5">
-			{#each data.user_memberships as membership}
+		<div
+			class="snap-x scroll-px-4 snap-mandatory scroll-smooth flex gap-4 overflow-x-auto py-5"
+		>
+			{#each data.userMemberships as membership}
 				<button
 					on:click={() => {
 						goto(`/clubs/${membership.club.id}`);
 					}}
 					class="snap-start shrink-0 card card-hover w-40 md:w-80 h-32 relative overflow-hidden flex items-end align-middle justify-center"
 				>
-					{#if membership.club.banner_file_id}
+					{#if membership.club.bannerFileId}
 						<img
-							src={`/api/images/${membership.club.banner_file_id}`}
+							src={`/api/images/${membership.club.bannerFileId}`}
 							class="absolute object-cover object-bottom rounded-none overflow-hidden w-full group-hover:hidden"
 							alt="Club Banner"
 						/>
@@ -85,9 +84,9 @@
 					{/if}
 
 					<div class="isolate h-1/3 w-full flex flex-row bg-surface-500">
-						{#if membership.club?.avatar_file_id}
+						{#if membership.club?.avatarFileId}
 							<Avatar
-								src={`/api/images/${membership.club?.avatar_file_id}`}
+								src={`/api/images/${membership.club?.avatarFileId}`}
 								initials={String(membership.club.name).slice(0, 2)}
 								width="w-16"
 								shadow="shadow-lg"
@@ -107,7 +106,9 @@
 								class="group-hover:hidden"
 							/>
 						{/if}
-						<h4 class="w-full h4 flex items-center align-middle justify-center text-center">
+						<h4
+							class="w-full h4 flex items-center align-middle justify-center text-center"
+						>
 							{membership.club.name}
 						</h4>
 					</div>
@@ -143,13 +144,13 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each clubs as club}
-				<tr on:click={() => goto(`/clubs/${club.id}`)}>
+			{#each clubs as club_obj}
+				<tr on:click={() => goto(`/clubs/${club_obj.club.id}`)}>
 					<td>
-						{#if club?.avatar_file_id}
+						{#if club_obj.club.avatarFileId}
 							<Avatar
-								src={`/api/images/${club?.avatar_file_id}`}
-								initials={String(club.name).slice(0, 2)}
+								src={`/api/images/${club_obj.club.avatarFileId}`}
+								initials={String(club_obj.club.name).slice(0, 2)}
 								width="w-16"
 								shadow="shadow-lg"
 								rounded="rounded-sm"
@@ -159,7 +160,7 @@
 							/>
 						{:else}
 							<Avatar
-								initials={String(club?.name).slice(0, 2)}
+								initials={String(club_obj.club.name).slice(0, 2)}
 								width="w-16"
 								shadow="shadow-lg"
 								rounded="rounded-sm"
@@ -172,15 +173,15 @@
 					<td>
 						<div class="flex flex-col gap-1">
 							<span class=" h4 font-bold">
-								{club.name}
+								{club_obj.club.name}
 							</span>
 							<span class="line-clamp-2">
-								{club.description}
+								{club_obj.club.description}
 							</span>
 						</div>
 					</td>
-					<td>{club.created_at}</td>
-					<td>{club._count.members}</td>
+					<td>{club_obj.club.createdAt}</td>
+					<td>{club_obj.memberCount}</td>
 				</tr>
 			{/each}
 		</tbody>

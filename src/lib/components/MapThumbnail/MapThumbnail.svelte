@@ -1,9 +1,10 @@
 <script setup lang="ts">
-	import maplibre, { type Map, type LngLatLike } from 'maplibre-gl';
+	import maplibre, { type LngLatLike, type Map } from 'maplibre-gl';
 	import { v4 as uuid } from 'uuid';
 
 	let map_id = uuid();
-	let style = 'https://api.maptiler.com/maps/outdoor-v2/style.json?key=vcLMPIc3W2UdFOStWLDw';
+	let style =
+		'https://api.maptiler.com/maps/outdoor-v2/style.json?key=vcLMPIc3W2UdFOStWLDw';
 	export let coordinates: Array<LngLatLike>;
 
 	let center = coordinates[0];
@@ -31,29 +32,11 @@
 			center,
 			zoom,
 			bounds,
-			fitBoundsOptions: { padding: { top: 20, bottom: 20, left: 20, right: 20 } },
+			fitBoundsOptions: {
+				padding: { top: 20, bottom: 20, left: 20, right: 20 }
+			},
 			interactive: false
 		});
-		// map.on('load', () => {
-		// 	try {
-		// 		map.addSource('trace_source', { type: 'geojson', data });
-		// 		map.addLayer({
-		// 			id: 'trace_layer',
-		// 			type: 'line',
-		// 			source: 'trace_source',
-		// 			layout: {
-		// 				'line-join': 'round',
-		// 				'line-cap': 'round'
-		// 			},
-		// 			paint: {
-		// 				'line-color': '#FFFFFF',
-		// 				'line-width': 5
-		// 			}
-		// 		});
-		// 	} catch (e) {
-		// 		console.log('error', e);
-		// 	}
-		// });
 
 		return {
 			destroy() {

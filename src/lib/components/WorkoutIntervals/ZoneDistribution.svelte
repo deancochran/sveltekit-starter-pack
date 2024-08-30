@@ -3,7 +3,7 @@
 	import { getIntensityColorByZoneNumber, getIntensityZone } from './types';
 
 	export let intervals: WorkoutInterval[];
-	export let total_duration: number;
+	export let totalDuration: number;
 
 	let zone_durations = {
 		'Zone 0': 0,
@@ -53,15 +53,22 @@
 </script>
 
 {#key zone_durations}
-	<div class="relative flex flex-row gap-px items-end align-baseline justify-between p-2">
+	<div
+		class="relative flex flex-row gap-px items-end align-baseline justify-between p-2"
+	>
 		{#each Object.entries(zone_durations) as [key, zone_duration], i}
-			{@const duration_percentage = zone_duration / total_duration}
+			{@const duration_percentage = zone_duration / totalDuration}
 			{@const height = duration_percentage * 100 + 1}
 			{@const color = getIntensityColorByZoneNumber(i)}
 			<div class="relative w-full h-full flex flex-col gap-1 overflow-hidden">
 				<p class="text-sm text-center text-nowrap">
 					{(
-						Number((Number.isNaN(duration_percentage) ? 0.0 : duration_percentage).toFixed(2)) * 100
+						Number(
+							(Number.isNaN(duration_percentage)
+								? 0.0
+								: duration_percentage
+							).toFixed(2)
+						) * 100
 					).toFixed(0)}%
 				</p>
 

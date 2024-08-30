@@ -1,158 +1,158 @@
-import { ActivityType, ThirdPartyIntegrationProvider } from '@prisma/client';
 import dayjs from 'dayjs';
+import { createInsertSchema } from 'drizzle-zod';
 import type { Infer } from 'sveltekit-superforms';
 import { z } from 'zod';
+import {
+	activityType,
+	thirdPartyIntegrationProvider,
+	user
+} from './drizzle/schema';
+import { WahooWorkoutTypeID } from './integrations/wahoo/types';
 import { addDays } from './utils/datetime';
-import { WahooWorkoutTypeID } from './utils/integrations/wahoo/types';
 
-const one_upper_case_letter: RegExp = new RegExp('.*[A-Z].*');
-const one_lower_case_letter: RegExp = new RegExp('.*[a-z].*');
-const one_number: RegExp = new RegExp('.*\\d.*');
-const one_special_char: RegExp = new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*');
-const alphanumeric_with_underscore: RegExp = new RegExp('^[A-Za-z0-9_]+$');
+const oneUpperCaseLetter: RegExp = new RegExp('.*[A-Z].*');
+const oneLowerCaseLetter: RegExp = new RegExp('.*[a-z].*');
+const oneNumber: RegExp = new RegExp('.*\\d.*');
+const oneSpecialChar: RegExp = new RegExp(
+	'.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'
+);
+const alphanumericWithUnderscore: RegExp = new RegExp('^[A-Za-z0-9_]+$');
 
-const username_schema = z
+const passwordSchema = z
 	.string()
-	.regex(alphanumeric_with_underscore, 'Must must be alaphanumeric, "_" is allowed')
-	.max(20, 'Must be at most 20 characters in length')
+	.regex(oneUpperCaseLetter, 'One uppercase character')
+	.regex(oneLowerCaseLetter, 'One lowercase character')
+	.regex(oneNumber, 'One number')
+	.regex(oneSpecialChar, 'One special character')
 	.min(8, 'Must be at least 8 characters in length');
 
-const password_schema = z
-	.string()
-	.regex(one_upper_case_letter, 'One uppercase character')
-	.regex(one_lower_case_letter, 'One lowercase character')
-	.regex(one_number, 'One number')
-	.regex(one_special_char, 'One special character')
-	.min(8, 'Must be at least 8 characters in length');
-
-export const signup_schema = z
-	.object({
-		email: z.string().email(),
-		username: username_schema,
-		password: password_schema,
-		val_password: z.string()
+export const signupSchema = createInsertSchema(user)
+	.pick({ email: true, username: true, password: true })
+	.extend({
+		valPassword: z.string()
 	})
-	.superRefine(({ val_password, password }, ctx) => {
-		if (val_password !== password) {
+	.superRefine(({ valPassword, password }, ctx) => {
+		if (valPassword !== password) {
 			ctx.addIssue({
 				code: 'custom',
 				message: 'The passwords did not match',
-				path: ['val_password']
+				path: ['valPassword']
 			});
 		}
 	});
-export type SignUpSchema = typeof signup_schema;
+export type SignUpSchema = typeof signupSchema;
 
-export const signin_schema = z.object({
-	email: z.string().email(),
+export const signinSchema = z.object({
+	email_or_username: z.string(),
 	password: z.string()
 });
-export type SignInSchema = typeof signin_schema;
+export type SignInSchema = typeof signinSchema;
 
-export const update_user_schema = z.object({
-	username: username_schema
+export const updateUserSchema = z.object({
+	username: passwordSchema
 });
 
-export type UpdateUserSchema = typeof update_user_schema;
+export type UpdateUserSchema = typeof updateUserSchema;
 
-export const verify_user_email_schema = z.object({
+export const verifyUserEmailSchema = z.object({
 	code: z.string()
 });
-export type VerifyUserEmailSchema = typeof verify_user_email_schema;
+export type VerifyUserEmailSchema = typeof verifyUserEmailSchema;
 
-export const update_user_email_schema = z.object({
+export const updateUserEmailSchema = z.object({
 	email: z.string().email(),
 	code: z.string()
 });
-export type UpdateUserEmailSchema = typeof update_user_email_schema;
+export type UpdateUserEmailSchema = typeof updateUserEmailSchema;
 
-export const send_new_user_email_code_schema = z.object({
+export const sendNewUserEmailCodeSchema = z.object({
 	email: z.string().email()
 });
-export type SendNewUserEmailCode = typeof send_new_user_email_code_schema;
+export type SendNewUserEmailCode = typeof sendNewUserEmailCodeSchema;
 
-export const update_user_password_schema = z
+export const updateUserPasswordSchema = z
 	.object({
-		password: password_schema,
-		val_password: z.string()
+		password: passwordSchema,
+		valPassword: z.string()
 	})
-	.superRefine(({ val_password, password }, ctx) => {
-		if (val_password !== password) {
+	.superRefine(({ valPassword, password }, ctx) => {
+		if (valPassword !== password) {
 			ctx.addIssue({
 				code: 'custom',
 				message: 'The passwords did not match',
-				path: ['val_password']
+				path: ['valPassword']
 			});
 		}
 	});
-export type UpdateUserPasswordSchema = typeof update_user_password_schema;
+export type UpdateUserPasswordSchema = typeof updateUserPasswordSchema;
 
-export const forgot_pass_schema = z.object({
+export const forgotPassSchema = z.object({
 	email: z.string().email()
 });
-export type ForgotPassSchema = typeof forgot_pass_schema;
+export type ForgotPassSchema = typeof forgotPassSchema;
 
-export const reset_forgot_pass_schema = z
+export const resetForgotPassSchema = z
 	.object({
 		code: z.string(),
-		password: password_schema,
-		val_password: z.string()
+		password: passwordSchema,
+		valPassword: z.string()
 	})
-	.superRefine(({ val_password, password }, ctx) => {
-		if (val_password !== password) {
+	.superRefine(({ valPassword, password }, ctx) => {
+		if (valPassword !== password) {
 			ctx.addIssue({
 				code: 'custom',
 				message: 'The passwords did not match',
-				path: ['val_password']
+				path: ['valPassword']
 			});
 		}
 	});
-export type ResetForgotPassSchema = typeof reset_forgot_pass_schema;
+export type ResetForgotPassSchema = typeof resetForgotPassSchema;
 
-export const reset_pass_schema = z
+export const resetPassSchema = z
 	.object({
-		password: password_schema,
-		val_password: z.string()
+		password: passwordSchema,
+		valPassword: z.string()
 	})
-	.superRefine(({ val_password, password }, ctx) => {
-		if (val_password !== password) {
+	.superRefine(({ valPassword, password }, ctx) => {
+		if (valPassword !== password) {
 			ctx.addIssue({
 				code: 'custom',
 				message: 'The passwords did not match',
-				path: ['val_password']
+				path: ['valPassword']
 			});
 		}
 	});
-export type ResetPassSchema = typeof reset_pass_schema;
+export type ResetPassSchema = typeof resetPassSchema;
 
-export const update_ftp_hr_schema = z.object({
+export const updateFtpHrSchema = z.object({
 	max_hr: z.number(),
-	run_ftp: z.number().nonnegative().max(15), // m/s
-	bike_ftp: z.number().min(1).max(500), // watts
-	swim_ftp: z.number().nonnegative().max(10) // m/s
+	runFtp: z.number().nonnegative().max(15), // m/s
+	bikeFtp: z.number().min(1).max(500), // watts
+	swimFtp: z.number().nonnegative().max(10) // m/s
 });
 
-export type UpdateFTP_HRSchema = typeof update_ftp_hr_schema;
+export type UpdateFTP_HRSchema = typeof updateFtpHrSchema;
 
-export const cancel_user_subscription_schema = z.object({
+export const cancelUserSubscriptionSchema = z.object({
 	password: z.string()
 });
 
-export type CancelUserSubscription = typeof cancel_user_subscription_schema;
+export type CancelUserSubscription = typeof cancelUserSubscriptionSchema;
 
-export const delete_user_schema = z.object({
+export const deleteUserSchema = z.object({
 	password: z.string()
 });
 
-export type DeleteUserSchema = typeof delete_user_schema;
+export type DeleteUserSchema = typeof deleteUserSchema;
 
-const ProviderEnum = z.nativeEnum(ThirdPartyIntegrationProvider);
+const ProviderEnum = z.enum(thirdPartyIntegrationProvider.enumValues);
 type ProviderEnum = z.infer<typeof ProviderEnum>;
-export const disconnect_user_integration_schema = z.object({
+export const disconnectUserIntegrationSchema = z.object({
 	provider: ProviderEnum
 });
 
-export type DisconnectUserIntegrationSchema = typeof disconnect_user_integration_schema;
+export type DisconnectUserIntegrationSchema =
+	typeof disconnectUserIntegrationSchema;
 
 export const stripeProductSchema = z.object({
 	id: z.string(),
@@ -168,25 +168,25 @@ export const stripeCustomerSchema = z.object({
 	metadata: z.record(z.string())
 });
 
-export const new_image_schema = z.object({
+export const newImageSchema = z.object({
 	image: z
 		.instanceof(File, { message: 'Please upload an image.' })
 		.refine((f) => f.size < 5_120_000, 'Max 5 Mb upload size.')
 });
-export type NewImageSchema = typeof new_image_schema;
+export type NewImageSchema = typeof newImageSchema;
 
-export const new_club_schema = z.object({
+export const newClubSchema = z.object({
 	name: z.string().max(100, 'Must be at most 100 characters long'),
 	description: z.string().max(200, 'Must be at most 200 characters long'),
 	private: z.boolean().default(false)
 });
-export type NewClubSchema = typeof new_club_schema;
+export type NewClubSchema = typeof newClubSchema;
 
-export const accept_club_member = z.object({
-	user_id: z.string()
+export const acceptClubMember = z.object({
+	userId: z.string()
 });
 
-export type AcceptClubMember = typeof accept_club_member;
+export type AcceptClubMember = typeof acceptClubMember;
 
 export enum RecurrenceFrequency {
 	DAILY = 'DAILY',
@@ -195,17 +195,19 @@ export enum RecurrenceFrequency {
 	MONTHLY = 'MONTHLY'
 }
 
-export const new_club_event_schema = z
+export const newClubEventSchema = z
 	.object({
-		training_session_id: z.number().optional(),
+		trainingSessionId: z.number().optional(),
 		date: z.date(),
 		name: z.string().max(50, 'Must be at most 50 characters long'),
 		description: z.string().max(200, 'Must be at most 200 characters long'),
 		recurring: z.boolean().default(false),
-		end_date: z.date().default(new Date()),
-		frequency: z.nativeEnum(RecurrenceFrequency).default(RecurrenceFrequency.WEEKLY)
+		endDate: z.date().default(new Date()),
+		frequency: z
+			.nativeEnum(RecurrenceFrequency)
+			.default(RecurrenceFrequency.WEEKLY)
 	})
-	.superRefine(({ date, end_date, recurring }, ctx) => {
+	.superRefine(({ date, endDate, recurring }, ctx) => {
 		if (date <= dayjs().add(-1, 'day').startOf('day').toDate()) {
 			ctx.addIssue({
 				code: 'custom',
@@ -213,34 +215,34 @@ export const new_club_event_schema = z
 				path: ['date']
 			});
 		}
-		if (end_date < date && recurring) {
+		if (endDate < date && recurring) {
 			ctx.addIssue({
 				code: 'custom',
 				message: 'The End Date Cannot be Before the Start Date.',
-				path: ['end_date']
+				path: ['endDate']
 			});
 		}
 	});
 
-export type NewClubEventSchema = typeof new_club_event_schema;
+export type NewClubEventSchema = typeof newClubEventSchema;
 
-export const training_plan_schema = z
+export const trainingPlanSchema = z
 	.object({
 		name: z.string(),
 		description: z.string().max(50, 'Must be at most 50 characters in length'),
-		start_date: z.date(),
-		end_date: z.date()
+		startDate: z.date(),
+		endDate: z.date()
 	})
-	.superRefine(({ start_date, end_date }, ctx) => {
-		if (end_date < start_date) {
+	.superRefine(({ startDate, endDate }, ctx) => {
+		if (endDate < startDate) {
 			ctx.addIssue({
 				code: 'custom',
 				message: 'The End Date Cannot be Before the Start Date.',
-				path: ['end_date']
+				path: ['endDate']
 			});
 		}
 	});
-export type TrainPlanSchema = typeof training_plan_schema;
+export type TrainPlanSchema = typeof trainingPlanSchema;
 
 export const IntervalSchema = z.object({
 	duration: z.number().min(0).nonnegative(),
@@ -252,48 +254,52 @@ export const IntervalSchema = z.object({
 export type Interval = z.infer<typeof IntervalSchema>;
 export type WorkoutInterval = z.infer<typeof IntervalSchema>;
 
-export const training_session_schema = z.object({
+export const trainingSessionSchema = z.object({
 	title: z.string(),
-	activity_type: z.nativeEnum(ActivityType),
+	activityType: z.enum(activityType.enumValues),
 	description: z.string().max(250, 'Must be at most 250 characters in length'),
 	// date: z.date(),
 	duration: z.number().default(0),
 	distance: z.number().optional(),
-	stress_score: z.number().gte(0),
+	stressScore: z.number().gte(0),
 	plan: z.array(IntervalSchema)
 });
-export type TrainingSessionSchema = typeof training_session_schema;
+export type TrainingSessionSchema = typeof trainingSessionSchema;
 
-export const create_wahoo_workout_schema = z
+export const createWahooWorkoutSchema = z
 	.object({
 		name: z.string(),
 		workout_type_id: z.nativeEnum(WahooWorkoutTypeID),
 		starts: z.date(),
 		minutes: z.number(),
-		workout_token: z.string(),
-		plan_id: z.number().optional(),
-		workout_summary_id: z.any().optional()
+		workoutToken: z.string(),
+		planId: z.number().optional(),
+		workoutSummaryId: z.any().optional()
 	})
 	.superRefine(({ starts }, ctx) => {
 		if (starts > addDays(new Date(), 6)) {
 			ctx.addIssue({
 				code: 'custom',
-				message: 'The workout can not be scheduled in wahoo by more than 6 days in advance.',
+				message:
+					'The workout can not be scheduled in wahoo by more than 6 days in advance.',
 				path: ['starts']
 			});
 		}
 	});
-export type CreateWahooWorkoutSchema = typeof create_wahoo_workout_schema;
+export type CreateWahooWorkoutSchema = typeof createWahooWorkoutSchema;
 
-export const user_feed_schema = z.object({
+export const userFeedSchema = z.object({
 	page: z.number(),
 	limit: z.number(),
 	size: z.number(),
 	amounts: z.array(z.number())
 });
-export const UserFeedSchema = typeof user_feed_schema;
+export const UserFeedSchema = typeof userFeedSchema;
 
-type ProductConfig = Record<string, { features: string[]; call_to_action: string }>;
+type ProductConfig = Record<
+	string,
+	{ features: string[]; callToAction: string }
+>;
 
 export const productConfig: ProductConfig = {
 	Free: {
@@ -304,7 +310,7 @@ export const productConfig: ProductConfig = {
 			'❌ 24/7 Customer Support',
 			'❌ SSO'
 		],
-		call_to_action: 'Get Started'
+		callToAction: 'Get Started'
 	},
 	Plus: {
 		features: [
@@ -314,7 +320,7 @@ export const productConfig: ProductConfig = {
 			'❌ 24/7 Customer Support',
 			'❌ SSO'
 		],
-		call_to_action: 'Start Free Trial'
+		callToAction: 'Start Free Trial'
 	},
 	Pro: {
 		features: [
@@ -324,19 +330,19 @@ export const productConfig: ProductConfig = {
 			'✅ 24/7 Customer Support',
 			'✅ SSO'
 		],
-		call_to_action: 'Start Free Trial'
+		callToAction: 'Start Free Trial'
 	}
 };
 
 export const freePrice = {
 	id: '',
-	unit_amount: 0,
+	unitAmount: 0,
 	interval: 'forever',
 	product: {
 		name: 'Free',
 		description: 'For limited personal use',
 		features: productConfig.Free.features,
-		call_to_action: productConfig.Free.call_to_action
+		callToAction: productConfig.Free.callToAction
 	}
 };
 
@@ -350,23 +356,35 @@ const priceProductSchema = z
 		return {
 			...product,
 			features: productConfig[product.name].features,
-			call_to_action: productConfig[product.name].call_to_action
+			callToAction: productConfig[product.name].callToAction
 		};
 	});
 
 const priceSchema = z.object({
 	id: z.string(),
-	lookup_key: z.string(),
-	unit_amount: z.number().transform((amount) => amount / 100),
+	lookupKey: z.string(),
+	unitAmount: z.number().transform((amount) => amount / 100),
 	product: priceProductSchema
 });
 
 export const priceListSchema = z.array(priceSchema);
 
-export const time_schema = z.object({
+export const timeSchema = z.object({
 	hours: z.number().max(23).min(0).default(0),
 	minutes: z.number().max(59).min(0).default(0),
 	seconds: z.number().max(59).min(0).default(0)
 });
 
-export type TimeSchema = Infer<typeof time_schema>;
+export type TimeSchema = Infer<typeof timeSchema>;
+
+export enum ActivityFrequency {
+	WEEK = 'week',
+	MONTH = 'month',
+	YEAR = 'year'
+}
+
+export const consistencyChartSchema = z.object({
+	frequency: z.nativeEnum(ActivityFrequency)
+});
+
+export type ConsistencyChartSchema = Infer<typeof consistencyChartSchema>;

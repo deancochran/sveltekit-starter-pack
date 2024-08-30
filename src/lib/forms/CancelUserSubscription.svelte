@@ -1,14 +1,17 @@
 <script lang="ts">
-	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
-	import type { Infer, SuperValidated } from 'sveltekit-superforms';
-	import { focusTrap } from '@skeletonlabs/skeleton';
-	import { superForm } from 'sveltekit-superforms/client';
-	import PasswordInput from './inputs/PasswordInput.svelte';
-	import { AlertCircle } from 'lucide-svelte';
 	import Button from '$lib/components/Button.svelte';
-	import { cancel_user_subscription_schema, type CancelUserSubscription } from '$lib/schemas';
+	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
+	import {
+		cancelUserSubscriptionSchema,
+		type CancelUserSubscription
+	} from '$lib/schemas';
+	import { focusTrap } from '@skeletonlabs/skeleton';
+	import { AlertCircle } from 'lucide-svelte';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
+	import { superForm } from 'sveltekit-superforms/client';
 	import InputLabel from './inputs/InputLabel.svelte';
+	import PasswordInput from './inputs/PasswordInput.svelte';
 
 	export let form_data: SuperValidated<Infer<CancelUserSubscription>>;
 
@@ -17,7 +20,7 @@
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: false,
-		validators: zod(cancel_user_subscription_schema),
+		validators: zod(cancelUserSubscriptionSchema),
 		delayMs: 0,
 		timeoutMs: 8000
 	});
@@ -37,8 +40,8 @@
 			</div>
 			<div class="alert-message">
 				<p>
-					Canceling your subscription will cause an immediate stop to all your subscriber
-					privileges.
+					Canceling your subscription will cause an immediate stop to all your
+					subscriber privileges.
 				</p>
 			</div>
 		</aside>
@@ -54,7 +57,9 @@
 			</InputLabel>
 		</form>
 	</section>
-	<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">
+	<footer
+		class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2"
+	>
 		{#if $delayed}
 			<LoadingIcon />
 		{:else}

@@ -1,12 +1,10 @@
-/* eslint-disable no-case-declarations */
-import type { training_session_schema } from '$lib/schemas';
-import { ActivityType } from '@prisma/client';
+import type { trainingSessionSchema } from '$lib/schemas';
 import type { User } from 'lucia';
 import type { Infer } from 'sveltekit-superforms';
 import { secondsToHHMMSS } from '../datetime';
-import { calc_cIF, calc_cTss, intensity_to_bike_watts } from '../tss/ctss';
-import { calc_rIF, calc_rTss, intensity_to_run_speed } from '../tss/rtss';
-import { calc_sIF, calc_sTss, intensity_to_swim_speed } from '../tss/stss';
+import { calcCIF, calcCTss, intensitBikeWatts } from '../tss/ctss';
+import { calcRIF, calcRTss, intensityRunSpeed } from '../tss/rtss';
+import { calcSIF, calcSTss, intensitySwimSpeed } from '../tss/stss';
 
 export type WorkoutInterval = {
 	duration: number;
@@ -16,74 +14,77 @@ export type WorkoutInterval = {
 export type WorkoutSession = WorkoutInterval[];
 
 function evaluateRunPlan(user: User, intervals: WorkoutInterval[]) {
-	let stress_score = 0;
+	let stressScore = 0;
 	for (const interval of intervals) {
-		const user_speed = user.run_ftp * interval.intensity;
+		const userSpeed = user.runFtp * interval.intensity;
 		// const distance = interval.duration *
 		// const GAP = calcRunPace(interval.distance, interval.duration);
-		const rIF = calc_rIF(user_speed, user.run_ftp);
-		stress_score += calc_rTss(interval.duration, user_speed, user.run_ftp, rIF);
+		const rIF = calcRIF(userSpeed, user.runFtp);
+		stressScore += calcRTss(interval.duration, userSpeed, user.runFtp, rIF);
 		break;
 	}
-	return stress_score < 1 ? 0 : stress_score;
+	return stressScore < 1 ? 0 : stressScore;
 }
 
 function evaluateBikePlan(user: User, intervals: WorkoutInterval[]) {
-	let stress_score = 0;
+	let stressScore = 0;
 	for (const interval of intervals) {
-		const NP = interval.intensity * user.bike_ftp;
-		const cIF = calc_cIF(NP, user.bike_ftp);
-		stress_score += calc_cTss(interval.duration, NP, user.bike_ftp, cIF);
+		const NP = interval.intensity * user.bikeFtp;
+		const cIF = calcCIF(NP, user.bikeFtp);
+		stressScore += calcCTss(interval.duration, NP, user.bikeFtp, cIF);
 	}
-	return stress_score < 1 ? 0 : stress_score;
+	return stressScore < 1 ? 0 : stressScore;
 }
 
 function evaluateSwimPlan(user: User, intervals: WorkoutInterval[]) {
-	let stress_score = 0;
+	let stressScore = 0;
 
 	for (const interval of intervals) {
-		const user_speed =
+		const userSpeed =
 			interval.intensity > 1
-				? user.swim_ftp - Math.round((interval.intensity - 1) * user.swim_ftp) // running beyond ftp means faster pace
-				: Math.round(user.swim_ftp * interval.intensity); // running under ftp means slower pace
+				? user.swimFtp - Math.round((interval.intensity - 1) * user.swimFtp) // running beyond ftp means faster pace
+				: Math.round(user.swimFtp * interval.intensity); // running under ftp means slower pace
 		// const distance = mps * interval.duration;
 		// const GAP = calcSwimPace(distance, interval.duration);
-		const sIF = calc_sIF(user_speed, user.swim_ftp);
-		stress_score += calc_sTss(interval.duration, user_speed, user.swim_ftp, sIF);
+		const sIF = calcSIF(userSpeed, user.swimFtp);
+		stressScore += calcSTss(interval.duration, userSpeed, user.swimFtp, sIF);
 	}
 
-	return stress_score < 1 ? 0 : stress_score;
+	return stressScore < 1 ? 0 : stressScore;
 }
 
 export type PlanStats = {
-	stress_score: number;
+	stressScore: number;
 	distance: number;
 	duration: number;
 };
 export function evaluatePlanTss(
 	user: User | undefined,
-	activity_type: ActivityType,
+	activityType: 'BIKE' | 'SWIM' | 'RUN',
 	intervals: WorkoutInterval[]
 ): PlanStats {
-	if (!user) return { stress_score: 0, distance: 0, duration: 0 };
-	let stress_score: number;
-	switch (activity_type) {
-		case ActivityType.RUN:
-			stress_score = Math.round(evaluateRunPlan(user, intervals));
-			return { stress_score, distance: 0, duration: 0 };
-		case ActivityType.BIKE:
-			stress_score = Math.round(evaluateBikePlan(user, intervals));
-			return { stress_score, distance: 0, duration: 0 };
-		case ActivityType.SWIM:
-			stress_score = Math.round(evaluateSwimPlan(user, intervals));
-			return { stress_score, distance: 0, duration: 0 };
+	if (!user) return { stressScore: 0, distance: 0, duration: 0 };
+	let stressScore: number;
+	switch (activityType) {
+		case 'RUN':
+			stressScore = Math.round(evaluateRunPlan(user, intervals));
+			return { stressScore, distance: 0, duration: 0 };
+		case 'BIKE':
+			stressScore = Math.round(evaluateBikePlan(user, intervals));
+			return { stressScore, distance: 0, duration: 0 };
+		case 'SWIM':
+			stressScore = Math.round(evaluateSwimPlan(user, intervals));
+			return { stressScore, distance: 0, duration: 0 };
 
 		default:
-			return { stress_score: 0, distance: 0, duration: 0 };
+			return { stressScore: 0, distance: 0, duration: 0 };
 	}
 }
 
-export function calculateAvgWatts(user: User | undefined, plan: WorkoutInterval[]): number {
+export function calculateAvgWatts(
+	user: User | undefined,
+	plan: WorkoutInterval[]
+): number {
 	//if no user return 0
 	if (!user) {
 		return 0;
@@ -94,94 +95,92 @@ export function calculateAvgWatts(user: User | undefined, plan: WorkoutInterval[
 
 	let totalWatts = 0;
 	plan.forEach((i) => {
-		totalWatts += i.intensity * user.bike_ftp;
+		totalWatts += i.intensity * user.bikeFtp;
 	});
 	return totalWatts / plan.length;
 }
 
 export function getIntensityDisplay(
 	intensity: number,
-	activity_type: string,
+	activityType: string,
 	user: User | undefined
 ): [display: string, value: number] {
 	if (!user) throw new Error('User not defined.');
-	switch (activity_type) {
-		case ActivityType.SWIM:
-			return intensity_to_swim_speed(intensity, user.swim_ftp);
-		case ActivityType.RUN:
-			return intensity_to_run_speed(intensity, user.run_ftp);
-		case ActivityType.BIKE:
-			return intensity_to_bike_watts(intensity, user.bike_ftp);
+	switch (activityType) {
+		case 'SWIM':
+			return intensitySwimSpeed(intensity, user.swimFtp);
+		case 'RUN':
+			return intensityRunSpeed(intensity, user.runFtp);
+		case 'BIKE':
+			return intensitBikeWatts(intensity, user.bikeFtp);
 	}
 	throw new Error('Function not implemented.');
 }
 
 export function getIntervalDisplay(
 	interval: WorkoutInterval,
-	activity_type: string,
+	activityType: string,
 	user: User | undefined
 ) {
-	console.log(interval, activity_type, user);
 	if (!user) throw new Error('User not defined.');
 
-	switch (activity_type) {
-		case ActivityType.SWIM:
-			const [swim_intensity_display, s_p_100m] = getIntensityDisplay(
+	switch (activityType) {
+		case 'SWIM':
+			const [swimIntensityDisplay, sP100m] = getIntensityDisplay(
 				interval.intensity,
-				activity_type,
+				activityType,
 				user
 			);
 
-			const swim_distance = (interval.duration / s_p_100m) * 100;
-			return `${swim_distance}m at ${swim_intensity_display}`;
-		case ActivityType.RUN:
-			// eslint-disable-next-line no-case-declarations
-			const [run_intensity_display, s_p_km] = getIntensityDisplay(
+			const swimDistance = (interval.duration / sP100m) * 100;
+			return `${swimDistance}m at ${swimIntensityDisplay}`;
+		case 'RUN':
+			const [runIntensityDisplay, sPKm] = getIntensityDisplay(
 				interval.intensity,
-				activity_type,
+				activityType,
 				user
 			);
 
-			const run_distance = (interval.duration / s_p_km) * 1000;
-			return `${run_distance}km at ${run_intensity_display}`;
-		case ActivityType.BIKE:
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const [bike_intensity_display, bike_watts] = getIntensityDisplay(
+			const runDistance = (interval.duration / sPKm) * 1000;
+			return `${runDistance}km at ${runIntensityDisplay}`;
+		case 'BIKE':
+			let [display] = getIntensityDisplay(
 				interval.intensity,
-				activity_type,
+				activityType,
 				user
 			);
-			const bike_duration = secondsToHHMMSS(interval.duration);
-			return `${bike_intensity_display} for ${bike_duration}`;
+			display = secondsToHHMMSS(interval.duration);
+			return `${display} for ${display}`;
 	}
 }
 
 export function calculateDistance(
-	data: Infer<typeof training_session_schema>,
+	data: Infer<typeof trainingSessionSchema>,
 	user: User | undefined = undefined
 ) {
 	if (!user) return '0km';
-	switch (data.activity_type) {
-		case ActivityType.SWIM:
-			const swim_distance = data.plan.reduce(
+	switch (data.activityType) {
+		case 'SWIM':
+			const swimDistance = data.plan.reduce(
 				(distance: number, interval: { duration: number; intensity: number }) =>
 					distance +
 					(interval.duration /
-						getIntensityDisplay(interval.intensity, ActivityType.SWIM, user)[1]) *
+						getIntensityDisplay(interval.intensity, 'SWIM', user)[1]) *
 						100,
 				0
 			);
-			return swim_distance.toFixed(0) + 'm';
-		case ActivityType.RUN:
-			const run_distance = data.plan.reduce(
+			return swimDistance.toFixed(0) + 'm';
+		case 'RUN':
+			const runDistance = data.plan.reduce(
 				(distance: number, interval: { duration: number; intensity: number }) =>
 					distance +
-					(interval.duration / getIntensityDisplay(interval.intensity, ActivityType.RUN, user)[1]) *
+					(interval.duration /
+						getIntensityDisplay(interval.intensity, 'RUN', user)[1]) *
 						1000,
 				0
 			);
-			return run_distance.toFixed(2) + 'km';
-		case ActivityType.BIKE:
+			return runDistance.toFixed(2) + 'km';
+		case 'BIKE':
 			throw new Error('Function not implemented.');
 	}
 }

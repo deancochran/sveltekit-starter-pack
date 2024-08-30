@@ -7,7 +7,9 @@
 </script>
 
 <div class="page-container flex items-center justify-center align-middle">
-	<div class="card p-4 flex-col gap-2 flex items-center justify-center align-middle">
+	<div
+		class="card p-4 flex-col gap-2 flex items-center justify-center align-middle"
+	>
 		<h1 class="h1 font-serif">
 			Welcome {#if $page.data?.user}
 				{$page.data?.user.username}
@@ -16,7 +18,8 @@
 			{/if}
 		</h1>
 		<span
-			>To an opinionated Authentication and Billing Implementation for Sveltekit using Stripe</span
+			>To an opinionated Authentication and Billing Implementation for Sveltekit
+			using Stripe</span
 		>
 		{#if !data.user}
 			<p>

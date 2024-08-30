@@ -6,9 +6,9 @@
 	const dispatch = createEventDispatcher();
 </script>
 
-{#if $page.data.user?.avatar_file_id}
+{#if $page.data.user?.avatarFileId}
 	<Avatar
-		src={`/api/images/${$page.data.user?.avatar_file_id}`}
+		src={`/api/images/${$page.data.user?.avatarFileId}`}
 		initials={String($page.data.user?.username).slice(0, 2)}
 		border="border-4 border-surface-300-600-token hover:!border-primary-500"
 		cursor="cursor-pointer"

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import SvelteSeo from 'svelte-seo';
-	import { PUBLIC_CANONICAL_URL } from '$env/static/public';
 	import { APP_NAME, APP_DESCRIPTION } from '$lib/constants';
 	let title: string;
 	let description: string;
@@ -11,4 +10,4 @@
 	});
 </script>
 
-<SvelteSeo bind:title bind:description canonical={PUBLIC_CANONICAL_URL} />
+<SvelteSeo bind:title bind:description canonical={$page.url.origin} />

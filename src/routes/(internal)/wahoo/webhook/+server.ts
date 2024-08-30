@@ -1,147 +1,172 @@
 import { SECRET_WAHOO_WEBHOOK_TOKEN } from '$env/static/private';
+import { db } from '$lib/drizzle/client';
+import {
+	activities,
+	thirdPartyIntegrationLogs,
+	thirdPartyIntegrationToken,
+	user
+} from '$lib/drizzle/schema';
 import {
 	WahooBikingWorkoutTypeIds,
 	WahooRunningWorkoutTypeIds,
 	WahooSWimmingWorkoutTypeIds,
 	type WahooWebhookEvent
-} from '$lib/utils/integrations/wahoo/types';
-import { calc_cTss } from '$lib/utils/tss/ctss';
-import { calcRunPace, calc_rIF, calc_rTss } from '$lib/utils/tss/rtss';
-import { calcSwimPace, calc_sIF, calc_sTss } from '$lib/utils/tss/stss';
+} from '$lib/integrations/wahoo/types';
+import { calcCTss } from '$lib/utils/tss/ctss';
+import { calcRIF, calcRTss, calcRunPace } from '$lib/utils/tss/rtss';
+import { calcSIF, calcSTss, calcSwimPace } from '$lib/utils/tss/stss';
+import type { RequestEvent } from '@sveltejs/kit';
+import { error } from 'console';
+import { json } from 'd3';
+import { and, eq, type InferSelectModel } from 'drizzle-orm';
 
-import {
-	ActivityType,
-	ThirdPartyIntegrationProvider,
-	type thirdPartyIntegrationLogs,
-	type thirdPartyIntegrationToken,
-	type user
-} from '@prisma/client';
-import { error, json } from '@sveltejs/kit';
+// import { calcCTss } from '$lib/utils/tss/ctss';
+// import { calcRIF, calcRTss, calcRunPace } from '$lib/utils/tss/rtss';
+// import { calcSIF, calcSTss, calcSwimPace } from '$lib/utils/tss/stss';
 
-export async function POST(event) {
+// import { error, json, type RequestEvent } from '@sveltejs/kit';
+// import { and, eq, type InferSelectModel } from 'drizzle-orm';
+
+export async function POST(event: RequestEvent) {
 	const { request } = event;
-	const hook_data: WahooWebhookEvent = await request.json();
+	const hookData: WahooWebhookEvent = await request.json();
 
-	if (hook_data.webhook_token !== SECRET_WAHOO_WEBHOOK_TOKEN) {
+	if (hookData.webhook_token !== SECRET_WAHOO_WEBHOOK_TOKEN) {
 		error(401);
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const integration = await prisma.thirdPartyIntegrationToken.findFirstOrThrow({
-		where: {
-			AND: [
-				{
-					provider: ThirdPartyIntegrationProvider.WAHOO
-				},
-				{
-					integration_id: String(hook_data.user.id)
-				}
-			]
-		}
+	const integration = await db.query.thirdPartyIntegrationToken.findFirst({
+		where: and(
+			eq(thirdPartyIntegrationToken.provider, 'WAHOO'),
+			eq(thirdPartyIntegrationToken.integrationId, String(hookData.user.id))
+		)
 	});
+	if (!integration) throw new Error('No integration Found');
 	try {
-		if (hook_data.event_type != 'wahoo_workout_summary')
-			json({ message: 'event_type is not wahoo_workout_summary' }, { status: 400 });
-		const log = await prisma.thirdPartyIntegrationLogs.create({
-			data: {
-				user_id: String(hook_data.user.id),
-				token_id: integration.id,
-				provider: ThirdPartyIntegrationProvider.WAHOO,
-				metadata: hook_data
-			},
-			include: {
-				token: true,
+		if (hookData.event_type != 'wahoo_workout_summary')
+			json('event_type is not wahoo_workout_summary');
+
+		const [newLog] = await db
+			.insert(thirdPartyIntegrationLogs)
+			.values({
+				userId: integration.userId,
+				tokenId: integration.id,
+				provider: 'WAHOO',
+				metadata: hookData
+			})
+			.returning();
+		const log = await db.query.thirdPartyIntegrationLogs.findFirst({
+			where: eq(thirdPartyIntegrationLogs.id, newLog.id),
+			with: {
+				thirdPartyIntegrationToken: true,
 				user: true
 			}
 		});
+		if (!log) throw new Error('No Log Found');
 		return await createActivityFromHook(log);
 	} catch (e) {
-		return json({ message: 'failed create' }, { status: 400 });
+		return json('failed create');
 	}
 }
 
 async function createActivityFromHook(
-	log: { token: thirdPartyIntegrationToken; user: user } & thirdPartyIntegrationLogs
+	log: {
+		thirdPartyIntegrationToken: InferSelectModel<
+			typeof thirdPartyIntegrationToken
+		>;
+		user: InferSelectModel<typeof user>;
+	} & InferSelectModel<typeof thirdPartyIntegrationLogs>
 ) {
 	const meta = log.metadata as unknown as WahooWebhookEvent;
 
 	const workout = meta.workout;
-	const workout_summary = meta.workout_summary;
+	const workoutSummary = meta.workout_summary;
 
 	if (WahooRunningWorkoutTypeIds.includes(workout.workout_type_id)) {
-		const requirements = [workout_summary.distance_accum, workout_summary.duration_active_accum];
+		const requirements = [
+			workoutSummary.distance_accum,
+			workoutSummary.duration_active_accum
+		];
 		if (requirements.some((value) => !value))
-			return json({ message: 'Invalid Run Requirements' }, { status: 400 });
+			return json('Invalid Run Requirements');
 		const GAP = calcRunPace(
-			workout_summary.distance_accum!,
-			workout_summary.duration_active_accum!
+			workoutSummary.distance_accum!,
+			workoutSummary.duration_active_accum!
 		);
-		const rIF = calc_rIF(GAP, log.user.run_ftp);
-		const tss = calc_rTss(workout_summary.duration_active_accum!, GAP, log.user.run_ftp, rIF);
-		await prisma.activities.create({
-			data: {
-				type: ActivityType.RUN,
-				distance: workout_summary.distance_accum ?? 0,
-				duration: workout_summary.duration_active_accum ?? 0,
-				date: workout.starts,
-				user_id: log.user_id,
-				stress_score: tss,
-				intensity_factor_score: rIF,
-				thirdparty_log_id: log.id
-			}
+		const rIF = calcRIF(GAP, log.user.runFtp);
+		const tss = calcRTss(
+			workoutSummary.duration_active_accum!,
+			GAP,
+			log.user.runFtp,
+			rIF
+		);
+		return await db.insert(activities).values({
+			type: 'RUN',
+			distance: workoutSummary.distance_accum ?? 0,
+			duration: workoutSummary.duration_active_accum ?? 0,
+			date: workout.starts,
+			userId: log.userId,
+			stressScore: tss,
+			intensityFactorScore: rIF,
+			thirdpartyLogId: log.id,
+			externalId: String(workoutSummary.id)
 		});
 	} else if (WahooBikingWorkoutTypeIds.includes(workout.workout_type_id)) {
 		const requirements = [
-			workout_summary.power_bike_np_last,
-			workout_summary.power_bike_np_last,
-			workout_summary.duration_active_accum
+			workoutSummary.power_bike_np_last,
+			workoutSummary.power_bike_np_last,
+			workoutSummary.duration_active_accum
 		];
 		if (requirements.some((value) => !value))
-			return json({ message: 'Invalid Bike Requirements' }, { status: 400 });
-		const cIF = calc_rIF(workout_summary.power_bike_np_last!, log.user.run_ftp);
-		const tss = calc_cTss(
-			workout_summary.duration_active_accum!,
-			workout_summary.power_bike_np_last!,
-			log.user.bike_ftp,
+			return json('Invalid Bike Requirements');
+		const cIF = calcRIF(workoutSummary.power_bike_np_last!, log.user.runFtp);
+		const tss = calcCTss(
+			workoutSummary.duration_active_accum!,
+			workoutSummary.power_bike_np_last!,
+			log.user.bikeFtp,
 			cIF
 		);
-		await prisma.activities.create({
-			data: {
-				type: ActivityType.BIKE,
-				distance: workout_summary.distance_accum ?? 0,
-				duration: workout_summary.duration_active_accum ?? 0,
-				date: workout.starts,
-				user_id: log.user_id,
-				stress_score: tss,
-				intensity_factor_score: cIF,
-				thirdparty_log_id: log.id
-			}
+		return await db.insert(activities).values({
+			type: 'BIKE',
+			distance: workoutSummary.distance_accum ?? 0,
+			duration: workoutSummary.duration_active_accum ?? 0,
+			date: workout.starts,
+			userId: log.userId,
+			stressScore: tss,
+			intensityFactorScore: cIF,
+			thirdpartyLogId: log.id,
+			externalId: String(workoutSummary.id)
 		});
 	} else if (WahooSWimmingWorkoutTypeIds.includes(workout.workout_type_id)) {
-		const requirements = [workout_summary.distance_accum, workout_summary.duration_active_accum];
+		const requirements = [
+			workoutSummary.distance_accum,
+			workoutSummary.duration_active_accum
+		];
 		if (requirements.some((value) => !value))
-			return json({ message: 'Invalid Swim Requirements' }, { status: 400 });
+			return json('Invalid Swim Requirements');
 		const GAP = calcSwimPace(
-			workout_summary.distance_accum!,
-			workout_summary.duration_active_accum!
+			workoutSummary.distance_accum!,
+			workoutSummary.duration_active_accum!
 		);
-		const sIF = calc_sIF(GAP, log.user.swim_ftp);
-		const tss = calc_sTss(workout_summary.duration_active_accum!, GAP, log.user.swim_ftp, sIF);
-		await prisma.activities.create({
-			data: {
-				type: ActivityType.SWIM,
-				distance: workout_summary.distance_accum ?? 0,
-				duration: workout_summary.duration_active_accum ?? 0,
-				date: workout.starts,
-				user_id: log.user_id,
-				stress_score: tss,
-				intensity_factor_score: sIF,
-				thirdparty_log_id: log.id
-			}
+		const sIF = calcSIF(GAP, log.user.swimFtp);
+		const tss = calcSTss(
+			workoutSummary.duration_active_accum!,
+			GAP,
+			log.user.swimFtp,
+			sIF
+		);
+		return await db.insert(activities).values({
+			type: 'SWIM',
+			distance: workoutSummary.distance_accum ?? 0,
+			duration: workoutSummary.duration_active_accum ?? 0,
+			date: workout.starts,
+			userId: log.userId,
+			stressScore: tss,
+			intensityFactorScore: sIF,
+			thirdpartyLogId: log.id,
+			externalId: String(workoutSummary.id)
 		});
 	} else {
-		return json({ message: 'Workout type is not valid' }, { status: 400 });
+		return json('Workout type is not valid');
 	}
-
-	return json({ message: 'successful create' }, { status: 200 });
 }

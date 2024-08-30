@@ -36,12 +36,12 @@ export enum Zone {
 }
 
 // percentages of FTP
-const zone1_max_ftp = 0.6;
-const zone2_max_ftp = 0.75; //LT1
-const zone3_max_ftp = 0.9;
-const zone4_max_ftp = 1.05; //LT2
-const zone5_max_ftp = 1.2;
-const zone6_max_ftp = 1.35;
+const zone1MaxFtp = 0.6;
+const zone2MaxFtp = 0.75; //LT1
+const zone3MaxFtp = 0.9;
+const zone4MaxFtp = 1.05; //LT2
+const zone5MaxFtp = 1.2;
+const zone6MaxFtp = 1.35;
 
 export type FtpZones = {
 	[Zone.zone1]: { min: number; max: number };
@@ -63,11 +63,11 @@ export const FtpZoneDescriptions = {
 	[Zone.zone7]: 'Neuromuscular Power'
 };
 // percentages of HR
-const zone1_max_hr = 0.6;
-const zone2_max_hr = 0.7; //LT1
-const zone3_max_hr = 0.8;
-const zone4_max_hr = 0.9; //LT2
-const zone5_max_hr = 1;
+const zone6MaxHr = 0.6;
+const zone2MaxHr = 0.7; //LT1
+const zone3MaxHr = 0.8;
+const zone4MaxHr = 0.9; //LT2
+const zone5MaxHr = 1;
 
 export type HRZones = {
 	[Zone.zone1]: { min: number; max: number };
@@ -108,7 +108,9 @@ export const daysBetweenNowAnd = (targetDate: Date) => {
  */
 export const daysInBasePhase = (startDate: Date, endDate: Date) => {
 	const availableTrainingDays = daysBetween(startDate, endDate);
-	return Math.ceil(availableTrainingDays * TrainingPlanPhasePercentages[TrainingPlanPhase.BASE]);
+	return Math.ceil(
+		availableTrainingDays * TrainingPlanPhasePercentages[TrainingPlanPhase.BASE]
+	);
 };
 
 /**
@@ -120,7 +122,10 @@ export const daysInBasePhase = (startDate: Date, endDate: Date) => {
  */
 export const daysInBuildingPhase = (startDate: Date, endDate: Date) => {
 	const availableTrainingDays = daysBetween(startDate, endDate);
-	return Math.ceil(availableTrainingDays * TrainingPlanPhasePercentages[TrainingPlanPhase.BUILD]);
+	return Math.ceil(
+		availableTrainingDays *
+			TrainingPlanPhasePercentages[TrainingPlanPhase.BUILD]
+	);
 };
 
 /**
@@ -132,7 +137,9 @@ export const daysInBuildingPhase = (startDate: Date, endDate: Date) => {
  */
 export const daysInPeakPhase = (startDate: Date, endDate: Date) => {
 	const availableTrainingDays = daysBetween(startDate, endDate);
-	return Math.ceil(availableTrainingDays * TrainingPlanPhasePercentages[TrainingPlanPhase.PEAK]);
+	return Math.ceil(
+		availableTrainingDays * TrainingPlanPhasePercentages[TrainingPlanPhase.PEAK]
+	);
 };
 
 /**
@@ -144,7 +151,10 @@ export const daysInPeakPhase = (startDate: Date, endDate: Date) => {
  */
 export const daysInTaperPhase = (startDate: Date, endDate: Date) => {
 	const availableTrainingDays = daysBetween(startDate, endDate);
-	return Math.ceil(availableTrainingDays * TrainingPlanPhasePercentages[TrainingPlanPhase.TAPER]);
+	return Math.ceil(
+		availableTrainingDays *
+			TrainingPlanPhasePercentages[TrainingPlanPhase.TAPER]
+	);
 };
 
 export type DaysInPhases = {
@@ -178,13 +188,13 @@ export const daysInPhases = (startDate: Date, endDate: Date): DaysInPhases => {
  */
 export const ftpZones = (ftp: number): FtpZones => {
 	return {
-		zone1: { min: 0, max: ftp * zone1_max_ftp },
-		zone2: { min: ftp * zone1_max_ftp, max: ftp * zone2_max_ftp },
-		zone3: { min: ftp * zone2_max_ftp, max: ftp * zone3_max_ftp },
-		zone4: { min: ftp * zone3_max_ftp, max: ftp * zone4_max_ftp },
-		zone5: { min: ftp * zone4_max_ftp, max: ftp * zone5_max_ftp },
-		zone6: { min: ftp * zone5_max_ftp, max: ftp * zone6_max_ftp },
-		zone7: { min: ftp * zone6_max_ftp, max: Infinity }
+		zone1: { min: 0, max: ftp * zone1MaxFtp },
+		zone2: { min: ftp * zone1MaxFtp, max: ftp * zone2MaxFtp },
+		zone3: { min: ftp * zone2MaxFtp, max: ftp * zone3MaxFtp },
+		zone4: { min: ftp * zone3MaxFtp, max: ftp * zone4MaxFtp },
+		zone5: { min: ftp * zone4MaxFtp, max: ftp * zone5MaxFtp },
+		zone6: { min: ftp * zone5MaxFtp, max: ftp * zone6MaxFtp },
+		zone7: { min: ftp * zone6MaxFtp, max: Infinity }
 	};
 };
 
@@ -196,10 +206,10 @@ export const ftpZones = (ftp: number): FtpZones => {
  */
 export const hrZones = (maxHR: number): HRZones => {
 	return {
-		zone1: { min: 0, max: maxHR * zone1_max_hr },
-		zone2: { min: maxHR * zone1_max_hr, max: maxHR * zone2_max_hr },
-		zone3: { min: maxHR * zone2_max_hr, max: maxHR * zone3_max_hr },
-		zone4: { min: maxHR * zone3_max_hr, max: maxHR * zone4_max_hr },
-		zone5: { min: maxHR * zone4_max_hr, max: maxHR * zone5_max_hr }
+		zone1: { min: 0, max: maxHR * zone6MaxHr },
+		zone2: { min: maxHR * zone6MaxHr, max: maxHR * zone2MaxHr },
+		zone3: { min: maxHR * zone2MaxHr, max: maxHR * zone3MaxHr },
+		zone4: { min: maxHR * zone3MaxHr, max: maxHR * zone4MaxHr },
+		zone5: { min: maxHR * zone4MaxHr, max: maxHR * zone5MaxHr }
 	};
 };

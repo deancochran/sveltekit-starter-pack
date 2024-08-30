@@ -1,55 +1,75 @@
+import { db } from '$lib/drizzle/client';
+import { thirdPartyIntegrationToken, user } from '$lib/drizzle/schema';
+import { disconnectIntegration } from '$lib/integrations/strava/utils';
 import {
-	cancel_user_subscription_schema,
-	delete_user_schema,
-	disconnect_user_integration_schema,
-	new_image_schema,
-	send_new_user_email_code_schema,
-	update_ftp_hr_schema,
-	update_user_email_schema,
-	update_user_password_schema,
-	update_user_schema
+	cancelUserSubscriptionSchema,
+	deleteUserSchema,
+	disconnectUserIntegrationSchema,
+	newClubSchema,
+	newImageSchema,
+	sendNewUserEmailCodeSchema,
+	updateFtpHrSchema,
+	updateUserEmailSchema,
+	updateUserPasswordSchema,
+	updateUserSchema
 } from '$lib/schemas';
 import { lucia } from '$lib/server/lucia';
 import { stripe } from '$lib/server/stripe';
+import { getActiveSubscription } from '$lib/server/stripe/subscriptions';
 import { sendEmailChangeCode } from '$lib/utils/emails';
-import { disconnect_integration } from '$lib/utils/integrations/strava/utils';
 import { PICTURE_BUCKET, uploadImage } from '$lib/utils/minio/helpers';
 import { handleSignInRedirect } from '$lib/utils/redirects/loginRedirect';
-import { getActiveSubscription } from '$lib/utils/stripe/subscriptions';
 import { validateEmailVerificationToken } from '$lib/utils/token';
-import type { file } from '@prisma/client';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { fail } from '@sveltejs/kit';
 import * as argon from 'argon2';
 import { randomUUID } from 'crypto';
+import { and, eq } from 'drizzle-orm';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate, withFiles } from 'sveltekit-superforms/server';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
-	const { parent } = event;
+	const { parent, locals } = event;
 	const data = await parent();
 	const initialData = { ...data.user };
-	if (!data.user) redirect(302, handleSignInRedirect(event));
-	const updateUserForm = await superValidate(initialData, zod(update_user_schema));
-	const updateUserEmailForm = await superValidate(zod(update_user_email_schema));
+	if (!locals.user) redirect(302, handleSignInRedirect(event));
+	const updateUserForm = await superValidate(
+		initialData,
+		zod(updateUserSchema)
+	);
+	const updateUserEmailForm = await superValidate(zod(updateUserEmailSchema));
 	const sendNewUserEmailCodeForm = await superValidate(
 		initialData,
-		zod(send_new_user_email_code_schema)
+		zod(sendNewUserEmailCodeSchema)
 	);
-	const deleteUserForm = await superValidate(zod(delete_user_schema));
-	const updateUserEmailPasswordForm = await superValidate(zod(update_user_password_schema));
-	const cancelUserSubscriptionForm = await superValidate(zod(cancel_user_subscription_schema));
-	const updateFTPForm = await superValidate(initialData, zod(update_ftp_hr_schema));
-	const integrationsForm = await superValidate(zod(disconnect_user_integration_schema));
-	const userAvatarForm = await superValidate(zod(new_image_schema));
-	const userBannerForm = await superValidate(zod(new_image_schema));
-	const user_integrations = await prisma.thirdPartyIntegrationToken.findMany({
-		where: {
-			user_id: data.user.id
-		}
+	const deleteUserForm = await superValidate(zod(deleteUserSchema));
+	const updateUserEmailPasswordForm = await superValidate(
+		zod(updateUserPasswordSchema)
+	);
+	const cancelUserSubscriptionForm = await superValidate(
+		zod(cancelUserSubscriptionSchema)
+	);
+	const updateFTPForm = await superValidate(
+		{
+			bikeFtp: initialData.bikeFtp,
+			swimFtp: initialData.swimFtp,
+			runFtp: initialData.runFtp,
+			max_hr: initialData.maxHr
+		},
+		zod(updateFtpHrSchema)
+	);
+	const integrationsForm = await superValidate(
+		zod(disconnectUserIntegrationSchema)
+	);
+	const userAvatarForm = await superValidate(zod(newImageSchema));
+	const userBannerForm = await superValidate(zod(newImageSchema));
+
+	const userIntegrations = await db.query.thirdPartyIntegrationToken.findMany({
+		where: eq(thirdPartyIntegrationToken.userId, locals.user.id)
 	});
+
 	return {
 		updateUserForm,
 		updateFTPForm,
@@ -58,7 +78,7 @@ export const load: PageServerLoad = async (event) => {
 		deleteUserForm,
 		updateUserEmailPasswordForm,
 		cancelUserSubscriptionForm,
-		user_integrations,
+		userIntegrations,
 		integrationsForm,
 		userAvatarForm,
 		userBannerForm,
@@ -69,19 +89,17 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	deleteUser: async (event) => {
 		const { locals, request } = event;
-		const form = await superValidate(request, zod(delete_user_schema));
+		const form = await superValidate(request, zod(deleteUserSchema));
 
 		let success = false;
 		try {
 			if (!form.valid) throw new Error('Must provide a valid password');
 			const subscription = await getActiveSubscription(locals.user!.id);
-			if (subscription) await stripe.subscriptions.cancel(subscription?.stripe_sub_id);
-			if (locals.user!.stripe_id) await stripe.customers.del(locals.user!.stripe_id);
-			await prisma.user.delete({
-				where: {
-					id: locals.user!.id
-				}
-			});
+			if (subscription)
+				await stripe.subscriptions.cancel(subscription?.stripeSubId);
+			if (locals.user!.stripeId)
+				await stripe.customers.del(locals.user!.stripeId);
+			await db.delete(user).where(eq(user.id, locals.user!.id));
 			success = true;
 		} catch (e) {
 			const t: ToastSettings = {
@@ -100,16 +118,17 @@ export const actions: Actions = {
 	},
 	updateUser: async (event) => {
 		const { locals, request } = event;
-		const form = await superValidate(request, zod(update_user_schema));
+		const form = await superValidate(request, zod(updateUserSchema));
 
 		try {
 			if (!form.valid) throw new Error('Must provide valid credentials');
 			if (form.data.username === locals.user!.username)
 				throw new Error('Must choose a new username');
-			await prisma.user.update({
-				where: { id: locals.user!.id },
-				data: { username: form.data.username }
-			});
+
+			await db
+				.update(user)
+				.set({ username: form.data.username })
+				.where(eq(user.id, locals.user!.id));
 			const session = await lucia.createSession(locals.user!.id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
@@ -141,16 +160,16 @@ export const actions: Actions = {
 	},
 	updateUserEmail: async (event) => {
 		const { locals, request } = event;
-		const form = await superValidate(request, zod(update_user_email_schema));
+		const form = await superValidate(request, zod(updateUserEmailSchema));
 
 		let t: ToastSettings;
 		try {
 			if (!form.valid) throw new Error('Must provide a valid email and code');
 			await validateEmailVerificationToken(form.data.code);
-			await prisma.user.update({
-				where: { id: locals.user!.id },
-				data: { email: form.data.email }
-			});
+			await db
+				.update(user)
+				.set({ email: form.data.email })
+				.where(eq(user.id, locals.user!.id));
 			const session = await lucia.createSession(locals.user!.id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
@@ -174,11 +193,12 @@ export const actions: Actions = {
 	},
 	sendUserEmailCode: async (event) => {
 		const { locals, request } = event;
-		const form = await superValidate(request, zod(send_new_user_email_code_schema));
+		const form = await superValidate(request, zod(sendNewUserEmailCodeSchema));
 		let t: ToastSettings;
 		try {
 			if (!form.valid) throw new Error('Must provide a valid email');
-			if (form.data.email === locals.user!.email) throw new Error('Must choose a new email');
+			if (form.data.email === locals.user!.email)
+				throw new Error('Must choose a new email');
 			await sendEmailChangeCode(locals.user!, form.data.email);
 			t = {
 				message: `A Code to verify your new email was sent`,
@@ -204,19 +224,21 @@ export const actions: Actions = {
 	},
 	updateFTPHR: async (event) => {
 		const { locals, request } = event;
-		const form = await superValidate(request, zod(update_ftp_hr_schema));
+		const form = await superValidate(request, zod(updateFtpHrSchema));
 
 		let t: ToastSettings;
 		try {
 			if (!form.valid) throw new Error('Must provide valid values');
-			await prisma.user.update({
-				where: {
-					id: locals.user!.id
-				},
-				data: {
-					...form.data
-				}
-			});
+			await db
+				.update(user)
+				.set({
+					maxHr: form.data.max_hr,
+					bikeFtp: form.data.bikeFtp,
+					runFtp: form.data.runFtp,
+					swimFtp: form.data.swimFtp
+				})
+				.where(eq(user.id, locals.user!.id));
+
 			t = {
 				message: 'Updated Settings',
 				background: 'variant-filled-success'
@@ -234,21 +256,20 @@ export const actions: Actions = {
 	},
 	updateUserPassword: async (event) => {
 		const { locals, request } = event;
-		const form = await superValidate(request, zod(update_user_password_schema));
+		const form = await superValidate(request, zod(updateUserPasswordSchema));
 
 		let t: ToastSettings;
 		try {
 			if (!form.valid) throw new Error('Must provide valid passwords');
 
-			const hashed_password = await argon.hash(form.data.password);
-			await prisma.user.update({
-				where: {
-					id: locals.user!.id
-				},
-				data: {
-					hashed_password: hashed_password
-				}
-			});
+			const hashedPassword = await argon.hash(form.data.password);
+			await db
+				.update(user)
+				.set({
+					password: hashedPassword
+				})
+				.where(eq(user.id, locals.user!.id));
+
 			const session = await lucia.createSession(locals.user!.id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
@@ -272,14 +293,18 @@ export const actions: Actions = {
 	},
 	cancelSubscription: async (event) => {
 		const { locals, request } = event;
-		const form = await superValidate(request, zod(cancel_user_subscription_schema));
+		const form = await superValidate(
+			request,
+			zod(cancelUserSubscriptionSchema)
+		);
 
 		let t: ToastSettings;
 		try {
 			if (!form.valid) throw new Error('Must provide a valid password');
-			const active_subscription = await getActiveSubscription(locals.user!.id);
-			if (!active_subscription) throw new Error('User has no active subscription');
-			await stripe.subscriptions.cancel(active_subscription.stripe_sub_id);
+			const activeSubscription = await getActiveSubscription(locals.user!.id);
+			if (!activeSubscription)
+				throw new Error('User has no active subscription');
+			await stripe.subscriptions.cancel(activeSubscription.stripeSubId);
 			t = {
 				message: 'Cancelled Subscription',
 				background: 'variant-filled-success'
@@ -302,26 +327,29 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 	},
-	disconnectIntegration: async (event) => {
-		const form = await superValidate(event.request, zod(disconnect_user_integration_schema));
+	disconnect_integration: async (event) => {
+		const form = await superValidate(
+			event.request,
+			zod(disconnectUserIntegrationSchema)
+		);
 		let t: ToastSettings;
 		try {
 			if (!event.locals?.user) throw new Error('User must be logged in');
 			if (!form.valid) throw new Error('Must provide a valid integration');
-			await prisma.$transaction(async (db) => {
-				let integration = await db.thirdPartyIntegrationToken.findFirstOrThrow({
-					where: {
-						user_id: event.locals.user!.id,
-						provider: form.data.provider
-					}
-				});
-				integration = await disconnect_integration(integration);
+			await db.transaction(async (ctx) => {
+				const integration =
+					await ctx.query.thirdPartyIntegrationToken.findFirst({
+						where: and(
+							eq(thirdPartyIntegrationToken.userId, event.locals.user!.id),
+							eq(thirdPartyIntegrationToken.provider, form.data.provider)
+						)
+					});
+				if (!integration) throw new Error('No integration Found');
+				await disconnectIntegration(integration);
 
-				await db.thirdPartyIntegrationToken.delete({
-					where: {
-						id: integration.id
-					}
-				});
+				await ctx
+					.delete(thirdPartyIntegrationToken)
+					.where(eq(thirdPartyIntegrationToken.id, integration.id));
 			});
 			t = {
 				message: 'Disconnected Integration',
@@ -342,52 +370,29 @@ export const actions: Actions = {
 		const { request, locals } = event;
 		if (!locals?.user) throw new Error('User must be logged in');
 		const formData = await request.formData();
-		const form = await superValidate(formData, zod(new_image_schema));
+		const form = await superValidate(formData, zod(newClubSchema));
 
 		if (!form.valid) return fail(400, withFiles({ form }));
 
 		const image = formData.get('image');
 		if (!(image instanceof File)) return fail(400, withFiles({ form }));
 		try {
-			await prisma.$transaction(async (db) => {
-				let new_file: file;
-				if (locals.user?.avatar_file_id) {
-					await uploadImage(PICTURE_BUCKET, locals.user.avatar_file_id, image);
-					new_file = await db.file.update({
-						where: {
-							id: locals.user.avatar_file_id
-						},
-						data: {
-							name: image.name,
-							type: image.type,
-							size: image.size
-						}
-					});
+			await db.transaction(async (ctx) => {
+				const uuid = randomUUID();
+				if (locals.user?.avatarFileId) {
+					await uploadImage(PICTURE_BUCKET, locals.user.avatarFileId, image);
 				} else {
-					const uuid = randomUUID();
 					await uploadImage(PICTURE_BUCKET, uuid, image);
-					new_file = await db.file.create({
-						data: {
-							id: uuid,
-							bucket: PICTURE_BUCKET,
-							name: image.name,
-							type: image.type,
-							size: image.size
-						}
-					});
 				}
 
-				await db.user.update({
-					where: {
-						id: locals.user!.id
-					},
-					data: {
-						avatar_file_id: new_file.id
-					}
-				});
-				return new_file;
+				await ctx
+					.update(user)
+					.set({
+						avatarFileId: locals.user!.avatarFileId ?? uuid
+					})
+					.where(eq(user.id, locals.user!.id));
 			});
-			let t: ToastSettings = {
+			const t: ToastSettings = {
 				message: 'Updated Profile Picture',
 				background: 'variant-filled-success'
 			} as const;
@@ -395,7 +400,7 @@ export const actions: Actions = {
 
 			return withFiles({ form });
 		} catch (error) {
-			let t: ToastSettings = {
+			const t: ToastSettings = {
 				message: 'Failed to update Profile Picture',
 				background: 'variant-filled-error'
 			} as const;
@@ -407,52 +412,29 @@ export const actions: Actions = {
 		const { request, locals } = event;
 		if (!locals?.user) throw new Error('User must be logged in');
 		const formData = await request.formData();
-		const form = await superValidate(formData, zod(new_image_schema));
+		const form = await superValidate(formData, zod(newClubSchema));
 
 		if (!form.valid) return fail(400, withFiles({ form }));
 
 		const image = formData.get('image');
 		if (!(image instanceof File)) return fail(400, withFiles({ form }));
 		try {
-			await prisma.$transaction(async (db) => {
-				let new_file: file;
-				if (locals.user?.banner_file_id) {
-					await uploadImage(PICTURE_BUCKET, locals.user.banner_file_id, image);
-					new_file = await db.file.update({
-						where: {
-							id: locals.user.banner_file_id
-						},
-						data: {
-							name: image.name,
-							type: image.type,
-							size: image.size
-						}
-					});
+			await db.transaction(async (ctx) => {
+				const uuid = randomUUID();
+				if (locals.user?.bannerFileId) {
+					await uploadImage(PICTURE_BUCKET, locals.user.bannerFileId, image);
 				} else {
-					const uuid = randomUUID();
 					await uploadImage(PICTURE_BUCKET, uuid, image);
-					new_file = await db.file.create({
-						data: {
-							id: uuid,
-							bucket: PICTURE_BUCKET,
-							name: image.name,
-							type: image.type,
-							size: image.size
-						}
-					});
 				}
 
-				await db.user.update({
-					where: {
-						id: locals.user!.id
-					},
-					data: {
-						banner_file_id: new_file.id
-					}
-				});
-				return new_file;
+				await ctx
+					.update(user)
+					.set({
+						bannerFileId: locals.user!.bannerFileId ?? uuid
+					})
+					.where(eq(user.id, locals.user!.id));
 			});
-			let t: ToastSettings = {
+			const t: ToastSettings = {
 				message: 'Updated Profile Banner Picture',
 				background: 'variant-filled-success'
 			} as const;
@@ -460,12 +442,32 @@ export const actions: Actions = {
 
 			return withFiles({ form });
 		} catch (error) {
-			let t: ToastSettings = {
+			const t: ToastSettings = {
 				message: 'Failed to update Profile Banner Picture',
 				background: 'variant-filled-error'
 			} as const;
 			setFlash(t, event);
 			return fail(400, withFiles({ form }));
 		}
+	},
+	subscriptions: async (event) => {
+		const { locals } = event;
+		if (!locals?.user) throw new Error('User must be logged in');
+		// if user is not a subscriber, redirect to pricing page
+		const _user = await db.query.user.findFirst({
+			where: eq(user.id, locals.user.id)
+		});
+		if (!_user) {
+			throw redirect(302, '/');
+		}
+
+		if (!_user.stripeId) {
+			throw redirect(302, '/pricing');
+		}
+		const session = await stripe.billingPortal.sessions.create({
+			customer: _user.stripeId,
+			return_url: `https://localhost:5173/settings/`
+		});
+		throw redirect(302, session.url);
 	}
 };

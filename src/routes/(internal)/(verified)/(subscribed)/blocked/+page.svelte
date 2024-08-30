@@ -1,18 +1,17 @@
 <script lang="ts">
-	import * as d3 from 'd3';
-	import type { PageData } from './$types';
-	import { onMount } from 'svelte';
-	import { generate_ATL_array } from '$lib/utils/atl/atl';
-	import { generate_CTL_array } from '$lib/utils/ctl/ctl';
+	import { generateATLArray } from '$lib/utils/atl/atl';
+	import { generateCTLArray } from '$lib/utils/ctl/ctl';
 	import { FORM } from '$lib/utils/form/form';
-	import { ConicGradient, type ConicStop } from '@skeletonlabs/skeleton';
+	import * as d3 from 'd3';
+	import { onMount } from 'svelte';
+	import type { PageData } from './$types';
 	export let data: PageData;
 
-	const values: Array<[number, number]> = Object.entries(data.agg_activities).map(
-		([date_local, act], i) => {
-			return [new Date(date_local).valueOf(), act.stress_score];
-		}
-	);
+	const values: Array<[number, number]> = Object.entries(
+		data.aggActivities
+	).map(([date_local, act], i) => {
+		return [new Date(date_local).valueOf(), act.stressScore];
+	});
 
 	$: width = 1000;
 	$: height = 600;
@@ -22,19 +21,19 @@
 	const marginLeft = 40;
 	let gx: SVGGElement;
 	let gy: SVGGElement;
-	$: dates = Object.entries(data.agg_activities).map(([date_local, day], i) => {
+	$: dates = Object.entries(data.aggActivities).map(([date_local, day], i) => {
 		return new Date(date_local).valueOf();
 	});
 
-	$: scores = Object.entries(data.agg_activities).map(([date_local, day], i) => {
-		return day.stress_score;
+	$: scores = Object.entries(data.aggActivities).map(([date_local, day], i) => {
+		return day.stressScore;
 	});
-	$: atl_scores = generate_ATL_array(scores, 0);
-	$: ctl_scores = generate_CTL_array(scores, 0);
-	$: atl_values = atl_scores.map((val, i) => {
+	$: atl_scores = generateATLArray(scores, 0);
+	$: ctl_scores = generateCTLArray(scores, 0);
+	$: ATLValues = atl_scores.map((val, i) => {
 		return [dates[i], val];
 	}) as [number, number][];
-	$: ctl_values = ctl_scores.map((val, i) => {
+	$: CTLValues = ctl_scores.map((val, i) => {
 		return [dates[i], val];
 	}) as [number, number][];
 	$: form_values = dates.map((date, i) => {
@@ -50,8 +49,11 @@
 		//@ts-ignore
 		.domain([minx, now]);
 
-	// @ts-ignore
-	$: y = d3.scaleLinear([-100, d3.max(scores) + 100], [height - marginBottom, marginTop]);
+	$: y = d3.scaleLinear(
+		// @ts-ignore
+		[-100, d3.max(scores) + 100],
+		[height - marginBottom, marginTop]
+	);
 	// TSS PATH AUC
 	$: area = d3
 		.area()
@@ -70,8 +72,11 @@
 	$: d3.select(gy).call(d3.axisLeft(y));
 	//@ts-ignore
 	$: d3.select(gx).call(
-		//@ts-ignore
-		d3.axisBottom(x).ticks(d3.timeDay.every(1)).tickFormat(d3.timeFormat('%m-%d-%y'))
+		d3
+			.axisBottom(x)
+			.ticks(d3.timeDay.every(1))
+			//@ts-ignore
+			.tickFormat(d3.timeFormat('%m-%d-%y'))
 	);
 	let svg: SVGElement;
 	onMount(resize);
@@ -139,7 +144,7 @@
 				{/each}
 			</g>
 			<!-- CTL PATH  -->
-			<path class="fill-none stroke-1 stroke-blue-600" d={line(ctl_values)} />
+			<path class="fill-none stroke-1 stroke-blue-600" d={line(CTLValues)} />
 			<!-- ATL POINTS -->
 			<g stroke-width="1">
 				{#each atl_scores as val, i}
@@ -147,7 +152,7 @@
 				{/each}
 			</g>
 			<!-- ATL PATH  -->
-			<path class="fill-none stroke-1 stroke-red-600" d={line(atl_values)} />
+			<path class="fill-none stroke-1 stroke-red-600" d={line(ATLValues)} />
 			<!-- FORM POINTS -->
 			<g stroke-width="1">
 				{#each form_values as [date, form_val], i}
@@ -155,7 +160,10 @@
 				{/each}
 			</g>
 			<!-- ATL PATH  -->
-			<path class="fill-none stroke-1 stroke-yellow-600" d={line(form_values)} />
+			<path
+				class="fill-none stroke-1 stroke-yellow-600"
+				d={line(form_values)}
+			/>
 			<!-- TSS PATH  -->
 			<!-- <path class="fill-none"  d={line(values)} /> -->
 			<!-- TSS PATH AUC -->

@@ -1,6 +1,10 @@
 <script lang="ts">
 	import { MapPin } from 'lucide-svelte';
-	import maplibre, { type Marker, type LngLatLike, type Map } from 'maplibre-gl';
+	import maplibre, {
+		type Marker,
+		type LngLatLike,
+		type Map
+	} from 'maplibre-gl';
 	import { createEventDispatcher } from 'svelte';
 	export let lngLat: LngLatLike;
 	export let map: Map;
@@ -12,7 +16,10 @@
 	$: marker?.setLngLat(lngLat);
 
 	const dispatch = createEventDispatcher();
-	function manageClasses(node: HTMLDivElement, initialAddedClasses: string | undefined) {
+	function manageClasses(
+		node: HTMLDivElement,
+		initialAddedClasses: string | undefined
+	) {
 		// These classes are added by MapLibre and we don't want to mess with them.
 		const frozenClasses = node.className;
 
@@ -60,7 +67,12 @@
 	}
 </script>
 
-<div use:addMarker use:manageClasses={classNames} role={undefined} on:click={sendEvent}>
+<div
+	use:addMarker
+	use:manageClasses={classNames}
+	role={undefined}
+	on:click={sendEvent}
+>
 	<slot>
 		<MapPin size={48} color="#000000" />
 	</slot>

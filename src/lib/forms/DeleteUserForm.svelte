@@ -1,14 +1,14 @@
 <script lang="ts">
-	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
-	import { delete_user_schema, type DeleteUserSchema } from '$lib/schemas';
-	import type { Infer, SuperValidated } from 'sveltekit-superforms';
-	import { focusTrap } from '@skeletonlabs/skeleton';
-	import { superForm } from 'sveltekit-superforms/client';
-	import PasswordInput from './inputs/PasswordInput.svelte';
-	import { AlertCircle } from 'lucide-svelte';
 	import Button from '$lib/components/Button.svelte';
+	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
+	import { type DeleteUserSchema, deleteUserSchema } from '$lib/schemas';
+	import { focusTrap } from '@skeletonlabs/skeleton';
+	import { AlertCircle } from 'lucide-svelte';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
+	import { superForm } from 'sveltekit-superforms/client';
 	import InputLabel from './inputs/InputLabel.svelte';
+	import PasswordInput from './inputs/PasswordInput.svelte';
 
 	export let form_data: SuperValidated<Infer<DeleteUserSchema>>;
 
@@ -17,7 +17,7 @@
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: false,
-		validators: zod(delete_user_schema),
+		validators: zod(deleteUserSchema),
 		delayMs: 0,
 		timeoutMs: 8000
 	});
@@ -37,8 +37,9 @@
 			</div>
 			<div class="alert-message">
 				<p>
-					Deleting your account will remove all your personal information from our database. This
-					includes any purchased products, services, or subscriptions.
+					Deleting your account will remove all your personal information from
+					our database. This includes any purchased products, services, or
+					subscriptions.
 				</p>
 			</div>
 		</aside>
@@ -54,12 +55,17 @@
 			</InputLabel>
 		</form>
 	</section>
-	<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">
+	<footer
+		class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2"
+	>
 		{#if $delayed}
 			<LoadingIcon />
 		{:else}
-			<Button shadow="shadow-md" color="variant-filled-error" form="deleteUser" type="submit"
-				>Delete Account</Button
+			<Button
+				shadow="shadow-md"
+				color="variant-filled-error"
+				form="deleteUser"
+				type="submit">Delete Account</Button
 			>
 		{/if}
 	</footer>

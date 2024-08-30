@@ -1,24 +1,19 @@
 <script lang="ts">
 	import Link from '$lib/components/Link.svelte';
-	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
-	import TrainingSessionPlanIntervals from '$lib/components/WorkoutIntervals/TrainingSessionPlanIntervals.svelte';
 	import TrainingSessionZoneDistribution from '$lib/components/WorkoutIntervals/TrainingSessionZoneDistribution.svelte';
-	import { user_feed_schema } from '$lib/schemas.js';
-	import type { club, club_event, trainingSession } from '@prisma/client';
+	import { userFeedSchema } from '$lib/schemas.js';
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import { onDestroy, onMount } from 'svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
 
 	export let data;
-	let items: Array<club_event & { club: club; training_session: trainingSession }> = <any>(
-		data.init_items
-	);
+	let items = data.init_items;
 	let fetching: boolean = false;
 
-	const { form, enhance, delayed, submit } = superForm(data.user_feed_form, {
+	const { form, enhance, delayed, submit } = superForm(data.userFeedForm, {
 		id: 'UserFeed',
-		validators: zod(user_feed_schema),
+		validators: zod(userFeedSchema),
 		delayMs: 0,
 		timeoutMs: 8000,
 		dataType: 'json',
@@ -30,7 +25,8 @@
 				!fetching &&
 				$form.limit * ($form.page + 1) < $form.size &&
 				items.length <= $form.size &&
-				listElement.scrollTop + listElement.clientHeight >= listElement.scrollHeight - threshold
+				listElement.scrollTop + listElement.clientHeight >=
+					listElement.scrollHeight - threshold
 			) {
 				fetching = true;
 				$form.page++;
@@ -41,7 +37,7 @@
 		onResult: ({ result }) => {
 			const { type, data: new_data } = <any>result;
 			if (type == 'success') {
-				items = [...items, ...new_data?.new_items];
+				items = [...items, ...new_data?.newItems];
 			}
 			fetching = false;
 		}
@@ -60,10 +56,6 @@
 			listElement.removeEventListener('scroll', submit);
 		}
 	});
-	//
-	// $: {
-	// 	console.log(items);
-	// }
 </script>
 
 {#if items.length > 0}
@@ -72,24 +64,25 @@
 			class="snap-y p-4 scroll-smooth flex flex-col gap-16 max-h-[85vh] overflow-visible overflow-y-scroll after:gap-16 before:gap-16"
 			bind:this={listElement}
 		>
-			{#each items as item, i}
+			{#each items as item}
 				{#key item.id}
 					<a
-						href="/clubs/{item.club_id}/events/{item.id}"
+						href="/clubs/{item.clubId}/events/{item.id}"
 						class="card card-hover snap-both shrink-0 overflow-auto"
 					>
 						<header class="card-header flex flex-col">
-							<div class="flex flex-row items-center align-middle justify-between gap-4">
+							<div
+								class="flex flex-row items-center align-middle justify-between gap-4"
+							>
 								<Link
 									color="variant-soft-surface"
 									label="Club Profile"
-									href="/clubs/{item.club_id}"
+									href="/clubs/{item.clubId}"
 									class="flex flex-row items-center gap-2 rounded-sm p-2"
 								>
-									<!-- <span class="chip variant-filled">Chip</span> -->
-									{#if item.club?.avatar_file_id}
+									{#if item.club?.avatarFileId}
 										<Avatar
-											src={`/api/images/${item.club?.avatar_file_id}`}
+											src={`/api/images/${item.club?.avatarFileId}`}
 											initials={String(item.club.name).slice(0, 2)}
 											width="w-16"
 											shadow="shadow-lg"
@@ -120,10 +113,12 @@
 						<section class="p-4">
 							<h1 class="h2">{item.name}</h1>
 							<p class="py-2 indent-2">{item.description}</p>
-							{#if item.training_session_id}
+							{#if item.trainingSession}
 								<section class="p-4 flex flex-col">
-									<TrainingSessionZoneDistribution training_session={item.training_session} />
-									<!-- <TrainingSessionPlanIntervals training_session={item.training_session} /> -->
+									<TrainingSessionZoneDistribution
+										_trainingSession={item.trainingSession}
+									/>
+									<!-- <TrainingSessionPlanIntervals _trainingSession={item.trainingSession} /> -->
 								</section>
 							{/if}
 						</section>

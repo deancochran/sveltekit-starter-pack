@@ -15,4 +15,5 @@ node_modules
 build
 package
 .eslintignore
+.eslintcache
 .pretieriignore

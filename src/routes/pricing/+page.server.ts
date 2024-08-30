@@ -1,8 +1,11 @@
+import { db } from '$lib/drizzle/client';
+import { user } from '$lib/drizzle/schema';
 import { lucia } from '$lib/server/lucia';
 import { stripe } from '$lib/server/stripe';
-import { getActiveSubscription } from '$lib/utils/stripe/subscriptions';
+import { getActiveSubscription } from '$lib/server/stripe/subscriptions';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
-import { fail } from '@sveltejs/kit';
+import { fail, type RequestEvent } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import type { PageServerLoad } from '../$types';
 
@@ -15,35 +18,35 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions = {
-	checkout: async (event) => {
+	checkout: async (event: RequestEvent) => {
 		const { request, url } = event;
-		const session_id = event.cookies.get(lucia.sessionCookieName);
+		const sessionId = event.cookies.get(lucia.sessionCookieName);
 		let t: ToastSettings;
-		if (!session_id) {
+		if (!sessionId) {
 			t = {
 				message: 'Must have an account to checkout',
 				background: 'variant-filled-warning'
 			} as const;
 			redirect('/sign-in', t, event);
 		}
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { session, user } = await lucia.validateSession(session_id);
-		if (!user) {
+
+		const { session, user: _user } = await lucia.validateSession(sessionId);
+		if (!_user) {
 			t = {
 				message: 'User Kicked for Security Measures',
 				background: 'variant-filled-warning'
 			} as const;
 			redirect('/sign-in', t, event);
 		}
-		if (!user.email_verified) {
+		if (!_user.emailVerified) {
 			t = {
 				message: 'Must have a verified account to checkout',
 				background: 'variant-filled-warning'
 			} as const;
 			redirect('/verify-email', t, event);
 		}
-		const active_sub = await getActiveSubscription(user.id);
-		if (active_sub) {
+		const activeSub = await getActiveSubscription(_user.id);
+		if (activeSub) {
 			t = {
 				message: 'You Already Have a Subscription',
 				background: 'variant-filled-warning'
@@ -58,18 +61,25 @@ export const actions = {
 		if (!priceId || typeof priceId !== 'string') {
 			return fail(400, { error: '`priceId` is required' });
 		}
-		const customer = await prisma.$transaction(async (db) => {
-			const new_customer = await stripe.customers.create({
-				email: user.email
+		const customer = await db.transaction(async (ctx) => {
+			const newCustomer = await stripe.customers.create({
+				email: _user.email
 			});
-			return await db.user.update({
-				where: {
-					id: user.id
-				},
-				data: {
-					stripe_id: new_customer.id
+			const [updatedUser] = await ctx
+				.update(user)
+				.set({
+					stripeId: newCustomer.id
+				})
+				.returning();
+
+			const newUser = await ctx.query.user.findFirst({
+				where: eq(user.id, updatedUser.id),
+				with: {
+					subscriptions: true
 				}
 			});
+			if (!newUser) throw new Error('No User Found');
+			return newUser;
 		});
 
 		// this is going to trigger the `/stripe/webhook` endpoint
@@ -82,20 +92,24 @@ export const actions = {
 				},
 				{}
 			],
-			subscription_data: {
-				trial_settings: {
-					end_behavior: {
-						missing_payment_method: 'cancel'
+			subscription_data: !customer.subscriptions
+				? {
+						trial_settings: {
+							end_behavior: {
+								missing_payment_method: 'cancel'
+							}
+						},
+						trial_period_days: 30
 					}
-				},
-				trial_period_days: 30
-			},
-			customer: customer.stripe_id as string,
+				: undefined,
+			customer: customer.stripeId as string,
 			payment_method_collection: 'always',
-			success_url: `${url.origin}/settings`,
-			cancel_url: `${url.origin}`,
+			success_url: `https://${url.origin}/settings`,
+			cancel_url: `https://${url.origin}`,
 			billing_address_collection: 'required',
-			custom_text: { submit: { message: 'Thanks for trying out the free trial. - Dean' } }
+			custom_text: !customer.subscriptions
+				? { submit: { message: 'Start Your Free Trial' } }
+				: undefined
 		});
 
 		redirect(303, stripeSession.url ?? '/');

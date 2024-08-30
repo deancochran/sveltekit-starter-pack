@@ -1,8 +1,10 @@
+import { HOST } from '$env/static/private';
 import { flashCookieOptions, loadFlash } from 'sveltekit-flash-message/server';
 import type { LayoutServerLoad } from './$types';
-flashCookieOptions.domain = process.env.PUBLIC_DOMAIN;
+flashCookieOptions.domain = HOST;
+flashCookieOptions.path = '.';
 flashCookieOptions.sameSite = 'strict';
-flashCookieOptions.secure = process.env.NODE_ENV === 'prod';
+flashCookieOptions.secure = true;
 
 export const load: LayoutServerLoad = loadFlash((event) => {
 	const { locals, url } = event;

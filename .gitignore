@@ -14,17 +14,10 @@ node_modules
 .env
 .vscode
 /.vscode/*
-.prisma
-/prisma/*.db
-/prisma/migrations/*
 .pnpm-lock*
-/prisma/seed.ts
 pnpm-lock.yaml
 /cert
 /cert/*
 .venv
 .vscode
-
-# do not load the bike dataset
-ml
-ml/data
+.eslintcache

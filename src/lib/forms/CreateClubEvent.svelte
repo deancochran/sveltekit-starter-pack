@@ -1,22 +1,28 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
+	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
 	import {
 		RecurrenceFrequency,
-		new_club_event_schema,
+		newClubEventSchema,
 		type NewClubEventSchema
 	} from '$lib/schemas';
-	import { SlideToggle, focusTrap, getModalStore } from '@skeletonlabs/skeleton';
+	import {
+		SlideToggle,
+		focusTrap,
+		getModalStore
+	} from '@skeletonlabs/skeleton';
+	import { PlusSquare } from 'lucide-svelte';
 	import type { SvelteComponent } from 'svelte';
-	import SuperDebug, { superForm, type SuperValidated } from 'sveltekit-superforms';
+	import SuperDebug, {
+		superForm,
+		type SuperValidated
+	} from 'sveltekit-superforms';
 	import { zod, type Infer } from 'sveltekit-superforms/adapters';
 	import DateInput from './inputs/DateInput.svelte';
-	import TextInput from './inputs/TextInput.svelte';
-	import TextArea from './inputs/TextArea.svelte';
 	import EnumSelectInput from './inputs/EnumSelectInput.svelte';
-	import { PlusSquare } from 'lucide-svelte';
-	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
-	import { invalidateAll } from '$app/navigation';
 	import InputLabel from './inputs/InputLabel.svelte';
+	import TextArea from './inputs/TextArea.svelte';
+	import TextInput from './inputs/TextInput.svelte';
 
 	export let parent: SvelteComponent;
 	const modal = getModalStore();
@@ -26,7 +32,7 @@
 
 	const superform = superForm(meta.form, {
 		id: 'CreateClubEvent',
-		validators: zod(new_club_event_schema),
+		validators: zod(newClubEventSchema),
 		delayMs: 0,
 		timeoutMs: 8000,
 		onResult: async (event) => {
@@ -46,7 +52,8 @@
 	// Base Classes
 	const cBase = 'card p-4 w-modal shadow-xl space-y-4';
 	const cHeader = 'text-2xl font-bold';
-	const cForm = 'border border-surface-500 p-4 space-y-4 rounded-container-token';
+	const cForm =
+		'border border-surface-500 p-4 space-y-4 rounded-container-token';
 </script>
 
 {#if $modal[0]}
@@ -74,7 +81,9 @@
 				<TextArea {superform} field="description" />
 			</InputLabel>
 
-			<SlideToggle name="recurring" bind:checked={$form.recurring}>Recurring Event</SlideToggle>
+			<SlideToggle name="recurring" bind:checked={$form.recurring}
+				>Recurring Event</SlideToggle
+			>
 			<InputLabel label="frequency">
 				<EnumSelectInput
 					enumType={RecurrenceFrequency}
@@ -83,8 +92,12 @@
 					bind:disabled={series_config_disable}
 				/>
 			</InputLabel>
-			<InputLabel label="end_date">
-				<DateInput {superform} field="end_date" bind:disabled={series_config_disable} />
+			<InputLabel label="endDate">
+				<DateInput
+					{superform}
+					field="endDate"
+					bind:disabled={series_config_disable}
+				/>
 			</InputLabel>
 			<div class="modal-footer {parent.regionFooter}">
 				<Button

@@ -3,29 +3,30 @@
 </script>
 
 <script lang="ts" generics="T extends Record<string, unknown>">
-	import { time_schema } from '$lib/schemas';
+	import { timeSchema } from '$lib/schemas';
 
 	import { zod } from 'sveltekit-superforms/adapters';
 	import InputLabel from '../InputLabel.svelte';
 	import NumberInput from '../NumberInput.svelte';
 
 	import {
-		formFieldProxy,
-		type SuperForm,
-		type FormPathLeaves,
 		defaults,
-		superForm
+		formFieldProxy,
+		superForm,
+		type FormPathLeaves,
+		type SuperForm
 	} from 'sveltekit-superforms';
 
 	export let superform: SuperForm<T>;
 	export let field: FormPathLeaves<T>;
 
-	const { value, errors, constraints } = formFieldProxy<T, FormPathLeaves<T>, number>(
-		superform,
-		field
-	);
+	const { value, errors, constraints } = formFieldProxy<
+		T,
+		FormPathLeaves<T>,
+		number
+	>(superform, field);
 
-	const time_superform = superForm(defaults(zod(time_schema)), {
+	const time_superform = superForm(defaults(zod(timeSchema)), {
 		id: 'time_form',
 		SPA: true
 	});

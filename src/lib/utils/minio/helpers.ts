@@ -3,14 +3,18 @@ import { error } from 'console';
 
 export const PICTURE_BUCKET = 'cadence-pictures';
 
-export async function uploadImage(bucketName: string, objectName: string, image_file: File) {
+export async function uploadImage(
+	bucketName: string,
+	objectName: string,
+	imageFile: File
+) {
 	try {
 		// Check if the bucket exists, if not, create it
 		const exists = await minio.bucketExists(bucketName);
 		if (!exists) {
 			await minio.makeBucket(bucketName, 'us-east-2');
 		}
-		const imageDataBuffer = Buffer.from(await image_file.arrayBuffer());
+		const imageDataBuffer = Buffer.from(await imageFile.arrayBuffer());
 		// Upload the image to MinIO
 		return await minio.putObject(bucketName, objectName, imageDataBuffer);
 	} catch (error) {

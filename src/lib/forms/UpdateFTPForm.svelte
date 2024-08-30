@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { update_ftp_hr_schema, type UpdateFTP_HRSchema } from '$lib/schemas';
-	import type { Infer, SuperValidated } from 'sveltekit-superforms';
-	import { superForm } from 'sveltekit-superforms/client';
-	import { focusTrap } from '@skeletonlabs/skeleton';
-	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
+	import { updateFtpHrSchema, type UpdateFTP_HRSchema } from '$lib/schemas';
+	import { focusTrap } from '@skeletonlabs/skeleton';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
+	import { superForm } from 'sveltekit-superforms/client';
 	import InputLabel from './inputs/InputLabel.svelte';
 	import RangeInput from './inputs/RangeInput.svelte';
 	export let form_data: SuperValidated<Infer<UpdateFTP_HRSchema>>;
@@ -15,7 +15,7 @@
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: false,
-		validators: zod(update_ftp_hr_schema),
+		validators: zod(updateFtpHrSchema),
 		delayMs: 0,
 		timeoutMs: 8000
 	});
@@ -39,17 +39,19 @@
 				<RangeInput {superform} field="max_hr" />
 			</InputLabel>
 			<InputLabel label="Swim FTP (m/s)">
-				<RangeInput {superform} field="swim_ftp" />
+				<RangeInput {superform} field="swimFtp" />
 			</InputLabel>
 			<InputLabel label="Bike FTP (watts)">
-				<RangeInput {superform} field="bike_ftp" />
+				<RangeInput {superform} field="bikeFtp" />
 			</InputLabel>
 			<InputLabel label="Run FTP (m/s)">
-				<RangeInput {superform} field="run_ftp" />
+				<RangeInput {superform} field="runFtp" />
 			</InputLabel>
 		</form>
 	</section>
-	<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">
+	<footer
+		class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2"
+	>
 		{#if $delayed}
 			<LoadingIcon />
 		{:else}

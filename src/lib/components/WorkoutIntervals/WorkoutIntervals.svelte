@@ -1,27 +1,31 @@
 <script lang="ts">
-	import { getIntervalDisplay, type WorkoutInterval } from '$lib/utils/trainingsessions/types';
-	import { FTP_INTENSITY, getIntensityColor } from './types';
 	import { page } from '$app/stores';
-	import { popup, type PopupSettings } from '@skeletonlabs/skeleton';
-	import { secondsToHHMMSS } from '$lib/utils/datetime';
-	import { CopyIcon, TrashIcon } from 'lucide-svelte';
+	import {
+		ItemsStoreService,
+		type ItemsStore
+	} from '$lib/utils/dragndrop/stores';
+	import {
+		getIntervalDisplay,
+		type WorkoutInterval
+	} from '$lib/utils/trainingsessions/types';
+	import { popup } from '@skeletonlabs/skeleton';
 	import { dndzone } from 'svelte-dnd-action';
-	import { Button } from 'svelte-email';
 	import { flip } from 'svelte/animate';
-	import type { ActivityType } from '@prisma/client';
-	import { ItemsStoreService, type ItemsStore } from '$lib/utils/dragndrop/stores';
+	import { getIntensityColor } from './types';
 
 	export let intervals: WorkoutInterval[];
-	export let total_duration: number;
+	export let totalDuration: number;
 	const max_intensity = intervals.reduce((a, b) => Math.max(a, b.intensity), 0);
 	// Init drag and drop sort items
-	function handleSort(e: { detail: { items: { id: number; data: WorkoutInterval }[] } }) {
+	function handleSort(e: {
+		detail: { items: { id: number; data: WorkoutInterval }[] };
+	}) {
 		$items = e.detail.items;
 	}
 	let items: ItemsStore<WorkoutInterval> = ItemsStoreService<WorkoutInterval>(
 		intervals.map((obj, i) => ({ id: i, data: obj }))
 	);
-	let activity_type: ActivityType;
+	let activityType: 'BIKE' | 'SWIM' | 'RUN';
 	let editing = false;
 </script>
 
@@ -34,10 +38,12 @@
 	{#each $items as item, index (item.id)}
 		<div
 			animate:flip={{ duration: 50 }}
-			style="width: {Math.ceil((item.data.duration / total_duration) * 100)}%; height: {Math.ceil(
-				(item.data.intensity / max_intensity) * 100
-			)}%"
-			class="w-fit p-2 snap-x rounded-sm {getIntensityColor(item.data.intensity)} overscroll-y-none"
+			style="width: {Math.ceil(
+				(item.data.duration / totalDuration) * 100
+			)}%; height: {Math.ceil((item.data.intensity / max_intensity) * 100)}%"
+			class="w-fit p-2 snap-x rounded-sm {getIntensityColor(
+				item.data.intensity
+			)} overscroll-y-none"
 			use:popup={{
 				event: 'click',
 				target: 'intervalPopup-' + index,
@@ -48,9 +54,15 @@
 				class="bg-surface-backdrop-token p-1 rounded-sm w-fit overscroll-y-none"
 				data-popup="intervalPopup-{index}"
 			>
-				<div class="flex flex-row items-center align-middle justify-center gap-1">
+				<div
+					class="flex flex-row items-center align-middle justify-center gap-1"
+				>
 					<span class="text-sm text-nowrap"
-						>{getIntervalDisplay(item.data, activity_type, $page.data.user)}</span
+						>{getIntervalDisplay(
+							item.data,
+							activityType,
+							$page.data.user
+						)}</span
 					>
 					<!-- {#if editing}
 										<Button
@@ -95,7 +107,7 @@
 		<div class=" w-full h-full flex flex-row items-baseline gap-px">
 			{#each intervals as interval, i}
 				{@const height = Math.ceil((interval.intensity / max_intensity) * 100)}
-				{@const width = Math.ceil((interval.duration / total_duration) * 100)}
+				{@const width = Math.ceil((interval.duration / totalDuration) * 100)}
 				<div
 					style="width: {width}%; height: {height}px"
 					class="card-hover hover:scale-110 rounded-sm flex items-end {getIntensityColor(

@@ -1,27 +1,35 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { FileDropzone, focusTrap } from '@skeletonlabs/skeleton';
-	import { fileProxy, superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import { new_image_schema, type NewImageSchema } from '$lib/schemas';
-	import { zod } from 'sveltekit-superforms/adapters';
 	import { invalidateAll } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { newImageSchema, type NewImageSchema } from '$lib/schemas';
+	import { FileDropzone, focusTrap } from '@skeletonlabs/skeleton';
+	import {
+		fileProxy,
+		superForm,
+		type Infer,
+		type SuperValidated
+	} from 'sveltekit-superforms';
+	import { zod } from 'sveltekit-superforms/adapters';
 	export let form_data: SuperValidated<Infer<NewImageSchema>>;
-	const { form, errors, constraints, enhance, delayed, submit } = superForm(form_data, {
-		id: 'updateUserBanner',
-		applyAction: true,
-		invalidateAll: true,
-		resetForm: false,
-		validators: zod(new_image_schema),
-		delayMs: 0,
-		timeoutMs: 8000,
-		onResult: async ({ result }) => {
-			switch (result.type) {
-				case 'success':
-					await invalidateAll();
-					break;
+	const { form, errors, constraints, enhance, delayed, submit } = superForm(
+		form_data,
+		{
+			id: 'updateUserBanner',
+			applyAction: true,
+			invalidateAll: true,
+			resetForm: false,
+			validators: zod(newImageSchema),
+			delayMs: 0,
+			timeoutMs: 8000,
+			onResult: async ({ result }) => {
+				switch (result.type) {
+					case 'success':
+						await invalidateAll();
+						break;
+				}
 			}
 		}
-	});
+	);
 	let isFocused: boolean = false;
 
 	const file = fileProxy(form, 'image');
@@ -36,14 +44,16 @@
 	use:enhance
 	class="w-full h-full"
 >
-	{#if $page.data.user?.banner_file_id}
+	{#if $page.data.user?.bannerFileId}
 		<img
-			src={`/api/images/${$page.data.user.banner_file_id}`}
+			src={`/api/images/${$page.data.user.bannerFileId}`}
 			class="object-cover rounded-none overflow-hidden w-full group-hover:hidden"
 			alt="Club Banner"
 		/>
 	{:else}
-		<div class="placeholder bg-cover bg-surface-backdrop-token h-full w-full rounded-none" />
+		<div
+			class="placeholder bg-cover bg-surface-backdrop-token h-full w-full rounded-none"
+		/>
 	{/if}
 	<FileDropzone
 		type="file"
@@ -53,6 +63,8 @@
 		class="w-full h-full hidden group-hover:flex"
 		bind:files={$file}
 	>
-		<svelte:fragment slot="message"><strong>Upload</strong> an image</svelte:fragment>
+		<svelte:fragment slot="message"
+			><strong>Upload</strong> an image</svelte:fragment
+		>
 	</FileDropzone>
 </form>

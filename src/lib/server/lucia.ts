@@ -1,23 +1,26 @@
-import type { UserRole } from '@prisma/client';
+import { HOST } from '$env/static/private';
+import { db } from '$lib/drizzle/client';
+import { session, user } from '$lib/drizzle/schema';
+import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle';
 import { Lucia } from 'lucia';
 import { TimeSpan } from 'oslo';
-import { adapter } from './prisma';
+const adapter = new DrizzlePostgreSQLAdapter(db, session, user);
 
 export const lucia = new Lucia(adapter, {
 	getUserAttributes: (attributes) => {
 		return {
 			email: attributes.email,
 			username: attributes.username,
-			email_verified: attributes.email_verified,
-			created_at: attributes.created_at,
-			stripe_id: attributes.stripe_id,
+			emailVerified: attributes.emailVerified,
+			createdAt: attributes.createdAt,
+			stripeId: attributes.stripeId,
 			role: attributes.role,
-			bike_ftp: attributes.bike_ftp,
-			swim_ftp: attributes.swim_ftp,
-			run_ftp: attributes.run_ftp,
-			max_hr: attributes.max_hr,
-			avatar_file_id: attributes.avatar_file_id,
-			banner_file_id: attributes.banner_file_id
+			bikeFtp: attributes.bikeFtp,
+			swimFtp: attributes.swimFtp,
+			runFtp: attributes.runFtp,
+			maxHr: attributes.maxHr,
+			avatarFileId: attributes.avatarFileId,
+			bannerFileId: attributes.bannerFileId
 		};
 	},
 	sessionExpiresIn: new TimeSpan(1, 'd'), // no more active/idle
@@ -25,49 +28,35 @@ export const lucia = new Lucia(adapter, {
 		name: 'session',
 		expires: true, // session cookies have very long lifespan (2 years)
 		attributes: {
-			secure: process.env.NODE_ENV === 'production',
+			domain: HOST,
 			sameSite: 'strict',
-			domain: process.env.PUBLIC_DOMAIN
+			path: '.',
+			secure: true
 		}
 	}
 });
 
-interface DatabaseUserAttributes {
-	email: string;
-	username: string;
-	email_verified: boolean;
-	created_at: Date;
-	stripe_id: string | null;
-	role: typeof UserRole;
-	bike_ftp: number;
-	swim_ftp: number;
-	run_ftp: number;
-	max_hr: number;
-	avatar_file_id?: string;
-	banner_file_id?: string;
-}
-
 declare module 'lucia' {
 	interface Register {
 		Lucia: typeof lucia;
-		DatabaseSessionAttributes: DatabaseSessionAttributes;
+		// DatabaseSessionAttributes: DatabaseSessionAttributes;
 		DatabaseUserAttributes: DatabaseUserAttributes;
 	}
 }
-interface DatabaseSessionAttributes {
-	ip_country?: string;
-}
+// interface DatabaseSessionAttributes {
+// 	ip_country?: string;
+// }
 interface DatabaseUserAttributes {
 	email: string;
 	username: string;
-	email_verified: boolean;
-	created_at: Date;
-	stripe_id: string | null;
-	role: typeof UserRole;
-	bike_ftp: number;
-	swim_ftp: number;
-	run_ftp: number;
-	max_hr: number;
-	avatar_file_id?: string;
-	banner_file_id?: string;
+	emailVerified: boolean;
+	createdAt: Date;
+	stripeId: string | null;
+	role: 'PRO' | 'BASE' | 'TRIAL';
+	bikeFtp: number;
+	swimFtp: number;
+	runFtp: number;
+	maxHr: number;
+	avatarFileId?: string;
+	bannerFileId?: string;
 }

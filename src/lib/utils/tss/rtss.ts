@@ -3,7 +3,7 @@
 // https://medium.com/strava-engineering/an-improved-gap-model-8b07ae8886c3
 // https://github.com/andrewhao/stressfactor
 
-import { SportType } from '../integrations/strava/typescript-fetch-client/models';
+import { SportType } from '$lib/integrations/strava/typescript-fetch-client/models';
 
 // The most useful tools to quantify how hard you're training are those that account for both the volume and the intensity of your running.
 // Running Training Stress ScoreTM (rTSS) is a trademark metric of TrainingPeaks
@@ -16,7 +16,7 @@ import { SportType } from '../integrations/strava/typescript-fetch-client/models
 //ftp:number= functional threshold pace (avg pace you can hold when running all out for one hour)
 //s:number= duration of workout in seconds
 
-export const valid_cTss_sport_types = [
+export const validCTssSportTypes = [
 	SportType.EMountainBikeRide,
 	SportType.GravelRide,
 	SportType.Handcycle,
@@ -25,7 +25,11 @@ export const valid_cTss_sport_types = [
 	SportType.VirtualRide
 ];
 
-export const valid_rTss_sport_types = [SportType.Run, SportType.TrailRun, SportType.VirtualRun];
+export const validRTssSportTypes = [
+	SportType.Run,
+	SportType.TrailRun,
+	SportType.VirtualRun
+];
 
 export function calcRunPace(
 	metersParam: number,
@@ -49,11 +53,16 @@ export function calcRunPace(
 	}
 }
 
-export function calc_rIF(NGP: number, FTP: number): number {
+export function calcRIF(NGP: number, FTP: number): number {
 	return NGP / FTP;
 }
 
-export function calc_rTss(S: number, NGP: number, FTP: number, INTENSITY_FACTOR: number) {
+export function calcRTss(
+	S: number,
+	NGP: number,
+	FTP: number,
+	INTENSITY_FACTOR: number
+) {
 	// returns effort score 0-X (X>=100)
 	// ru ngp given in best sec/km for an activity
 	// run ftp give in best sec/km pace that you can hold over 1 hour
@@ -72,24 +81,24 @@ export function calc_rTss(S: number, NGP: number, FTP: number, INTENSITY_FACTOR:
 	return rTSS;
 }
 
-export function intensity_to_run_speed(
+export function intensityRunSpeed(
 	intensity: number,
-	run_ftp: number | undefined
+	runFtp: number | undefined
 ): [display: string, value: number] {
-	if (run_ftp === undefined) {
+	if (runFtp === undefined) {
 		return ['00:00/km', 0];
 	}
-	let sec_p_km: number;
+	let secPKm: number;
 
 	if (intensity > 1) {
-		sec_p_km = run_ftp - Math.round((intensity - 1) * run_ftp);
+		secPKm = runFtp - Math.round((intensity - 1) * runFtp);
 	} else {
-		sec_p_km = run_ftp + Math.round((1 - intensity) * run_ftp);
+		secPKm = runFtp + Math.round((1 - intensity) * runFtp);
 	}
 	return [
-		`${Math.floor(sec_p_km / 60)
+		`${Math.floor(secPKm / 60)
 			.toString()
-			.padStart(2, '0')}:${(sec_p_km % 60).toFixed(0).padStart(2, '0')}/km`,
-		sec_p_km
+			.padStart(2, '0')}:${(secPKm % 60).toFixed(0).padStart(2, '0')}/km`,
+		secPKm
 	];
 }

@@ -1,31 +1,32 @@
+import { db } from '$lib/drizzle/client';
 import { handleSignInRedirect } from '$lib/utils/redirects/loginRedirect';
-import { FriendshipStatus } from '@prisma/client';
+import { count, eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 
+import { club, clubMember } from '$lib/drizzle/schema';
 import { redirect as r } from '@sveltejs/kit';
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
 	const data = await parent();
 
 	if (!data.user) r(302, handleSignInRedirect(event));
-	const user_memberships = await prisma.club_member.findMany({
-		where: {
-			user_id: data.user?.id
-		},
-		include: {
+	const userMemberships = await db.query.clubMember.findMany({
+		where: eq(clubMember.userId, data.user?.id),
+		with: {
 			club: true
 		}
 	});
-	const clubs = await prisma.club.findMany({
-		take: 5,
-		include: { _count: { select: { members: { where: { status: FriendshipStatus.ACCEPTED } } } } }
-	});
-	const clubs_count = await prisma.club.count();
+	const clubs = await db
+		.select({ club, memberCount: count(clubMember) })
+		.from(club)
+		.leftJoin(clubMember, eq(club.id, clubMember.clubId))
+		.limit(5);
+	const [clubsCount] = await db.select({ count: count(club) }).from(club);
 
 	return {
 		...data,
-		user_memberships,
+		userMemberships,
 		clubs,
-		clubs_count
+		clubsCount
 	};
 };

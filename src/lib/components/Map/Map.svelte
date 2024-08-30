@@ -14,7 +14,12 @@
 	const mapStore = getMapContext();
 
 	function createMap(element: HTMLDivElement) {
-		$mapStore = new maplibre.Map({ container: element, style: map_style, center, zoom });
+		$mapStore = new maplibre.Map({
+			container: element,
+			style: map_style,
+			center,
+			zoom
+		});
 		// Add geolocate control to the map.
 		$mapStore.addControl(
 			new maplibre.GeolocateControl({

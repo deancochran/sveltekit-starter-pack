@@ -1,7 +1,6 @@
-import type { ThirdPartyIntegrationProvider } from '@prisma/client';
 import type { EventDispatcher } from 'svelte';
 
 export type DisconnectEvent = {
-	disconnect: ThirdPartyIntegrationProvider;
+	disconnect: 'STRAVA' | 'WAHOO';
 };
 export type DisconnectEventDispatcher = EventDispatcher<DisconnectEvent>;

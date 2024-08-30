@@ -1,9 +1,14 @@
-import { getTokenFromAuthCode, type StravaOAuth } from '$lib/utils/integrations/strava/auth';
-import { ThirdPartyIntegrationProvider } from '@prisma/client';
+import { db } from '$lib/drizzle/client';
+import { thirdPartyIntegrationToken } from '$lib/drizzle/schema';
+import {
+	getTokenFromAuthCode,
+	type StravaOAuth
+} from '$lib/integrations/strava/auth';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
+import type { RequestEvent } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
 
-export async function GET(event) {
+export async function GET(event: RequestEvent) {
 	const { locals, url } = event;
 	let t: ToastSettings;
 	if (url.searchParams.has('error')) {
@@ -25,27 +30,30 @@ export async function GET(event) {
 			redirect('/settings', t, event);
 		}
 		try {
-			const token_obj: StravaOAuth = await getTokenFromAuthCode(code);
-			const timestampInMilliseconds = token_obj.expires_at * 1000;
-			await prisma.thirdPartyIntegrationToken.upsert({
-				where: {
-					integration_id: String(token_obj.athlete.id)
-				},
-				update: {
-					integration_id: String(token_obj.athlete.id),
-					expires_at: new Date(timestampInMilliseconds),
-					access_token: token_obj.access_token,
-					refresh_token: token_obj.refresh_token
-				},
-				create: {
-					user_id: locals.user!.id,
-					integration_id: String(token_obj.athlete.id),
-					provider: ThirdPartyIntegrationProvider.STRAVA,
-					expires_at: new Date(timestampInMilliseconds),
-					access_token: token_obj.access_token,
-					refresh_token: token_obj.refresh_token
-				}
-			});
+			const tokenObj: StravaOAuth = await getTokenFromAuthCode(code);
+			const timestampInMilliseconds = tokenObj.expires_at * 1000;
+			await db
+				.insert(thirdPartyIntegrationToken)
+				.values({
+					userId: locals.user!.id,
+					integrationId: String(tokenObj.athlete.id),
+					provider: 'STRAVA',
+					expiresAt: new Date(timestampInMilliseconds),
+					accessToken: tokenObj.access_token,
+					refreshToken: tokenObj.refresh_token,
+					updatedAt: new Date()
+				})
+				.onConflictDoUpdate({
+					target: thirdPartyIntegrationToken.integrationId,
+					set: {
+						integrationId: String(tokenObj.athlete.id),
+						expiresAt: new Date(timestampInMilliseconds),
+						accessToken: tokenObj.access_token,
+						refreshToken: tokenObj.refresh_token,
+						updatedAt: new Date()
+					}
+				});
+
 			t = {
 				message: 'Successfully created strava integration',
 				background: 'variant-filled-success'

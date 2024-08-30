@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { passwordResetToken } from '@prisma/client';
 	import { Button, Hr, Html, Text } from 'svelte-email';
 
 	export let origin: string;

@@ -1,28 +1,32 @@
 <script lang="ts">
-	import IntegrationDisconnectButton from '$lib/components/IntegrationDisconnectButton.svelte';
+	import { invalidateAll } from '$app/navigation';
 	import IntegrationConnectButton from '$lib/components/IntegrationConnectButton.svelte';
+	import IntegrationDisconnectButton from '$lib/components/IntegrationDisconnectButton.svelte';
+	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
 	import {
-		disconnect_user_integration_schema,
+		disconnectUserIntegrationSchema,
 		type DisconnectUserIntegrationSchema
 	} from '$lib/schemas';
-	import { ThirdPartyIntegrationProvider, type thirdPartyIntegrationToken } from '@prisma/client';
 	import { focusTrap } from '@skeletonlabs/skeleton';
-	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import {
+		superForm,
+		type Infer,
+		type SuperValidated
+	} from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
-	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
-	import { invalidateAll } from '$app/navigation';
 
-	export let integrations: thirdPartyIntegrationToken[];
+	export let integrations;
 	export let form_data: SuperValidated<Infer<DisconnectUserIntegrationSchema>>;
 
 	$: user_integration_providers = integrations.map(
-		(integration) => integration.provider as ThirdPartyIntegrationProvider
+		(integration: { provider: string }) =>
+			integration.provider as 'STRAVA' | 'WAHOO'
 	);
 	const { form, errors, constraints, enhance, delayed } = superForm(form_data, {
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: true,
-		validators: zod(disconnect_user_integration_schema),
+		validators: zod(disconnectUserIntegrationSchema),
 		delayMs: 0,
 		timeoutMs: 8000,
 		onResult: async ({ result }) => {
@@ -32,7 +36,7 @@
 		}
 	});
 	let isFocused: boolean = false;
-	let selectedProvider: ThirdPartyIntegrationProvider;
+	let selectedProvider: 'STRAVA' | 'WAHOO';
 </script>
 
 <div class="card">
@@ -44,7 +48,7 @@
 			use:focusTrap={isFocused}
 			id="disconnect"
 			method="post"
-			action="?/disconnectIntegration"
+			action="?/disconnect_integration"
 			class="logo-cloud grid-cols-1 gap-1"
 			use:enhance
 		>

@@ -1,9 +1,16 @@
-import { forgot_pass_schema, reset_forgot_pass_schema, signin_schema } from '$lib/schemas';
-import { lucia } from '$lib/server/lucia';
+import { user as userTable } from '$lib/drizzle/schema';
+import {
+	forgotPassSchema,
+	resetForgotPassSchema,
+	signinSchema
+} from '$lib/schemas';
+
+import { db } from '$lib/drizzle/client';
 import { sendForgottenPasswordResetLink } from '$lib/utils/emails';
 import { validatePasswordResetToken } from '$lib/utils/token';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { fail } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
 import type { User } from 'lucia';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -11,21 +18,27 @@ import { superValidate } from 'sveltekit-superforms/server';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
-	const forgotPassForm = await superValidate(zod(signin_schema));
-	const resetForgotPassForm = await superValidate(zod(reset_forgot_pass_schema));
+	const forgotPassForm = await superValidate(zod(signinSchema));
+	const resetForgotPassForm = await superValidate(zod(resetForgotPassSchema));
 	return { forgotPassForm, resetForgotPassForm };
 };
 
 export const actions: Actions = {
 	forgot: async (event) => {
 		const { url, request } = event;
-		const form = await superValidate(request, zod(forgot_pass_schema));
+		const form = await superValidate(request, zod(forgotPassSchema));
 		let t: ToastSettings;
 		try {
-			const user = await prisma.user.findUniqueOrThrow({ where: { email: form.data.email } });
-			if (user) {
-				await sendForgottenPasswordResetLink(user as unknown as User, url.origin);
-			}
+			const user = db
+				.select()
+				.from(userTable)
+				.where(eq(userTable.email, form.data.email))
+				.limit(1);
+
+			if (!user) throw new Error('No User Found');
+
+			await sendForgottenPasswordResetLink(user as unknown as User, url.origin);
+
 			t = {
 				message: `A New Password Reset Link was Sent`,
 				background: 'variant-filled-success'
@@ -48,29 +61,12 @@ export const actions: Actions = {
 		}
 	},
 	reset_forgot: async (event) => {
-		const { request, locals } = event;
-		const form = await superValidate(request, zod(reset_forgot_pass_schema));
+		const { request } = event;
+		const form = await superValidate(request, zod(resetForgotPassSchema));
 		let t: ToastSettings;
 		if (form.valid) {
 			try {
-				const user = await validatePasswordResetToken(form.data.code, form.data.password);
-
-				if (!user.email_verified) {
-					await prisma.user;
-					t = {
-						message: 'Your Email has Successfully been Verified',
-						background: 'variant-filled-success'
-					} as const;
-					setFlash(t, event);
-				}
-				await lucia.invalidateUserSessions(user.id);
-				const session = await lucia.createSession(user.id, {});
-				const sessionCookie = lucia.createSessionCookie(session.id);
-				event.cookies.set(sessionCookie.name, sessionCookie.value, {
-					path: '.',
-					...sessionCookie.attributes
-				});
-
+				await validatePasswordResetToken(form.data.code, form.data.password);
 				t = {
 					message: `Your Password has been Updated`,
 					background: 'variant-filled-success'

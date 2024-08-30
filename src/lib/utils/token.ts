@@ -1,94 +1,102 @@
-import type { emailVerificationToken, user } from '@prisma/client';
-import { error } from '@sveltejs/kit';
+import { db } from '$lib/drizzle/client';
+import {
+	emailVerificationToken,
+	passwordResetToken,
+	user
+} from '$lib/drizzle/schema';
 import * as argon from 'argon2';
+import { eq, type InferSelectModel } from 'drizzle-orm';
 import { TimeSpan, createDate, isWithinExpirationDate } from 'oslo';
 import { alphabet, generateRandomString, sha256 } from 'oslo/crypto';
 import { encodeHex } from 'oslo/encoding';
 
-export async function generatePasswordResetToken(user_id: string): Promise<string> {
-	const new_code = await prisma.$transaction(async (db) => {
-		await db.passwordResetToken.deleteMany({
-			where: { user_id: user_id }
+export async function generatePasswordResetToken(
+	userId: string
+): Promise<string> {
+	return await db.transaction(async (ctx) => {
+		await ctx
+			.delete(passwordResetToken)
+			.where(eq(passwordResetToken.userId, userId));
+		const newCode = generateRandomString(8, alphabet('0-9', 'A-Z', 'a-z'));
+		const hashedCode = encodeHex(
+			await sha256(new TextEncoder().encode(newCode))
+		);
+
+		await ctx.insert(passwordResetToken).values({
+			hashedCode: hashedCode,
+			expiresAt: createDate(new TimeSpan(15, 'm')), // 15 minutes
+			userId: userId
 		});
-		const new_code = generateRandomString(8, alphabet('0-9', 'A-Z', 'a-z'));
-		const hashed_code = encodeHex(await sha256(new TextEncoder().encode(new_code)));
-		await db.passwordResetToken.create({
-			data: {
-				hashed_code: hashed_code,
-				expires_at: createDate(new TimeSpan(15, 'm')), // 15 minutes
-				user_id: user_id
-			}
-		});
-		return new_code;
+
+		return newCode;
 	});
-	return new_code;
 }
 
-export const validatePasswordResetToken = async (code: string, password: string): Promise<user> => {
-	const user = await prisma.$transaction(async (db) => {
-		const hashed_code = encodeHex(await sha256(new TextEncoder().encode(code)));
-		const token = await db.passwordResetToken.findFirstOrThrow({
-			where: { hashed_code: hashed_code }
+export async function validatePasswordResetToken(
+	code: string,
+	password: string
+) {
+	await db.transaction(async (ctx) => {
+		const hashedCode = encodeHex(await sha256(new TextEncoder().encode(code)));
+		const token = await ctx.query.passwordResetToken.findFirst({
+			where: eq(passwordResetToken.hashedCode, hashedCode)
 		});
-		if (!isWithinExpirationDate(token.expires_at)) {
-			throw error(404, { code: '404', message: 'expired code' });
-		}
-		const hashed_password = await argon.hash(password);
-		const user = await prisma.user.update({
-			where: {
-				id: token.user_id
-			},
-			data: {
-				hashed_password: hashed_password
-			}
-		});
-		await db.passwordResetToken.deleteMany({
-			where: { user_id: token.user_id }
-		});
-		return user;
+		if (!token) throw new Error('No Token Found');
+		if (!isWithinExpirationDate(token.expiresAt))
+			throw new Error('Token is Expired');
+
+		const hashedPassword = await argon.hash(password);
+		await db
+			.update(user)
+			.set({
+				password: hashedPassword
+			})
+			.where(eq(user.id, token.userId));
+
+		await ctx
+			.delete(passwordResetToken)
+			.where(eq(passwordResetToken.userId, token.userId));
 	});
-	return user;
-};
+}
 
 export async function generateEmailVerificationToken(
 	userId: string
-): Promise<emailVerificationToken> {
-	const new_token = await prisma.$transaction(async (db) => {
-		await db.emailVerificationToken.deleteMany({
-			where: { user_id: userId }
-		});
-		const new_code = generateRandomString(8, alphabet('0-9'));
-		return await db.emailVerificationToken.create({
-			data: {
-				code: new_code,
-				expires_at: createDate(new TimeSpan(15, 'm')), // 15 minutes
-				user_id: userId
-			}
-		});
+): Promise<InferSelectModel<typeof emailVerificationToken>> {
+	const [newToken] = await db.transaction(async (ctx) => {
+		await ctx
+			.delete(emailVerificationToken)
+			.where(eq(emailVerificationToken.userId, userId));
+
+		const newCode = generateRandomString(8, alphabet('0-9'));
+		return await ctx
+			.insert(emailVerificationToken)
+			.values({
+				code: newCode,
+				expiresAt: createDate(new TimeSpan(15, 'm')), // 15 minutes
+				userId: userId
+			})
+			.returning();
 	});
-	return new_token;
+
+	return newToken;
 }
 
-export const validateEmailVerificationToken = async (code: string): Promise<user> => {
-	const user = await prisma.$transaction(async (db) => {
-		const token = await db.emailVerificationToken.findFirstOrThrow({
-			where: { code: code }
+export async function validateEmailVerificationToken(code: string) {
+	await db.transaction(async (tx) => {
+		const token = await tx.query.emailVerificationToken.findFirst({
+			where: eq(emailVerificationToken.code, code)
 		});
-		if (!isWithinExpirationDate(token.expires_at)) {
-			throw error(404, { code: '404', message: 'expired code' });
+		if (!token) throw new Error('Token has expired');
+		if (!isWithinExpirationDate(token.expiresAt)) {
 		}
-		const user = await prisma.user.update({
-			where: {
-				id: token.user_id
-			},
-			data: {
-				email_verified: true
-			}
-		});
-		await db.emailVerificationToken.deleteMany({
-			where: { user_id: token.user_id }
-		});
-		return user;
+		await tx
+			.update(user)
+			.set({
+				emailVerified: true
+			})
+			.where(eq(user.id, token.userId));
+		await tx
+			.delete(emailVerificationToken)
+			.where(eq(emailVerificationToken.userId, token.userId));
 	});
-	return user;
-};
+}

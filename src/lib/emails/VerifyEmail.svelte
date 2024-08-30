@@ -1,9 +1,9 @@
 <script lang="ts">
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
-	import type { emailVerificationToken } from '@prisma/client';
-	import { Button, Head, Hr, Html, Preview, Text } from 'svelte-email';
-	export let origin: string;
-	export let token: emailVerificationToken;
+	import { emailVerificationToken } from '$lib/drizzle/schema';
+	import type { InferSelectModel } from 'drizzle-orm';
+	import { Head, Hr, Html, Preview, Text } from 'svelte-email';
+	export let token: InferSelectModel<typeof emailVerificationToken>;
 </script>
 
 <Html lang="en">
@@ -11,6 +11,5 @@
 	<Preview preview="Hello, New User!" />
 	<Hr />
 	<Text>Verify your email with this code: {token.code}</Text>
-	<Button href="{origin}/verify-email/{token.code}">Verify Email</Button>
 </Html>
 <LoadingIcon />

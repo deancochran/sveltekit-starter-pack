@@ -19,7 +19,11 @@ export function addHours(date: Date, hours: number): Date {
 
 type DateStyle = Intl.DateTimeFormatOptions['dateStyle'];
 
-export function formatDate(date: string, dateStyle: DateStyle = 'medium', locales = 'en') {
+export function formatDate(
+	date: string,
+	dateStyle: DateStyle = 'medium',
+	locales = 'en'
+) {
 	// Safari is mad about dashes in the date
 	const dateToFormat = new Date(date.replace('-', '/'));
 	const dateFormatter = new Intl.DateTimeFormat(locales, { dateStyle });

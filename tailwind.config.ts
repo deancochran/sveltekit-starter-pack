@@ -2,13 +2,15 @@ import { join } from 'path';
 import type { Config } from 'tailwindcss';
 
 import { skeleton } from '@skeletonlabs/tw-plugin';
-import plugin from 'tailwindcss/plugin';
 
-const config = {
+export default {
 	darkMode: 'class',
 	content: [
 		'./src/**/*.{html,js,svelte,ts}',
-		join(require.resolve('@skeletonlabs/skeleton'), '../**/*.{html,js,svelte,ts}')
+		join(
+			require.resolve('@skeletonlabs/skeleton'),
+			'../**/*.{html,js,svelte,ts}'
+		)
 	],
 	theme: {
 		extend: {}
@@ -20,6 +22,8 @@ const config = {
 		require('@tailwindcss/forms'),
 		require('@tailwindcss/typography'),
 		require('@tailwindcss/container-queries'),
+		// require('@tailwindcss/line-clamp'),
+		// require('@tailwindcss/aspect-ratio'),
 		skeleton({
 			themes: {
 				preset: [
@@ -38,5 +42,3 @@ const config = {
 		})
 	]
 } satisfies Config;
-
-export default config;

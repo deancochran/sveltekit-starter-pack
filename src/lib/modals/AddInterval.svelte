@@ -1,27 +1,38 @@
 <script lang="ts">
+	import Button from '$lib/components/Button.svelte';
 	import { getModalStore } from '@skeletonlabs/skeleton';
 	import { PlusSquare } from 'lucide-svelte';
-	import { onDestroy, onMount, type SvelteComponent } from 'svelte';
-	import Button from '$lib/components/Button.svelte';
-	import { ActivityType } from '@prisma/client';
+	import { type SvelteComponent } from 'svelte';
 	// import type { Infer, SuperValidated } from 'sveltekit-superforms';
-	import { IntervalSchema, type training_session_schema } from '$lib/schemas';
 	import { page } from '$app/stores';
-	import { superForm, type Infer, type SuperForm, type SuperValidated } from 'sveltekit-superforms';
-	import type { WorkoutInterval } from '$lib/utils/trainingsessions/types';
-	import type { ItemsStore } from '$lib/utils/dragndrop/stores';
-	import { zod } from 'sveltekit-superforms/adapters';
 	import InputLabel from '$lib/forms/inputs/InputLabel.svelte';
 	import NumberInput from '$lib/forms/inputs/NumberInput.svelte';
 	import RangeInput from '$lib/forms/inputs/RangeInput.svelte';
+	import type { ItemsStore } from '$lib/utils/dragndrop/stores';
+	import {
+		superForm,
+		type Infer,
+		type SuperValidated
+	} from 'sveltekit-superforms';
+	import { zod } from 'sveltekit-superforms/adapters';
+	import { z } from 'zod';
 
+	const IntervalSchema = z.object({
+		duration: z.number().min(0).nonnegative(),
+		intensity: z.number().min(0).nonnegative(),
+		distance: z.number().min(0).nonnegative().optional(),
+		power: z.number().min(0).nonnegative().optional(),
+		hr: z.number().min(0).nonnegative().optional()
+	});
+	type Interval = z.infer<typeof IntervalSchema>;
+	type WorkoutInterval = z.infer<typeof IntervalSchema>;
 	/** Exposes parent props to this component. */
 	export let parent: SvelteComponent;
 	const modal = getModalStore();
 
-	const { items, activity_type, workoutIntervalForm } = $modal[0].meta as {
+	const { items, activityType, workoutIntervalForm } = $modal[0].meta as {
 		items: ItemsStore<WorkoutInterval>;
-		activity_type: ActivityType;
+		activityType: 'BIKE' | 'SWIM' | 'RUN';
 		workoutIntervalForm: SuperValidated<Infer<typeof IntervalSchema>>;
 	};
 	const superform = superForm(workoutIntervalForm, {
@@ -31,12 +42,14 @@
 		applyAction: false,
 		dataType: 'json'
 	});
-	const { form, errors, constraints, validateForm, enhance, delayed, reset } = superform;
+	const { form, errors, constraints, validateForm, enhance, delayed, reset } =
+		superform;
 
 	// Base Classes
 	const cBase = 'card p-4 w-modal shadow-xl space-y-4';
 	const cHeader = 'text-2xl font-bold';
-	const cForm = 'border border-surface-500 p-4 space-y-4 rounded-container-token';
+	const cForm =
+		'border border-surface-500 p-4 space-y-4 rounded-container-token';
 
 	async function formSubmitHandler(
 		event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement }
@@ -57,8 +70,8 @@
 			on:submit|preventDefault={formSubmitHandler}
 			class="modal-form {cForm}"
 		>
-			{#key activity_type}
-				{#if activity_type === ActivityType.SWIM}
+			{#key activityType}
+				{#if activityType === 'SWIM'}
 					<InputLabel label="Distance">
 						<NumberInput {superform} field="distance" />
 					</InputLabel>
@@ -66,7 +79,7 @@
 					<InputLabel label="Duration">
 						<RangeInput {superform} field="duration" />
 					</InputLabel>
-				{:else if activity_type === ActivityType.RUN}
+				{:else if activityType === 'RUN'}
 					<InputLabel label="Distance">
 						<NumberInput {superform} field="distance" />
 					</InputLabel>
@@ -74,7 +87,7 @@
 					<InputLabel label="Duration">
 						<RangeInput {superform} field="duration" />
 					</InputLabel>
-				{:else if activity_type === ActivityType.BIKE}
+				{:else if activityType === 'BIKE'}
 					<InputLabel label="Distance">
 						<NumberInput {superform} field="distance" />
 					</InputLabel>

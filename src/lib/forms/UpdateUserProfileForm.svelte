@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { update_user_schema, type UpdateUserSchema } from '$lib/schemas';
-	import type { Infer, SuperValidated } from 'sveltekit-superforms';
-	import { superForm } from 'sveltekit-superforms/client';
-	import { focusTrap } from '@skeletonlabs/skeleton';
-	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
-	import TextInput from './inputs/TextInput.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
+	import { updateUserSchema, type UpdateUserSchema } from '$lib/schemas';
+	import { focusTrap } from '@skeletonlabs/skeleton';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
+	import { superForm } from 'sveltekit-superforms/client';
+	import TextInput from './inputs/TextInput.svelte';
 	export let form_data: SuperValidated<Infer<UpdateUserSchema>>;
 
 	const superform = superForm(form_data, {
@@ -14,7 +14,7 @@
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: false,
-		validators: zod(update_user_schema),
+		validators: zod(updateUserSchema),
 		delayMs: 0,
 		timeoutMs: 8000
 	});
@@ -37,7 +37,9 @@
 			<TextInput {superform} field="username" />
 		</form>
 	</section>
-	<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">
+	<footer
+		class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2"
+	>
 		{#if $delayed}
 			<LoadingIcon />
 		{:else}

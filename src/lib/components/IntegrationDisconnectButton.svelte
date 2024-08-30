@@ -1,27 +1,29 @@
 <script lang="ts">
-	import type { ThirdPartyIntegrationProvider } from '@prisma/client';
-	import { createEventDispatcher } from 'svelte';
-	import Button from './Button.svelte';
 	import type {
 		DisconnectEvent,
 		DisconnectEventDispatcher
 	} from '$lib/components/IntegrationButtons/types';
-	export let provider: ThirdPartyIntegrationProvider;
+	import { createEventDispatcher } from 'svelte';
+	import Button from './Button.svelte';
+	export let provider: string;
 
-	let dispatch: DisconnectEventDispatcher = createEventDispatcher<DisconnectEvent>();
+	let dispatch: DisconnectEventDispatcher =
+		createEventDispatcher<DisconnectEvent>();
 
-	function titleCase(provider: ThirdPartyIntegrationProvider) {
-		return provider[0].toUpperCase() + provider.slice(1).toLowerCase();
+	// TODO Redo this function
+	function titleCase(provider: string) {
+		// return provider[0].toUpperCase() + provider.slice(1).toLowerCase();
+		return provider;
 	}
-	$: title = titleCase(provider as ThirdPartyIntegrationProvider);
+	$: title = titleCase(provider);
 	let hovering = false;
 
-	function toggleHovering(e: CustomEvent<any>): void {
+	function toggleHovering(): void {
 		hovering = !hovering;
 	}
 
-	function dispatchProviderDisconnect(e: CustomEvent<any>): void {
-		dispatch('disconnect', provider);
+	function dispatchProviderDisconnect(): void {
+		dispatch('disconnect', provider as 'STRAVA' | 'WAHOO');
 	}
 </script>
 

@@ -2,7 +2,11 @@
 	import { enhance } from '$app/forms';
 
 	import { storeTheme } from '$lib/stores/theme';
-	import { LightSwitch, popup, type PopupSettings } from '@skeletonlabs/skeleton';
+	import {
+		LightSwitch,
+		popup,
+		type PopupSettings
+	} from '@skeletonlabs/skeleton';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	export let showLightSwitch = false;
 
@@ -34,8 +38,11 @@
 	};
 </script>
 
-<button type="button" form="theme" class="btn shadow-md variant-filled" use:popup={popupClick}
-	>Theme</button
+<button
+	type="button"
+	form="theme"
+	class="btn shadow-md variant-filled"
+	use:popup={popupClick}>Theme</button
 >
 <div class="card p-2 soft-filled-primary shadow-2xl" data-popup="popupClick">
 	{#if showLightSwitch}

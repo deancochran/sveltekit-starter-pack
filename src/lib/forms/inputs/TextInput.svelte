@@ -9,7 +9,6 @@
 		type SuperForm
 	} from 'sveltekit-superforms';
 
-	
 	export let superform: SuperForm<T>;
 	export let field: FormPathLeaves<T>;
 

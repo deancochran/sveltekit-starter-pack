@@ -1,8 +1,5 @@
 <script lang="ts">
-	import {
-		convertZwiftWorkoutIntervals,
-		type Zwift_Archive_Workout
-	} from '$lib/assets/workouts/zwift_archives';
+	import { convertZwiftWorkoutIntervals } from '$lib/assets/workouts/zwift_archives';
 	import WorkoutIntervals from '$lib/components/WorkoutIntervals/WorkoutIntervals.svelte';
 	import ZoneDistribution from '$lib/components/WorkoutIntervals/ZoneDistribution.svelte';
 	import type { WorkoutInterval } from '$lib/schemas';
@@ -12,7 +9,7 @@
 	export let data: PageData;
 
 	function calculateTotalDuration(intervals: WorkoutInterval[]): number {
-		return intervals.reduce((acc: number, { duration, intensity }) => {
+		return intervals.reduce((acc: number, { duration }) => {
 			return acc + duration;
 		}, 0);
 	}
@@ -25,7 +22,10 @@
 		return ((interval.duration * Math.pow(interval.intensity, 2)) / 3600) * 100;
 	}
 	function intervals_stress_score(intervals: WorkoutInterval[]): number {
-		return intervals.reduce((total, interval) => total + interval_stress_score(interval), 0);
+		return intervals.reduce(
+			(total, interval) => total + interval_stress_score(interval),
+			0
+		);
 	}
 </script>
 
@@ -35,9 +35,9 @@
 
 <div>
 	{#each data.workouts as workout}
-		{@const training_session = convertZwiftWorkoutIntervals(workout)}
-		{@const totalDuration = calculateTotalDuration(training_session.plan)}
-		{@const cTSS = intervals_stress_score(training_session.plan).toFixed(0)}
+		{@const trainingSession = convertZwiftWorkoutIntervals(workout)}
+		{@const totalDuration = calculateTotalDuration(trainingSession.plan)}
+		{@const cTSS = intervals_stress_score(trainingSession.plan).toFixed(0)}
 		<div class="card">
 			<header class="card-header flex flex-col justify-center">
 				<div class="flex flex-row justify-between">
@@ -49,12 +49,14 @@
 				<h1>{workout.description}</h1>
 			</header>
 			<section class="p-4 flex flex-col">
-				<ZoneDistribution intervals={training_session.plan} total_duration={totalDuration} />
-				<WorkoutIntervals intervals={training_session.plan} total_duration={totalDuration} />
+				<ZoneDistribution intervals={trainingSession.plan} {totalDuration} />
+				<WorkoutIntervals intervals={trainingSession.plan} {totalDuration} />
 			</section>
-			<footer class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2">
-				<!-- {workout.total_duration} -->
-				<!-- Stress Score: {calc_cTss_from_intervals(
+			<footer
+				class="w-full card-footer flex flex-wrap items-end align-middle justify-end gap-2"
+			>
+				<!-- {workout.totalDuration} -->
+				<!-- Stress Score: {calcCTssFromIntervals(
 					convert_ZwiftArchiveWorkoutIntervals(workout.intervals)
 				)} -->
 			</footer>

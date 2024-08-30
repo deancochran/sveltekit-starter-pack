@@ -21,8 +21,6 @@ A full-stack example of a Software as a Service (SaaS) web application built wit
     - [Stripe Setup](#stripe-setup)
     - [Creating a Stripe Subscription Product in Test Mode](#creating-a-stripe-subscription-product-in-test-mode)
     - [Lucia Authentication](#lucia-authentication)
-    - [Database (Prisma)](#database-prisma)
-    - [Database (Prisma)](#database-prisma-1)
 - [Fun Calculations](#fun-calculations)
 - [80/20 Rule:](#8020-rule)
 - [TODO for implementation...](#todo-for-implementation)
@@ -38,7 +36,6 @@ This SvelteKit SaaS Starter Kit provides a foundation for building modern web ap
 - User authentication using Lucia
 - Subscription management with Stripe
 - Stripe Webhook integration and handling
-- Database interactions with Prisma ORM
 - Form handling with Svelte Superforms and Zod
 - UI styling with Skeleton UI
 - Iconography with Lucide
@@ -48,9 +45,10 @@ This SvelteKit SaaS Starter Kit provides a foundation for building modern web ap
 - [SvelteKit](https://kit.svelte.dev/)
 - [Lucia](https://lucia.js.org/)
 - [Stripe](https://stripe.com/)
-- [Prisma ORM](https://www.prisma.io/)
+- [Drozzle ORM](https://orm.drizzle.team/)
 - [Svelte Superforms](https://github.com/ciscoheat/sveltekit-superforms)
 - [Flash Message](https://github.com/ciscoheat/sveltekit-flash-message)
+- [Skeleton UI](https://github.com/ciscoheat/sveltekit-flash-message)
 - [Zod](https://github.com/colinhacks/zod)
 - [Skeleton CSS](http://skeleton.dev/)
 - [Lucide Icons](https://lucide.dev/)
@@ -90,15 +88,11 @@ NOTICE: It is imperative for the application that your add a `TIER` tag to the p
   <p align="center">
     <img src="./static/TierExample.png" alt="drawing" width="800"/>
   </p>
-  
-The different tags that you can specify are found in the `prisma/schema.prisma` file. So changing these will alter the business logic of the application.
 
-```prisma
-enum UserRole {
-  PRO
-  BASE
+BASE
 }
-```
+
+````
 
 </div>
 
@@ -113,7 +107,7 @@ enum UserRole {
 
 STRIPE_SECRET_KEY=XXXXXX
 STRIPE_PUBLIC_KEY=XXXXXX
-```
+````
 
 </div>
 
@@ -121,7 +115,7 @@ STRIPE_PUBLIC_KEY=XXXXXX
 
 Configure Lucia authentication by updating the authentication configuration in `src/lib/auth.js`.
 
-### Database (Prisma)
+### Database (DRIZZLE)
 
 Create a `.env` file with your database connection URL:
 
@@ -132,10 +126,10 @@ DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
 Apply database migrations:
 
 ```bash
-prisma migrate dev
+drizzle migrate dev
 ```
 
-### Database (Prisma)
+### Database (Drizzler)
 
 Run the SvelteKit application:
 
@@ -199,8 +193,8 @@ Ensure you have a valid mkcert https certificate stored in the /cert directory (
 
 docker compose -f dev.docker-compose up --build (runs your db at localhost:5432... i think)
 
-npx prisma migrate dev will run your migrations
-npx prisma generate will generate the client
+npx drizzle migrate dev will run your migrations
+npx drizzle generate will generate the client
 
 - pnpm run ngrok (exposes the localhost at a proxied address)
 
@@ -214,6 +208,14 @@ Take the proxied address and update your thridparty api configurations
 - test the webhook endpoints using postman on an external network device
   - I recommend sending a postman request from another laptop using a hotspot from your phone's cellular data for ease of developer experience
 
-pnpm run prisma-studio should open the database view on port 5555
+pnpm run drizzle should open the database view on port 5555
 
 pnpm run stripe-webhook should open up stripe capabilities on your machine
+
+# ENSURE YOU'RE API WEBHOOKS ARE ENABLED!
+
+# ENSURE THE IP ADDRESSES ARE CORRECT
+
+# ENSURE COOKIES ARE BEING PASSED
+
+# CHECKOUT SWAPY https://swapy.tahazsh.com/ for Interval drag and drop

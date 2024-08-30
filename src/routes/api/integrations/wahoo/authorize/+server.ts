@@ -1,9 +1,13 @@
-import { createWahooIntegration, getTokenFromAuthCode } from '$lib/utils/integrations/wahoo/api';
-import type { WahooTokenObj } from '$lib/utils/integrations/wahoo/types';
+import {
+	createWahooIntegration,
+	getTokenFromAuthCode
+} from '$lib/integrations/wahoo/api';
+import type { WahooTokenObj } from '$lib/integrations/wahoo/types';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
+import type { RequestEvent } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
 
-export async function GET(event) {
+export async function GET(event: RequestEvent) {
 	console.log('hit');
 	const { locals, url } = event;
 	let t: ToastSettings;
@@ -14,20 +18,17 @@ export async function GET(event) {
 		} as const;
 		redirect('/settings', t, event);
 	}
-	// const scope = url.searchParams.get('scope');
 	const code = url.searchParams.get('code');
 	if (code) {
 		try {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const token_obj: WahooTokenObj = await getTokenFromAuthCode(code);
-			// // verify scope
+			const tokenObj: WahooTokenObj = await getTokenFromAuthCode(code);
 			if (
-				token_obj.scope !==
+				tokenObj.scope !==
 				'workouts_read workouts_write plans_read plans_write power_zones_read offline_data user_read'
 			) {
 				throw new Error('Invalid Scope');
 			}
-			await createWahooIntegration(locals.user!, token_obj);
+			await createWahooIntegration(locals.user!, tokenObj);
 
 			t = {
 				message: 'Successfully created wahoo integration',

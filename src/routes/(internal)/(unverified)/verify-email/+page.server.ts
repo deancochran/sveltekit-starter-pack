@@ -1,4 +1,4 @@
-import { verify_user_email_schema } from '$lib/schemas';
+import { verifyUserEmailSchema } from '$lib/schemas';
 import { lucia } from '$lib/server/lucia';
 import { sendEmailVerificationLink } from '$lib/utils/emails';
 import { validateEmailVerificationToken } from '$lib/utils/token';
@@ -12,18 +12,18 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
 	const data = await parent();
-	const verifyEmailForm = await superValidate(zod(verify_user_email_schema));
+	const verifyEmailForm = await superValidate(zod(verifyUserEmailSchema));
 	return { verifyEmailForm, ...data };
 };
 
 export const actions: Actions = {
 	verify: async (event) => {
 		const { request, locals } = event;
-		const form = await superValidate(request, zod(verify_user_email_schema));
+		const form = await superValidate(request, zod(verifyUserEmailSchema));
 		let t: ToastSettings;
 		try {
-			const user = await validateEmailVerificationToken(form.data.code);
-			const session = await lucia.createSession(user!.id, {});
+			await validateEmailVerificationToken(form.data.code);
+			const session = await lucia.createSession(locals.user!.id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: '.',
@@ -34,7 +34,8 @@ export const actions: Actions = {
 				message: 'Your Email has Successfully been Verified',
 				background: 'variant-filled-success'
 			};
-		} catch (error) {
+		} catch (error){
+			console.log(error);
 			t = {
 				message: 'Failed to verify your email',
 				background: 'variant-filled-warning'
@@ -42,13 +43,13 @@ export const actions: Actions = {
 			setFlash(t, event);
 			return fail(400, { form });
 		}
-		redirect('/', t, event);
+		redirect('/dashboard', t, event);
 	},
 	resend: async (event) => {
-		const { url, locals } = event;
+		const { locals } = event;
 		let t: ToastSettings;
 		try {
-			await sendEmailVerificationLink(locals.user!, url.origin);
+			await sendEmailVerificationLink(locals.user!);
 			t = {
 				message: `New Email Verification Link Sent ${locals.user?.username}`,
 				background: 'variant-filled-success'

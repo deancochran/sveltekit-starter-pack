@@ -20,7 +20,9 @@
 	}
 </script>
 
-<div class="flex flex-col items-center align-middle justify-center h-[80vh] gap-4">
+<div
+	class="flex flex-col items-center align-middle justify-center h-[80vh] gap-4"
+>
 	{#await pickRandomQuote()}
 		<br />
 		<br />

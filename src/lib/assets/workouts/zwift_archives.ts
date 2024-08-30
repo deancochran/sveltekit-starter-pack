@@ -1,6 +1,5 @@
 import data from '$lib/assets/workouts/zwift_archives.json';
 import type { WorkoutInterval } from '$lib/schemas';
-import { ActivityType } from '@prisma/client';
 
 export type ZwiftArchiveWorkoutInterval = [duration: number, intensity: number];
 
@@ -12,7 +11,7 @@ export enum ZwiftArchiveWorkoutCategory {
 	VO2 = 'vo2',
 	ANAEROBIC = 'anaerobic'
 }
-export type Zwift_Archive_Workout = {
+export type ZwiftArchiveWorkout = {
 	name: string;
 	description: string;
 	category: ZwiftArchiveWorkoutCategory;
@@ -20,13 +19,15 @@ export type Zwift_Archive_Workout = {
 };
 
 // TODO: Read Zwift Archive Workouts
-export const readZwiftArchiveWorkouts = async (): Promise<Array<Zwift_Archive_Workout>> => {
-	return data as unknown as Array<Zwift_Archive_Workout>;
+export const readZwiftArchiveWorkouts = async (): Promise<
+	Array<ZwiftArchiveWorkout>
+> => {
+	return data as unknown as Array<ZwiftArchiveWorkout>;
 };
 
 export type ZwiftBikeWorkout = {
 	title: string;
-	activity_type: ActivityType;
+	activityType: 'SWIM' | 'BIKE' | 'RUN';
 	description: string;
 	date?: Date;
 	distance?: number;
@@ -34,13 +35,15 @@ export type ZwiftBikeWorkout = {
 	stress_score: number;
 	plan: Array<WorkoutInterval>;
 };
-export function convertZwiftWorkoutIntervals(workout: Zwift_Archive_Workout): ZwiftBikeWorkout {
+export function convertZwiftWorkoutIntervals(
+	workout: ZwiftArchiveWorkout
+): ZwiftBikeWorkout {
 	return {
 		title: workout.name,
-		activity_type: ActivityType.BIKE,
+		activityType: 'BIKE',
 		description: workout.description,
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		duration: workout.intervals.reduce((i, [duration, _intensity]) => duration, 0),
+
+		duration: workout.intervals.reduce((i, [duration]) => duration, 0),
 		stress_score: 0,
 		plan: workout.intervals.map((interval) => {
 			return { duration: interval[0], intensity: interval[1] };

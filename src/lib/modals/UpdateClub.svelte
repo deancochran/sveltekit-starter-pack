@@ -2,28 +2,38 @@
 	import { page } from '$app/stores';
 	import Button from '$lib/components/Button.svelte';
 	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
+	import type { club } from '$lib/drizzle/schema';
 	import TextArea from '$lib/forms/inputs/TextArea.svelte';
 	import TextInput from '$lib/forms/inputs/TextInput.svelte';
 	import {
-		new_club_schema,
-		new_image_schema,
+		newClubSchema,
+		newImageSchema,
 		type NewClubSchema,
 		type NewImageSchema
 	} from '$lib/schemas';
-	import type { club } from '@prisma/client';
-	import { Avatar, FileDropzone, SlideToggle, getModalStore } from '@skeletonlabs/skeleton';
+	import {
+		Avatar,
+		FileDropzone,
+		getModalStore,
+		SlideToggle
+	} from '@skeletonlabs/skeleton';
+	import type { InferSelectModel } from 'drizzle-orm';
 	import type { SvelteComponent } from 'svelte';
-	import { fileProxy, superForm, type SuperValidated } from 'sveltekit-superforms';
+	import {
+		fileProxy,
+		superForm,
+		type SuperValidated
+	} from 'sveltekit-superforms';
 	import { zod, type Infer } from 'sveltekit-superforms/adapters';
-
 	/** Exposes parent props to this component. */
+
 	export let parent: SvelteComponent;
 	const modal = getModalStore();
 	let meta = $modal[0].meta as {
 		avatar_form: SuperValidated<Infer<NewImageSchema>>;
 		banner_form: SuperValidated<Infer<NewImageSchema>>;
 		club_form: SuperValidated<Infer<NewClubSchema>>;
-		club: club;
+		club: InferSelectModel<typeof club>;
 	};
 
 	// Base Classes
@@ -40,7 +50,7 @@
 	} = superForm(meta.avatar_form, {
 		id: 'updateClubAvatar',
 		applyAction: true,
-		validators: zod(new_image_schema),
+		validators: zod(newImageSchema),
 		delayMs: 0,
 		timeoutMs: 8000,
 		onResult: async ({ result }) => {
@@ -62,7 +72,7 @@
 	} = superForm(meta.banner_form, {
 		id: 'updateClubBanner',
 		applyAction: true,
-		validators: zod(new_image_schema),
+		validators: zod(newImageSchema),
 		delayMs: 0,
 		timeoutMs: 8000,
 		onResult: async ({ result }) => {
@@ -79,7 +89,7 @@
 	const club_superform = superForm(meta.club_form, {
 		id: 'updateClub',
 		applyAction: true,
-		validators: zod(new_club_schema),
+		validators: zod(newClubSchema),
 		delayMs: 0,
 		timeoutMs: 8000,
 		onResult: async ({ result }) => {
@@ -114,9 +124,9 @@
 					use:banner_enhance
 					class="w-full h-full"
 				>
-					{#if meta.club?.banner_file_id}
+					{#if meta.club?.bannerFileId}
 						<img
-							src={`/api/images/${meta.club?.banner_file_id}`}
+							src={`/api/images/${meta.club?.bannerFileId}`}
 							class="object-cover rounded-none overflow-hidden w-full group-hover:hidden"
 							alt="Club Banner"
 						/>
@@ -133,13 +143,24 @@
 						class="w-full h-full hidden group-hover:flex"
 						bind:files={$banner_file}
 					>
-						<svelte:fragment slot="message"><strong>Upload</strong> an image</svelte:fragment>
+						<svelte:fragment slot="message"
+							><strong>Upload</strong> an image</svelte:fragment
+						>
 					</FileDropzone>
 				</form>
 			</div>
-			<form id="updateClub" method="POST" action="?/updateClub" use:club_enhance>
-				<div class="flex flex-row h-24 items-start align-baseline justify-start p-4">
-					<div class="flex flex-row h-24 -mt-6 items-end align-baseline justify-start px-4">
+			<form
+				id="updateClub"
+				method="POST"
+				action="?/updateClub"
+				use:club_enhance
+			>
+				<div
+					class="flex flex-row h-24 items-start align-baseline justify-start p-4"
+				>
+					<div
+						class="flex flex-row h-24 -mt-6 items-end align-baseline justify-start px-4"
+					>
 						<div class="relative group h-36 w-36">
 							<form
 								id="updateClubAvatar"
@@ -149,9 +170,9 @@
 								use:avatar_enhance
 							>
 								{#if meta.club}
-									{#if meta.club?.avatar_file_id}
+									{#if meta.club?.avatarFileId}
 										<Avatar
-											src={`/api/images/${meta.club?.avatar_file_id}`}
+											src={`/api/images/${meta.club?.avatarFileId}`}
 											initials={String(meta.club.name).slice(0, 2)}
 											width="w-36"
 											shadow="shadow-lg"
@@ -193,7 +214,9 @@
 					</div>
 				</div>
 				<TextArea superform={club_superform} field="description" />
-				<SlideToggle name="private" bind:checked={$club_form.private}>Private Club</SlideToggle>
+				<SlideToggle name="private" bind:checked={$club_form.private}
+					>Private Club</SlideToggle
+				>
 			</form>
 		</div>
 		<div class="modal-footer {parent.regionFooter}">

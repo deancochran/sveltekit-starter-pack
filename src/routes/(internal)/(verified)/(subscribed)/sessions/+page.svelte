@@ -17,7 +17,7 @@
 	</header>
 	<!-- Session List -->
 	<section class="blog-list space-y-8">
-		{#each data.training_sessions as session}
+		{#each data.trainingSessions as session}
 			<div
 				class="block card variant-soft p-4 rounded-container-token"
 				data-sveltekit-preload-data="hover"

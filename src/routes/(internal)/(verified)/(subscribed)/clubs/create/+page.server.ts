@@ -1,7 +1,9 @@
-import { new_club_schema } from '$lib/schemas';
-import { FriendshipStatus, type club } from '@prisma/client';
+import { newClubSchema } from '$lib/schemas';
+import { db } from '$lib/drizzle/client';
+import { club, clubMember } from '$lib/drizzle/schema';
 import type { ToastSettings } from '@skeletonlabs/skeleton';
 import { fail } from '@sveltejs/kit';
+import type { InferInsertModel } from 'drizzle-orm';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms/server';
@@ -10,7 +12,7 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async (event) => {
 	const { parent } = event;
 	const data = await parent();
-	const clubSchema = await superValidate(zod(new_club_schema));
+	const clubSchema = await superValidate(zod(newClubSchema));
 
 	return { ...data, clubSchema };
 };
@@ -18,29 +20,32 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	create: async (event) => {
 		const { locals, request } = event;
-		const form = await superValidate(request, zod(new_club_schema));
+		const form = await superValidate(request, zod(newClubSchema));
 		let t: ToastSettings;
-		let new_club: club;
+		let newClub: InferInsertModel<typeof club>;
 		try {
-			new_club = await prisma.$transaction(async (db) => {
-				let club = await db.club.create({
-					data: {
-						...form.data
-					}
+			newClub = await db.transaction(async (ctx) => {
+				const [_club] = await ctx
+					.insert(club)
+					.values({
+						name: form.data.name,
+						description: form.data.description,
+						updatedAt: new Date(),
+						private: form.data.private
+					})
+					.returning();
+				await ctx.insert(clubMember).values({
+					clubId: _club.id,
+					userId: locals.user!.id,
+					status: 'ACCEPTED',
+					admin: true,
+					updatedAt: new Date()
 				});
-				await db.club_member.create({
-					data: {
-						club_id: club.id,
-						user_id: locals.user!.id,
-						status: FriendshipStatus.ACCEPTED,
-						admin: true
-					}
-				});
-				return club;
+				return _club;
 			});
 
 			t = {
-				message: `Successfully Created ${new_club.name}`,
+				message: `Successfully Created ${newClub.name}`,
 				background: 'variant-filled-success'
 			} as const;
 		} catch (e) {
@@ -51,6 +56,6 @@ export const actions: Actions = {
 			setFlash(t, event);
 			return fail(400, { form });
 		}
-		redirect(`/clubs/${new_club.id}`, t, event);
+		redirect(`/clubs/${newClub.id}`, t, event);
 	}
 };

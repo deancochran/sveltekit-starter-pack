@@ -1,22 +1,24 @@
 <script lang="ts">
+	import { invalidateAll } from '$app/navigation';
+	import Button from '$lib/components/Button.svelte';
+	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
 	import {
-		send_new_user_email_code_schema,
-		update_user_email_schema,
+		sendNewUserEmailCodeSchema,
+		updateUserEmailSchema,
 		type SendNewUserEmailCode,
 		type UpdateUserEmailSchema
 	} from '$lib/schemas';
-	import type { Infer, SuperValidated } from 'sveltekit-superforms';
-	import { superForm } from 'sveltekit-superforms/client';
 	import { focusTrap, Step, Stepper } from '@skeletonlabs/skeleton';
-	import LoadingIcon from '$lib/components/LoadingIcon.svelte';
-	import TextInput from './inputs/TextInput.svelte';
-	import EmailInput from './inputs/EmailInput.svelte';
-	import { invalidateAll } from '$app/navigation';
-	import Button from '$lib/components/Button.svelte';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
+	import { superForm } from 'sveltekit-superforms/client';
+	import EmailInput from './inputs/EmailInput.svelte';
+	import TextInput from './inputs/TextInput.svelte';
 
 	export let form_data: SuperValidated<Infer<UpdateUserEmailSchema>>;
-	export let send_new_user_email_code_form_data: SuperValidated<Infer<SendNewUserEmailCode>>;
+	export let send_new_user_email_code_form_data: SuperValidated<
+		Infer<SendNewUserEmailCode>
+	>;
 	$: successfullySentCode = false;
 	$: lock_verify_code = !successfullySentCode;
 
@@ -25,7 +27,7 @@
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: true,
-		validators: zod(update_user_email_schema),
+		validators: zod(updateUserEmailSchema),
 		delayMs: 0,
 		timeoutMs: 8000,
 		onResult(event) {
@@ -50,7 +52,7 @@
 		applyAction: true,
 		invalidateAll: true,
 		resetForm: false,
-		validators: zod(send_new_user_email_code_schema),
+		validators: zod(sendNewUserEmailCodeSchema),
 		delayMs: 0,
 		timeoutMs: 8000,
 		onResult(event) {

@@ -1,5 +1,11 @@
 <script lang="ts">
-	import { Dock, FileQuestion, Book, CreditCard, Settings } from 'lucide-svelte';
+	import {
+		Dock,
+		FileQuestion,
+		Book,
+		CreditCard,
+		Settings
+	} from 'lucide-svelte';
 	export let icon_name: string;
 
 	let component = handleIconName() as unknown as any;

@@ -41,7 +41,7 @@
 	class:duration-300={true}
 	{...$$props}
 	{...$$restProps}
-	class="{$$props.class} {classes}"
+	class="{$$props.class ?? ''} {classes}"
 >
 	<slot /></button
 >
